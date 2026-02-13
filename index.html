@@ -5,102 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Fertilizantes</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(180deg, #F5F5F7 0%, #E5E5E7 100%);
             padding: 10px;
             min-height: 100vh;
-            overflow-x: hidden;
         }
-
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            overflow-x: hidden;
-        }
-
-        .header-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
-
-        .header-card h1 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1D1D1F;
-            margin-bottom: 12px;
-        }
-
-        .header-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-        }
-
-        .input-field {
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        label {
-            font-size: 10px;
-            font-weight: 600;
-            color: #86868B;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        input, select {
-            padding: 10px;
-            border: 1px solid #D1D1D6;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.2s;
-            background: white;
-            width: 100%;
-            min-width: 0;
-        }
-
-        select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2386868B' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            padding-right: 32px;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #007AFF;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-        }
-
+        
+        .container { max-width: 100%; margin: 0 auto; }
+        
         .card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
-
-        .card h2 {
+        
+        h1 { font-size: 16px; font-weight: 600; color: #1D1D1F; margin-bottom: 12px; }
+        h2 {
             font-size: 13px;
             font-weight: 600;
             color: #1D1D1F;
@@ -110,708 +36,593 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
-        .nutrients-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+        
+        label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #86868B;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            display: block;
         }
-
+        
+        input, select {
+            padding: 10px;
+            border: 1px solid #D1D1D6;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            width: 100%;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #007AFF;
+            box-shadow: 0 0 0 3px rgba(0,122,255,0.1);
+        }
+        
+        .header-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .nutrients-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .fert-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 8px; }
+        .secondary-grid { display: none; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 8px; }
+        .secondary-grid.show { display: grid; }
+        
         .nutrient-badge {
             background: #F5F5F7;
             padding: 12px;
             border-radius: 10px;
             text-align: center;
             border: 2px solid #E5E5E7;
-            transition: all 0.2s;
         }
-
+        
         .nutrient-badge.primary {
             border-color: #007AFF;
-            background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0.05) 100%);
+            background: linear-gradient(135deg, rgba(0,122,255,0.1), rgba(0,122,255,0.05));
         }
-
+        
         .nutrient-badge.secondary {
             border-color: #34C759;
-            background: linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(52, 199, 89, 0.05) 100%);
+            background: linear-gradient(135deg, rgba(52,199,89,0.1), rgba(52,199,89,0.05));
         }
-
-        .nutrient-badge label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 11px;
-        }
-
+        
         .nutrient-badge input {
             text-align: center;
             font-size: 16px;
             font-weight: 600;
-            padding: 10px;
         }
-
-        .nutrient-priority {
-            font-size: 9px;
-            font-weight: 600;
-            margin-top: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .nutrient-badge.primary .nutrient-priority {
-            color: #007AFF;
-        }
-
-        .nutrient-badge.secondary .nutrient-priority {
-            color: #34C759;
-        }
-
-        .fertilizer-input-card {
+        
+        .priority { font-size: 9px; font-weight: 600; margin-top: 6px; text-transform: uppercase; }
+        .primary .priority { color: #007AFF; }
+        .secondary .priority { color: #34C759; }
+        
+        .input-card {
             background: #F5F5F7;
             border: 2px solid #E5E5E7;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
         }
-
-        .fert-name-row {
-            margin-bottom: 12px;
-        }
-
-        .fert-name-row input {
-            font-size: 15px;
-            font-weight: 600;
-            padding: 12px;
-        }
-
-        .fert-nutrients-row {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .expand-secondary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .expand-secondary {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #007AFF;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .expand-secondary:hover {
-            background: rgba(0, 122, 255, 0.1);
-        }
-
-        .expand-icon {
-            transition: transform 0.3s;
-            font-size: 16px;
-        }
-
-        .expand-icon.expanded {
-            transform: rotate(180deg);
-        }
-
-        .toggle-visibility {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #86868B;
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            padding: 6px 10px;
-            border-radius: 6px;
-            transition: all 0.2s;
-            background: white;
-        }
-
-        .toggle-visibility:hover {
-            background: #E5E5E7;
-            color: #1D1D1F;
-        }
-
-        .toggle-icon {
-            font-size: 14px;
-        }
-
-        .secondary-nutrients {
-            display: none;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .secondary-nutrients.show {
-            display: grid;
-        }
-
-        .fertilizer-list-item {
+        
+        .fert-item {
             background: #F5F5F7;
             padding: 14px;
             border-radius: 12px;
             margin-bottom: 10px;
             border: 2px solid #E5E5E7;
         }
-
+        
+        .fert-item.excluded { border-color: #FF3B30; background: rgba(255,59,48,0.05); }
+        
         .fert-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
-
-        .fert-name {
-            font-weight: 600;
-            color: #1D1D1F;
-            font-size: 15px;
-        }
-
-        .fert-formula {
-            font-size: 12px;
-            color: #86868B;
-            font-weight: 500;
-        }
-
-        .btn-remove-icon {
+        
+        .fert-name { font-weight: 600; color: #1D1D1F; font-size: 15px; }
+        .fert-formula { font-size: 12px; color: #86868B; }
+        
+        .fert-actions { display: flex; gap: 6px; }
+        
+        .btn-icon {
             width: 28px;
             height: 28px;
             border-radius: 6px;
-            background: #FF3B30;
             color: white;
             border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            font-weight: 300;
+            font-size: 16px;
             transition: all 0.2s;
         }
-
-        .btn-remove-icon:hover {
-            background: #e53329;
-            transform: scale(1.1);
-        }
-
-        .fert-values {
+        
+        .btn-edit { background: #007AFF; }
+        .btn-edit:hover { background: #0051D5; transform: scale(1.1); }
+        .btn-remove { background: #FF3B30; font-weight: 300; }
+        .btn-remove:hover { background: #e53329; transform: scale(1.1); }
+        
+        .values-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
             margin-bottom: 8px;
         }
-
-        .fert-value-item {
-            text-align: center;
-        }
-
-        .fert-value-label {
-            font-size: 9px;
-            color: #86868B;
-            text-transform: uppercase;
-            margin-bottom: 2px;
-        }
-
-        .fert-value {
-            font-size: 13px;
-            font-weight: 600;
-            color: #1D1D1F;
-        }
-
-        .fert-prices {
+        
+        .value-item { text-align: center; }
+        .value-label { font-size: 9px; color: #86868B; text-transform: uppercase; margin-bottom: 2px; }
+        .value { font-size: 13px; font-weight: 600; color: #1D1D1F; }
+        
+        .prices-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
         }
-
-        .fert-price-item {
+        
+        .price-item {
             background: white;
             padding: 8px;
             border-radius: 6px;
             text-align: center;
         }
-
+        
         button {
-            padding: 12px 18px;
+            padding: 12px;
             border: none;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-            color: white;
             width: 100%;
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            transition: all 0.2s;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #007AFF, #0051D5);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
         }
-
-        .btn-add {
+        
+        .btn-add, .btn-save {
             background: #34C759;
             color: white;
-            padding: 12px;
-            font-size: 15px;
-            line-height: 1;
-            width: 100%;
         }
-
-        .btn-add:hover {
-            background: #2fb350;
-            transform: translateY(-1px);
+        
+        .btn-cancel {
+            background: #86868B;
+            color: white;
+            margin-top: 8px;
         }
-
-        .result-card {
-            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+        
+        .toggle-expand {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #007AFF;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        
+        .toggle-expand:hover { background: rgba(0,122,255,0.1); }
+        .expand-icon { transition: transform 0.3s; }
+        .expand-icon.open { transform: rotate(180deg); }
+        
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 2px solid #E5E5E7;
+            cursor: pointer;
+        }
+        
+        .checkbox-row:hover { border-color: #FF3B30; }
+        .checkbox-row input { width: 18px; height: 18px; cursor: pointer; }
+        .checkbox-row label { cursor: pointer; color: #FF3B30; font-weight: 600; font-size: 12px; text-transform: none; }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        
+        .badge-best { background: #34C759; color: white; }
+        .badge-excluded { background: #FF3B30; color: white; padding: 2px 6px; border-radius: 8px; font-size: 9px; }
+        
+        .result {
             padding: 16px;
             border-radius: 12px;
             margin-bottom: 12px;
             border: 2px solid #81C784;
         }
-
-        .result-card.secondary-option {
-            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+        
+        .result.best {
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+        }
+        
+        .result.second {
+            background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
             border-color: #FFB74D;
         }
-
-        .result-card h3 {
+        
+        .result h3 {
             font-size: 15px;
             color: #2E7D32;
             margin-bottom: 10px;
             font-weight: 600;
         }
-
-        .result-card.secondary-option h3 {
-            color: #E65100;
-        }
-
+        
+        .result.second h3 { color: #E65100; }
+        
         .result-row {
             display: flex;
             justify-content: space-between;
             padding: 6px 0;
-            border-bottom: 1px solid rgba(46, 125, 50, 0.2);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
             font-size: 13px;
         }
-
-        .result-row:last-child {
-            border-bottom: none;
+        
+        .result-total {
             font-weight: 600;
             font-size: 16px;
-            color: #1B5E20;
             margin-top: 8px;
             padding-top: 12px;
             border-top: 2px solid #2E7D32;
+            display: flex;
+            justify-content: space-between;
         }
-
-        .grain-calc {
-            background: rgba(0, 122, 255, 0.08);
-            border: 1px solid rgba(0, 122, 255, 0.3);
+        
+        .grain-info {
+            background: rgba(0,122,255,0.08);
+            border: 1px solid rgba(0,122,255,0.3);
             padding: 12px;
             border-radius: 8px;
             margin-top: 10px;
             font-size: 12px;
         }
-
-        .grain-calc-row {
+        
+        .grain-row {
             display: flex;
             justify-content: space-between;
             padding: 4px 0;
         }
-
-        .grain-calc-value {
-            font-weight: 600;
-            color: #007AFF;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 24px;
-            color: #86868B;
-            font-size: 13px;
-        }
-
-        .best-badge {
-            display: inline-block;
-            background: #34C759;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
-            margin-left: 6px;
-            text-transform: uppercase;
-        }
-
-        .combo-badge {
-            display: inline-block;
-            background: #007AFF;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
-            margin-left: 6px;
-            text-transform: uppercase;
-        }
-
-        .save-indicator {
+        
+        .grain-value { font-weight: 600; color: #007AFF; }
+        
+        .empty { text-align: center; padding: 24px; color: #86868B; font-size: 13px; }
+        
+        .save-badge {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: rgba(52, 199, 89, 0.95);
+            background: rgba(52,199,89,0.95);
             color: white;
             padding: 10px 16px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
             opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-            pointer-events: none;
-            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4);
+            transition: opacity 0.3s;
         }
-
-        .save-indicator.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+        
+        .save-badge.show { opacity: 1; }
+        
         @media (max-width: 768px) {
-            .header-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .nutrients-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .fert-nutrients-row {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .fert-values {
-                grid-template-columns: repeat(3, 1fr);
-            }
+            .header-grid, .nutrients-grid { grid-template-columns: 1fr; }
+            .fert-row { grid-template-columns: repeat(3, 1fr); }
+            .values-grid { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Cabeçalho -->
-        <div class="header-card">
+        <div class="card">
             <h1>🌾 Calculadora de Fertilizantes</h1>
-            
             <div class="header-grid">
-                <div class="input-field">
+                <div>
                     <label>Cultura</label>
                     <select id="crop" onchange="changeCrop()">
                         <option value="soja">🌱 Soja</option>
                         <option value="milho">🌽 Milho</option>
                     </select>
                 </div>
-                <div class="input-field">
+                <div>
                     <label>Área (ha)</label>
-                    <input type="number" id="area" placeholder="100" step="0.1" value="100" oninput="autoSave()">
+                    <input type="number" id="area" value="100" step="0.1" oninput="save()">
                 </div>
-                <div class="input-field">
+                <div>
                     <label id="grainLabel">Soja (R$/sc)</label>
-                    <input type="number" id="grainPrice" placeholder="120" step="0.1" value="120" oninput="autoSave()">
+                    <input type="number" id="grainPrice" value="120" step="0.1" oninput="save()">
                 </div>
             </div>
         </div>
 
-        <!-- Necessidades -->
         <div class="card">
             <h2>🎯 Necessidades (kg/ha)</h2>
-            <div class="nutrients-grid" id="nutrientsGrid"></div>
+            <div class="nutrients-grid" id="nutrients"></div>
         </div>
 
-        <!-- Cadastro -->
         <div class="card">
             <h2>📋 Fertilizantes</h2>
             
-            <div class="fertilizer-input-card">
-                <div class="fert-name-row">
-                    <div class="input-field">
-                        <label>Nome</label>
-                        <input type="text" id="fertName" placeholder="Ex: MAP, KCl, Ureia">
-                    </div>
+            <div class="input-card">
+                <div style="margin-bottom: 12px;">
+                    <label>Nome</label>
+                    <input type="text" id="name" placeholder="Ex: MAP, KCl, Ureia">
                 </div>
 
-                <div class="fert-nutrients-row">
-                    <div class="input-field">
-                        <label>N (%)</label>
-                        <input type="number" id="fertN" placeholder="10" step="0.1" value="0">
-                    </div>
-                    <div class="input-field">
-                        <label>P₂O₅ (%)</label>
-                        <input type="number" id="fertP" placeholder="52" step="0.1" value="0">
-                    </div>
-                    <div class="input-field">
-                        <label>K₂O (%)</label>
-                        <input type="number" id="fertK" placeholder="60" step="0.1" value="0">
-                    </div>
-                    <div class="input-field">
-                        <label>Preço (R$/ton)</label>
-                        <input type="number" id="fertPrice" placeholder="3500" step="10">
-                    </div>
-                    <div class="input-field">
-                        <label>Frete (R$/ton)</label>
-                        <input type="number" id="fertFreight" placeholder="300" step="10">
-                    </div>
+                <div class="fert-row">
+                    <div><label>N (%)</label><input type="number" id="n" value="0" step="0.1"></div>
+                    <div><label>P₂O₅ (%)</label><input type="number" id="p" value="0" step="0.1"></div>
+                    <div><label>K₂O (%)</label><input type="number" id="k" value="0" step="0.1"></div>
+                    <div><label>Preço (R$/ton)</label><input type="number" id="price" step="10"></div>
+                    <div><label>Frete (R$/ton)</label><input type="number" id="freight" value="0" step="10"></div>
                 </div>
 
-                <div class="expand-secondary-row">
-                    <div class="expand-secondary" onclick="toggleSecondary()">
-                        <span class="expand-icon" id="expandIcon">▲</span>
-                        <span>Ca, S, B e outros</span>
-                    </div>
-                    <div class="toggle-visibility" onclick="toggleInputVisibility()" id="toggleBtn" style="display: none;">
-                        <span class="toggle-icon" id="toggleIcon">👁</span>
-                        <span id="toggleText">Ocultar</span>
-                    </div>
+                <div class="toggle-expand" onclick="toggleSecondary()">
+                    <span class="expand-icon" id="icon">▲</span>
+                    <span>Ca, S, B e outros</span>
                 </div>
 
-                <div class="secondary-nutrients" id="secondaryNutrients">
-                    <div class="input-field">
-                        <label>Ca (Cálcio) %</label>
-                        <input type="number" id="fertCa" placeholder="0" step="0.1" value="0">
-                    </div>
-                    <div class="input-field">
-                        <label>S (Enxofre) %</label>
-                        <input type="number" id="fertS" placeholder="0" step="0.1" value="0">
-                    </div>
-                    <div class="input-field">
-                        <label>B (Boro) %</label>
-                        <input type="number" id="fertB" placeholder="0" step="0.01" value="0">
-                    </div>
-                    <div class="input-field">
-                        <label>Outros %</label>
-                        <input type="number" id="fertOther" placeholder="0" step="0.1" value="0">
-                    </div>
+                <div class="secondary-grid" id="secondary">
+                    <div><label>Ca %</label><input type="number" id="ca" value="0" step="0.1"></div>
+                    <div><label>S %</label><input type="number" id="s" value="0" step="0.1"></div>
+                    <div><label>B %</label><input type="number" id="b" value="0" step="0.01"></div>
+                    <div><label>Outros %</label><input type="number" id="other" value="0" step="0.1"></div>
                 </div>
 
-                <button class="btn-add" onclick="addFertilizer()">+ Adicionar</button>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="exclude">
+                    <label for="exclude">🚫 Excluir de combinações (tem P+K)</label>
+                </div>
+
+                <button class="btn-add" id="addBtn" onclick="add()">+ Adicionar</button>
+                <button class="btn-save" id="saveBtn" onclick="saveEdit()" style="display:none;">💾 Salvar</button>
+                <button class="btn-cancel" id="cancelBtn" onclick="cancel()" style="display:none;">Cancelar</button>
             </div>
             
-            <div id="fertilizerList"></div>
+            <div id="list"></div>
         </div>
 
-        <button class="btn-primary" onclick="calculate()">💰 Calcular</button>
-
-        <div id="resultsContainer"></div>
+        <button class="btn-primary" onclick="calculate()">💰 Calcular Melhores Combinações</button>
+        <div id="results"></div>
     </div>
 
-    <div class="save-indicator" id="saveIndicator">✓ Salvo</div>
+    <div class="save-badge" id="saveBadge">✓ Salvo</div>
 
     <script>
-        let currentCrop = 'soja';
-        let fertilizers = [];
-        let saveTimeout;
-        let secondaryExpanded = false;
-        let secondaryVisible = true;
+        let crop = 'soja';
+        let ferts = [];
+        let editing = -1;
 
-        const cropConfig = {
+        const config = {
             soja: {
                 label: 'Soja',
                 nutrients: [
-                    { id: 'P', label: 'P₂O₅', priority: 'primary', priorityText: '1ª', default: 90 },
-                    { id: 'K', label: 'K₂O', priority: 'secondary', priorityText: '2ª', default: 120 },
-                    { id: 'N', label: 'N', priority: null, priorityText: '-', default: 0, disabled: true }
+                    { id: 'P', label: 'P₂O₅', priority: 'primary', text: '1ª', val: 90 },
+                    { id: 'K', label: 'K₂O', priority: 'secondary', text: '2ª', val: 120 },
+                    { id: 'N', label: 'N', priority: null, text: '-', val: 0, disabled: true }
                 ]
             },
             milho: {
                 label: 'Milho',
                 nutrients: [
-                    { id: 'N', label: 'N', priority: 'primary', priorityText: '1ª', default: 120 },
-                    { id: 'K', label: 'K₂O', priority: 'secondary', priorityText: '2ª', default: 100 },
-                    { id: 'P', label: 'P₂O₅', priority: null, priorityText: '3ª', default: 80 }
+                    { id: 'N', label: 'N', priority: 'primary', text: '1ª', val: 120 },
+                    { id: 'K', label: 'K₂O', priority: 'secondary', text: '2ª', val: 100 },
+                    { id: 'P', label: 'P₂O₅', priority: null, text: '3ª', val: 80 }
                 ]
             }
         };
 
         function toggleSecondary() {
-            secondaryExpanded = !secondaryExpanded;
-            const container = document.getElementById('secondaryNutrients');
-            const icon = document.getElementById('expandIcon');
-            const toggleBtn = document.getElementById('toggleBtn');
-            
-            if (secondaryExpanded) {
-                container.classList.add('show');
-                icon.classList.add('expanded');
-                toggleBtn.style.display = 'flex';
+            const el = document.getElementById('secondary');
+            const icon = document.getElementById('icon');
+            if (el.classList.contains('show')) {
+                el.classList.remove('show');
+                icon.classList.remove('open');
             } else {
-                container.classList.remove('show');
-                icon.classList.remove('expanded');
-                toggleBtn.style.display = 'none';
+                el.classList.add('show');
+                icon.classList.add('open');
             }
         }
 
-        function toggleInputVisibility() {
-            secondaryVisible = !secondaryVisible;
-            const container = document.getElementById('secondaryNutrients');
-            const icon = document.getElementById('toggleIcon');
-            const text = document.getElementById('toggleText');
-            
-            if (secondaryVisible) {
-                container.style.display = 'grid';
-                icon.textContent = '👁';
-                text.textContent = 'Ocultar';
-            } else {
-                container.style.display = 'none';
-                icon.textContent = '👁‍🗨';
-                text.textContent = 'Mostrar';
-            }
-        }
-
-        function autoSave() {
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(() => {
-                saveData();
-                showSaveIndicator();
-            }, 500);
-        }
-
-        function saveData() {
-            const data = {
-                crop: currentCrop,
+        function save() {
+            localStorage.setItem('fertCalc', JSON.stringify({
+                crop,
                 area: document.getElementById('area').value,
-                grainPrice: document.getElementById('grainPrice').value,
-                nutrients: {
+                price: document.getElementById('grainPrice').value,
+                needs: {
                     N: document.getElementById('needN')?.value || 0,
                     P: document.getElementById('needP')?.value || 0,
                     K: document.getElementById('needK')?.value || 0
                 },
-                fertilizers: fertilizers
-            };
-            localStorage.setItem('fertilizerCalc', JSON.stringify(data));
+                ferts
+            }));
+            const badge = document.getElementById('saveBadge');
+            badge.classList.add('show');
+            setTimeout(() => badge.classList.remove('show'), 2000);
         }
 
-        function loadData() {
-            const saved = localStorage.getItem('fertilizerCalc');
-            if (saved) {
+        function load() {
+            const data = localStorage.getItem('fertCalc');
+            if (data) {
                 try {
-                    const data = JSON.parse(saved);
-                    currentCrop = data.crop || 'soja';
-                    document.getElementById('crop').value = currentCrop;
-                    if (data.area) document.getElementById('area').value = data.area;
-                    if (data.grainPrice) document.getElementById('grainPrice').value = data.grainPrice;
-                    if (data.fertilizers) fertilizers = data.fertilizers;
+                    const d = JSON.parse(data);
+                    crop = d.crop || 'soja';
+                    document.getElementById('crop').value = crop;
+                    if (d.area) document.getElementById('area').value = d.area;
+                    if (d.price) document.getElementById('grainPrice').value = d.price;
+                    if (d.ferts) ferts = d.ferts;
                     changeCrop();
                     setTimeout(() => {
-                        if (data.nutrients) {
-                            if (document.getElementById('needN')) document.getElementById('needN').value = data.nutrients.N || 0;
-                            if (document.getElementById('needP')) document.getElementById('needP').value = data.nutrients.P || 0;
-                            if (document.getElementById('needK')) document.getElementById('needK').value = data.nutrients.K || 0;
+                        if (d.needs) {
+                            if (document.getElementById('needN')) document.getElementById('needN').value = d.needs.N;
+                            if (document.getElementById('needP')) document.getElementById('needP').value = d.needs.P;
+                            if (document.getElementById('needK')) document.getElementById('needK').value = d.needs.K;
                         }
                     }, 100);
-                } catch (e) {
-                    console.error('Erro:', e);
-                }
+                } catch(e) {}
             }
         }
 
-        function showSaveIndicator() {
-            const indicator = document.getElementById('saveIndicator');
-            indicator.classList.add('show');
-            setTimeout(() => indicator.classList.remove('show'), 2000);
-        }
-
         function changeCrop() {
-            currentCrop = document.getElementById('crop').value;
-            document.getElementById('grainLabel').textContent = cropConfig[currentCrop].label + ' (R$/sc)';
+            crop = document.getElementById('crop').value;
+            document.getElementById('grainLabel').textContent = config[crop].label + ' (R$/sc)';
             renderNutrients();
-            autoSave();
+            save();
         }
 
         function renderNutrients() {
-            const config = cropConfig[currentCrop];
-            const grid = document.getElementById('nutrientsGrid');
-            grid.innerHTML = config.nutrients.map(n => `
+            const c = config[crop];
+            document.getElementById('nutrients').innerHTML = c.nutrients.map(n => `
                 <div class="nutrient-badge ${n.priority || ''}">
                     <label>${n.label}</label>
-                    <input type="number" id="need${n.id}" value="${n.default}" ${n.disabled ? 'disabled' : ''} placeholder="0" step="1" oninput="autoSave()" style="${n.disabled ? 'background: #F5F5F7; color: #C7C7CC;' : ''}">
-                    <div class="nutrient-priority">${n.priorityText}</div>
+                    <input type="number" id="need${n.id}" value="${n.val}" ${n.disabled ? 'disabled' : ''} step="1" oninput="save()" style="${n.disabled ? 'background:#F5F5F7;color:#C7C7CC' : ''}">
+                    <div class="priority">${n.text}</div>
                 </div>
             `).join('');
         }
 
-        function addFertilizer() {
-            const name = document.getElementById('fertName').value.trim();
-            const n = parseFloat(document.getElementById('fertN').value) || 0;
-            const p = parseFloat(document.getElementById('fertP').value) || 0;
-            const k = parseFloat(document.getElementById('fertK').value) || 0;
-            const ca = parseFloat(document.getElementById('fertCa').value) || 0;
-            const s = parseFloat(document.getElementById('fertS').value) || 0;
-            const b = parseFloat(document.getElementById('fertB').value) || 0;
-            const other = parseFloat(document.getElementById('fertOther').value) || 0;
-            const price = parseFloat(document.getElementById('fertPrice').value) || 0;
-            const freight = parseFloat(document.getElementById('fertFreight').value) || 0;
+        function clear() {
+            document.getElementById('name').value = '';
+            ['n','p','k','ca','s','b','other'].forEach(id => document.getElementById(id).value = '0');
+            document.getElementById('price').value = '';
+            document.getElementById('freight').value = '0';
+            document.getElementById('exclude').checked = false;
+            editing = -1;
+            document.getElementById('addBtn').style.display = 'block';
+            document.getElementById('saveBtn').style.display = 'none';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
 
-            if (!name || (n === 0 && p === 0 && k === 0) || price === 0 || freight === 0) {
-                alert('Preencha nome, nutriente, preço e frete!');
+        function add() {
+            const name = document.getElementById('name').value.trim();
+            const n = parseFloat(document.getElementById('n').value) || 0;
+            const p = parseFloat(document.getElementById('p').value) || 0;
+            const k = parseFloat(document.getElementById('k').value) || 0;
+            const ca = parseFloat(document.getElementById('ca').value) || 0;
+            const s = parseFloat(document.getElementById('s').value) || 0;
+            const b = parseFloat(document.getElementById('b').value) || 0;
+            const other = parseFloat(document.getElementById('other').value) || 0;
+            const price = parseFloat(document.getElementById('price').value) || 0;
+            const freight = parseFloat(document.getElementById('freight').value) || 0;
+            const exclude = document.getElementById('exclude').checked;
+
+            if (!name || (n === 0 && p === 0 && k === 0) || price === 0) {
+                alert('Preencha nome, nutriente e preço!');
                 return;
             }
 
-            fertilizers.push({ name, n, p, k, ca, s, b, other, price, freight });
-
-            document.getElementById('fertName').value = '';
-            ['fertN', 'fertP', 'fertK', 'fertCa', 'fertS', 'fertB', 'fertOther'].forEach(id => document.getElementById(id).value = '0');
-            document.getElementById('fertPrice').value = '';
-            document.getElementById('fertFreight').value = '';
-
-            renderFertilizers();
-            autoSave();
+            ferts.push({ name, n, p, k, ca, s, b, other, price, freight, exclude });
+            clear();
+            render();
+            save();
         }
 
-        function removeFertilizer(index) {
-            fertilizers.splice(index, 1);
-            renderFertilizers();
-            autoSave();
+        function edit(i) {
+            editing = i;
+            const f = ferts[i];
+            
+            document.getElementById('name').value = f.name;
+            document.getElementById('n').value = f.n;
+            document.getElementById('p').value = f.p;
+            document.getElementById('k').value = f.k;
+            document.getElementById('ca').value = f.ca || 0;
+            document.getElementById('s').value = f.s || 0;
+            document.getElementById('b').value = f.b || 0;
+            document.getElementById('other').value = f.other || 0;
+            document.getElementById('price').value = f.price;
+            document.getElementById('freight').value = f.freight;
+            document.getElementById('exclude').checked = f.exclude || false;
+
+            document.getElementById('addBtn').style.display = 'none';
+            document.getElementById('saveBtn').style.display = 'block';
+            document.getElementById('cancelBtn').style.display = 'block';
+
+            document.getElementById('name').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function renderFertilizers() {
-            const list = document.getElementById('fertilizerList');
-            if (fertilizers.length === 0) {
-                list.innerHTML = '<div class="empty-state">Nenhum fertilizante</div>';
+        function saveEdit() {
+            if (editing === -1) return;
+
+            const name = document.getElementById('name').value.trim();
+            const n = parseFloat(document.getElementById('n').value) || 0;
+            const p = parseFloat(document.getElementById('p').value) || 0;
+            const k = parseFloat(document.getElementById('k').value) || 0;
+            const ca = parseFloat(document.getElementById('ca').value) || 0;
+            const s = parseFloat(document.getElementById('s').value) || 0;
+            const b = parseFloat(document.getElementById('b').value) || 0;
+            const other = parseFloat(document.getElementById('other').value) || 0;
+            const price = parseFloat(document.getElementById('price').value) || 0;
+            const freight = parseFloat(document.getElementById('freight').value) || 0;
+            const exclude = document.getElementById('exclude').checked;
+
+            if (!name || (n === 0 && p === 0 && k === 0) || price === 0) {
+                alert('Preencha nome, nutriente e preço!');
                 return;
             }
-            list.innerHTML = fertilizers.map((f, i) => `
-                <div class="fertilizer-list-item">
+
+            ferts[editing] = { name, n, p, k, ca, s, b, other, price, freight, exclude };
+            clear();
+            render();
+            save();
+        }
+
+        function cancel() {
+            clear();
+        }
+
+        function remove(i) {
+            if (confirm('Remover fertilizante?')) {
+                ferts.splice(i, 1);
+                render();
+                save();
+            }
+        }
+
+        function render() {
+            const list = document.getElementById('list');
+            if (ferts.length === 0) {
+                list.innerHTML = '<div class="empty">Nenhum fertilizante</div>';
+                return;
+            }
+            list.innerHTML = ferts.map((f, i) => `
+                <div class="fert-item ${f.exclude ? 'excluded' : ''}">
                     <div class="fert-header">
                         <div>
-                            <div class="fert-name">${f.name}</div>
+                            <div class="fert-name">
+                                ${f.name}
+                                ${f.exclude ? '<span class="badge-excluded">P+K</span>' : ''}
+                            </div>
                             <div class="fert-formula">${f.n}-${f.p}-${f.k}</div>
                         </div>
-                        <button class="btn-remove-icon" onclick="removeFertilizer(${i})">×</button>
+                        <div class="fert-actions">
+                            <button class="btn-icon btn-edit" onclick="edit(${i})">✏️</button>
+                            <button class="btn-icon btn-remove" onclick="remove(${i})">×</button>
+                        </div>
                     </div>
-                    <div class="fert-values">
-                        <div class="fert-value-item"><div class="fert-value-label">N</div><div class="fert-value">${f.n.toFixed(1)}%</div></div>
-                        <div class="fert-value-item"><div class="fert-value-label">P₂O₅</div><div class="fert-value">${f.p.toFixed(1)}%</div></div>
-                        <div class="fert-value-item"><div class="fert-value-label">K₂O</div><div class="fert-value">${f.k.toFixed(1)}%</div></div>
-                        <div class="fert-value-item"><div class="fert-value-label">Ca</div><div class="fert-value">${f.ca.toFixed(1)}%</div></div>
-                        <div class="fert-value-item"><div class="fert-value-label">S</div><div class="fert-value">${f.s.toFixed(1)}%</div></div>
+                    <div class="values-grid">
+                        <div class="value-item"><div class="value-label">N</div><div class="value">${f.n.toFixed(1)}%</div></div>
+                        <div class="value-item"><div class="value-label">P₂O₅</div><div class="value">${f.p.toFixed(1)}%</div></div>
+                        <div class="value-item"><div class="value-label">K₂O</div><div class="value">${f.k.toFixed(1)}%</div></div>
+                        <div class="value-item"><div class="value-label">Ca</div><div class="value">${f.ca.toFixed(1)}%</div></div>
+                        <div class="value-item"><div class="value-label">S</div><div class="value">${f.s.toFixed(1)}%</div></div>
                     </div>
-                    <div class="fert-prices">
-                        <div class="fert-price-item"><div class="fert-value-label">Preço</div><div class="fert-value">R$ ${f.price.toFixed(0)}/ton</div></div>
-                        <div class="fert-price-item"><div class="fert-value-label">Frete</div><div class="fert-value">R$ ${f.freight.toFixed(0)}/ton</div></div>
+                    <div class="prices-grid">
+                        <div class="price-item"><div class="value-label">Preço</div><div class="value">R$ ${f.price.toFixed(0)}/ton</div></div>
+                        <div class="price-item"><div class="value-label">Frete</div><div class="value">R$ ${f.freight.toFixed(0)}/ton</div></div>
                     </div>
                 </div>
             `).join('');
@@ -824,65 +635,50 @@
             const needP = parseFloat(document.getElementById('needP').value) || 0;
             const needK = parseFloat(document.getElementById('needK').value) || 0;
 
-            if (area === 0 || grainPrice === 0 || fertilizers.length === 0 || (needN === 0 && needP === 0 && needK === 0)) {
-                alert('Preencha todos os campos!');
+            if (area === 0 || grainPrice === 0 || ferts.length === 0) {
+                alert('Preencha área, preço do grão e cadastre fertilizantes!');
                 return;
             }
 
-            // Cálculo individual
-            const singleResults = calculateSingleFertilizers(needN, needP, needK, area, grainPrice);
-            
-            // Cálculo combinado (2 fertilizantes)
-            const comboResults = calculateCombinations(needN, needP, needK, area, grainPrice);
-
-            displayResults(singleResults, comboResults, area, grainPrice);
-        }
-
-        function calculateSingleFertilizers(needN, needP, needK, area, grainPrice) {
-            const results = [];
-            fertilizers.forEach(fert => {
-                let kgPerHa = 0;
-                if (needN > 0 && fert.n > 0) kgPerHa = Math.max(kgPerHa, (needN * 100) / fert.n);
-                if (needP > 0 && fert.p > 0) kgPerHa = Math.max(kgPerHa, (needP * 100) / fert.p);
-                if (needK > 0 && fert.k > 0) kgPerHa = Math.max(kgPerHa, (needK * 100) / fert.k);
-                if (kgPerHa > 0) {
-                    const totalTon = (kgPerHa / 1000) * area;
-                    const totalCost = totalTon * (fert.price + fert.freight);
-                    const costPerHa = totalCost / area;
-                    results.push({
-                        name: fert.name,
-                        formula: `${fert.n}-${fert.p}-${fert.k}`,
-                        kgPerHa,
-                        totalTon,
-                        totalCost,
-                        costPerHa,
-                        sacasPerHa: costPerHa / grainPrice
-                    });
-                }
-            });
-            return results.sort((a, b) => a.totalCost - b.totalCost);
-        }
-
-        function calculateCombinations(needN, needP, needK, area, grainPrice) {
             const combos = [];
-            for (let i = 0; i < fertilizers.length; i++) {
-                for (let j = i + 1; j < fertilizers.length; j++) {
-                    const f1 = fertilizers[i];
-                    const f2 = fertilizers[j];
+            const valid = ferts.filter(f => !f.exclude);
+            
+            for (let i = 0; i < valid.length; i++) {
+                for (let j = i + 1; j < valid.length; j++) {
+                    const f1 = valid[i];
+                    const f2 = valid[j];
                     
-                    // Calcular dosagens para cada fertilizante
                     let dose1 = 0, dose2 = 0;
                     
-                    // Prioridade: P > K > N (para soja)
+                    // P primeiro
                     if (needP > 0) {
-                        if (f1.p > f2.p) dose1 = (needP * 100) / f1.p;
-                        else dose2 = (needP * 100) / f2.p;
+                        if (f1.p > 0 && f2.p === 0) dose1 = (needP * 100) / f1.p;
+                        else if (f2.p > 0 && f1.p === 0) dose2 = (needP * 100) / f2.p;
+                        else if (f1.p > f2.p) dose1 = (needP * 100) / f1.p;
+                        else if (f2.p > 0) dose2 = (needP * 100) / f2.p;
                     }
-                    if (needK > 0) {
-                        const k1Need = Math.max(0, needK - (dose1 * f1.k / 100));
-                        const k2Need = Math.max(0, needK - (dose2 * f2.k / 100));
-                        if (k1Need > 0 && f1.k > 0) dose1 = Math.max(dose1, (k1Need * 100) / f1.k);
-                        if (k2Need > 0 && f2.k > 0) dose2 = Math.max(dose2, (k2Need * 100) / f2.k);
+                    
+                    // K depois
+                    const kGot1 = (dose1 * f1.k) / 100;
+                    const kGot2 = (dose2 * f2.k) / 100;
+                    const kNeed = Math.max(0, needK - kGot1 - kGot2);
+                    
+                    if (kNeed > 0) {
+                        if (f1.k > 0 && (dose1 === 0 || f1.p === 0)) {
+                            dose1 = Math.max(dose1, (kNeed * 100) / f1.k);
+                        } else if (f2.k > 0 && (dose2 === 0 || f2.p === 0)) {
+                            dose2 = Math.max(dose2, (kNeed * 100) / f2.k);
+                        }
+                    }
+                    
+                    // N depois
+                    const nGot1 = (dose1 * f1.n) / 100;
+                    const nGot2 = (dose2 * f2.n) / 100;
+                    const nNeed = Math.max(0, needN - nGot1 - nGot2);
+                    
+                    if (nNeed > 0) {
+                        if (f1.n > 0 && dose1 === 0) dose1 = (nNeed * 100) / f1.n;
+                        else if (f2.n > 0 && dose2 === 0) dose2 = (nNeed * 100) / f2.n;
                     }
                     
                     if (dose1 > 0 || dose2 > 0) {
@@ -890,81 +686,81 @@
                         const ton2 = (dose2 / 1000) * area;
                         const cost1 = ton1 * (f1.price + f1.freight);
                         const cost2 = ton2 * (f2.price + f2.freight);
-                        const totalCost = cost1 + cost2;
-                        const costPerHa = totalCost / area;
+                        const total = cost1 + cost2;
                         
                         combos.push({
                             name: `${f1.name} + ${f2.name}`,
-                            fert1: { name: f1.name, dose: dose1, ton: ton1, cost: cost1 },
-                            fert2: { name: f2.name, dose: dose2, ton: ton2, cost: cost2 },
-                            totalCost,
-                            costPerHa,
-                            sacasPerHa: costPerHa / grainPrice
+                            f1: { name: f1.name, dose: dose1, ton: ton1, cost: cost1 },
+                            f2: { name: f2.name, dose: dose2, ton: ton2, cost: cost2 },
+                            total,
+                            perHa: total / area,
+                            sacks: (total / area) / grainPrice
                         });
                     }
                 }
             }
-            return combos.sort((a, b) => a.totalCost - b.totalCost);
+            
+            if (combos.length === 0) {
+                alert('Nenhuma combinação possível!');
+                return;
+            }
+            
+            combos.sort((a, b) => a.total - b.total);
+            showResults(combos, grainPrice);
         }
 
-        function displayResults(singles, combos, area, grainPrice) {
-            const container = document.getElementById('resultsContainer');
-            const cropName = cropConfig[currentCrop].label;
+        function showResults(combos, grainPrice) {
+            const res = document.getElementById('results');
+            const cropName = config[crop].label;
             
             let html = '';
             
-            // Melhor individual
-            if (singles.length > 0) {
-                const best = singles[0];
+            // Melhor
+            if (combos[0]) {
+                const c = combos[0];
                 html += `
-                    <div class="result-card">
-                        <h3>✅ ${best.name} (${best.formula}) <span class="best-badge">Individual</span></h3>
-                        <div class="result-row"><span>Dose/ha:</span><strong>${best.kgPerHa.toFixed(1)} kg</strong></div>
-                        <div class="result-row"><span>Total:</span><strong>${best.totalTon.toFixed(2)} ton</strong></div>
-                        <div class="result-row"><span>CUSTO:</span><strong>R$ ${best.totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></div>
-                        <div class="grain-calc">
-                            <div class="grain-calc-row"><span>R$/ha:</span><span class="grain-calc-value">${best.costPerHa.toFixed(2)}</span></div>
-                            <div class="grain-calc-row"><span>Sacas:</span><span class="grain-calc-value">${best.sacasPerHa.toFixed(2)} sc/ha</span></div>
+                    <div class="result best">
+                        <h3>🥇 ${c.name} <span class="badge badge-best">Melhor</span></h3>
+                        <div class="result-row"><span>${c.f1.name}:</span><strong>${c.f1.dose.toFixed(1)} kg/ha</strong></div>
+                        <div class="result-row"><span>Total:</span><strong>${c.f1.ton.toFixed(2)} ton</strong></div>
+                        <div class="result-row"><span>Custo:</span><strong>R$ ${c.f1.cost.toLocaleString('pt-BR', {minimumFractionDigits:2})}</strong></div>
+                        <div style="height:8px"></div>
+                        <div class="result-row"><span>${c.f2.name}:</span><strong>${c.f2.dose.toFixed(1)} kg/ha</strong></div>
+                        <div class="result-row"><span>Total:</span><strong>${c.f2.ton.toFixed(2)} ton</strong></div>
+                        <div class="result-row"><span>Custo:</span><strong>R$ ${c.f2.cost.toLocaleString('pt-BR', {minimumFractionDigits:2})}</strong></div>
+                        <div class="result-total"><span>TOTAL:</span><strong>R$ ${c.total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</strong></div>
+                        <div class="grain-info">
+                            <div class="grain-row"><span>R$/ha:</span><span class="grain-value">${c.perHa.toFixed(2)}</span></div>
+                            <div class="grain-row"><span>Sacas:</span><span class="grain-value">${c.sacks.toFixed(2)} sc/ha</span></div>
                         </div>
                     </div>
                 `;
             }
             
-            // Melhor combinação
-            if (combos.length > 0) {
-                const bestCombo = combos[0];
+            // 2ª melhor
+            if (combos[1]) {
+                const c = combos[1];
+                const diff = c.total - combos[0].total;
                 html += `
-                    <div class="result-card">
-                        <h3>🔄 ${bestCombo.name} <span class="combo-badge">Combinação</span></h3>
-                        <div class="result-row"><span>${bestCombo.fert1.name}:</span><strong>${bestCombo.fert1.dose.toFixed(1)} kg/ha (${bestCombo.fert1.ton.toFixed(2)} ton)</strong></div>
-                        <div class="result-row"><span>${bestCombo.fert2.name}:</span><strong>${bestCombo.fert2.dose.toFixed(1)} kg/ha (${bestCombo.fert2.ton.toFixed(2)} ton)</strong></div>
-                        <div class="result-row"><span>CUSTO:</span><strong>R$ ${bestCombo.totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></div>
-                        <div class="grain-calc">
-                            <div class="grain-calc-row"><span>R$/ha:</span><span class="grain-calc-value">${bestCombo.costPerHa.toFixed(2)}</span></div>
-                            <div class="grain-calc-row"><span>Sacas:</span><span class="grain-calc-value">${bestCombo.sacasPerHa.toFixed(2)} sc/ha</span></div>
+                    <div class="result second">
+                        <h3>🥈 ${c.name}</h3>
+                        <div class="result-row"><span>${c.f1.name}:</span><strong>${c.f1.dose.toFixed(1)} kg/ha (${c.f1.ton.toFixed(2)} ton)</strong></div>
+                        <div class="result-row"><span>${c.f2.name}:</span><strong>${c.f2.dose.toFixed(1)} kg/ha (${c.f2.ton.toFixed(2)} ton)</strong></div>
+                        <div class="result-total"><span>TOTAL:</span><strong>R$ ${c.total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</strong></div>
+                        <div class="grain-info">
+                            <div class="grain-row"><span>Diferença:</span><span class="grain-value">+ R$ ${diff.toFixed(2)}</span></div>
+                            <div class="grain-row"><span>Sacas:</span><span class="grain-value">${c.sacks.toFixed(2)} sc/ha</span></div>
                         </div>
                     </div>
                 `;
             }
             
-            // Segunda melhor opção individual
-            if (singles.length > 1) {
-                const second = singles[1];
-                html += `
-                    <div class="result-card secondary-option">
-                        <h3>2️⃣ ${second.name} (${second.formula})</h3>
-                        <div class="result-row"><span>Dose/ha:</span><strong>${second.kgPerHa.toFixed(1)} kg</strong></div>
-                        <div class="result-row"><span>CUSTO:</span><strong>R$ ${second.totalCost.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></div>
-                    </div>
-                `;
-            }
-            
-            container.innerHTML = html;
+            res.innerHTML = html;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            loadData();
-            renderFertilizers();
+            load();
+            render();
         });
     </script>
 </body>
