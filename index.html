@@ -996,6 +996,7 @@
                 if (!data) {
                     // Primeira vez: carrega fertilizantes padrão
                     state.fertilizers = DEFAULT_FERTILIZERS.map(f => ({...f}));
+                    console.log(`✅ Carregados ${state.fertilizers.length} fertilizantes padrão`);
                     return false;
                 }
 
@@ -1006,6 +1007,9 @@
                 // Se não tem fertilizantes, carrega os padrões
                 if (state.fertilizers.length === 0) {
                     state.fertilizers = DEFAULT_FERTILIZERS.map(f => ({...f}));
+                    console.log(`✅ Carregados ${state.fertilizers.length} fertilizantes padrão (lista estava vazia)`);
+                } else {
+                    console.log(`✅ Carregados ${state.fertilizers.length} fertilizantes do localStorage`);
                 }
                 
                 // Restaura filtros
@@ -1024,6 +1028,7 @@
             } catch (e) {
                 // Em caso de erro, carrega fertilizantes padrão
                 state.fertilizers = DEFAULT_FERTILIZERS.map(f => ({...f}));
+                console.log(`⚠️ Erro ao carregar, usando ${state.fertilizers.length} fertilizantes padrão`);
                 return false;
             }
         },
@@ -1674,7 +1679,12 @@
             }, 0);
         }
 
+        // Renderiza lista (mesmo oculta, precisa renderizar para mostrar o contador)
         Renderer.fertilizerList();
+        
+        // Atualiza o texto do toggle com o contador
+        const listText = document.getElementById('listToggleText');
+        listText.textContent = `Mostrar lista (${state.fertilizers.length} fertilizantes)`;
 
         document.getElementById('crop').addEventListener('change', () => {
             state.crop = document.getElementById('crop').value;
