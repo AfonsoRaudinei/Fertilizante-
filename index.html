@@ -617,46 +617,54 @@
         </div>
 
         <div class="card">
-            <h2>📋 Fertilizantes</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2 style="margin: 0;">📋 Fertilizantes</h2>
+                <div class="toggle-expand" id="toggleFormCard" style="margin: 0; padding: 6px 12px;">
+                    <span class="expand-icon" id="formIcon">▲</span>
+                    <span style="font-size: 11px;">Formulário</span>
+                </div>
+            </div>
             
-            <div class="input-card">
-                <div style="margin-bottom: 12px;">
-                    <label>Nome</label>
-                    <input type="text" id="name" placeholder="Ex: MAP, KCl, Ureia">
-                </div>
+            <div id="formCard">
+                <div class="input-card">
+                    <div style="margin-bottom: 12px;">
+                        <label>Nome</label>
+                        <input type="text" id="name" placeholder="Ex: MAP, KCl, Ureia">
+                    </div>
 
-                <div class="fert-row">
-                    <div><label>N (%)</label><input type="number" id="n" value="0" step="0.1" min="0" max="100"></div>
-                    <div><label>P₂O₅ (%)</label><input type="number" id="p" value="0" step="0.1" min="0" max="100"></div>
-                    <div><label>K₂O (%)</label><input type="number" id="k" value="0" step="0.1" min="0" max="100"></div>
-                    <div><label>Preço (R$/ton)</label><input type="number" id="price" step="10" min="0"></div>
-                    <div><label>Frete (R$/ton)</label><input type="number" id="freight" value="0" step="10" min="0"></div>
-                </div>
+                    <div class="fert-row">
+                        <div><label>N (%)</label><input type="number" id="n" value="0" step="0.1" min="0" max="100"></div>
+                        <div><label>P₂O₅ (%)</label><input type="number" id="p" value="0" step="0.1" min="0" max="100"></div>
+                        <div><label>K₂O (%)</label><input type="number" id="k" value="0" step="0.1" min="0" max="100"></div>
+                        <div><label>Preço (R$/ton)</label><input type="number" id="price" step="10" min="0"></div>
+                        <div><label>Frete (R$/ton)</label><input type="number" id="freight" value="0" step="10" min="0"></div>
+                    </div>
 
-                <div class="toggle-expand" id="toggleSecondary">
-                    <span class="expand-icon" id="icon">▲</span>
-                    <span>Ca, S, B e outros</span>
-                </div>
+                    <div class="toggle-expand" id="toggleSecondary">
+                        <span class="expand-icon" id="icon">▲</span>
+                        <span>Ca, S, B e outros</span>
+                    </div>
 
-                <div class="secondary-grid" id="secondary">
-                    <div><label>Ca %</label><input type="number" id="ca" value="0" step="0.1" min="0" max="100"></div>
-                    <div><label>S %</label><input type="number" id="s" value="0" step="0.1" min="0" max="100"></div>
-                    <div><label>B %</label><input type="number" id="b" value="0" step="0.01" min="0" max="100"></div>
-                    <div><label>Outros %</label><input type="number" id="other" value="0" step="0.1" min="0" max="100"></div>
-                </div>
+                    <div class="secondary-grid" id="secondary">
+                        <div><label>Ca %</label><input type="number" id="ca" value="0" step="0.1" min="0" max="100"></div>
+                        <div><label>S %</label><input type="number" id="s" value="0" step="0.1" min="0" max="100"></div>
+                        <div><label>B %</label><input type="number" id="b" value="0" step="0.01" min="0" max="100"></div>
+                        <div><label>Outros %</label><input type="number" id="other" value="0" step="0.1" min="0" max="100"></div>
+                    </div>
 
-                <button class="btn-add" id="addBtn">+ Adicionar</button>
-                <button class="btn-save" id="saveBtn" style="display:none;">💾 Salvar</button>
-                <button class="btn-cancel" id="cancelBtn" style="display:none;">Cancelar</button>
+                    <button class="btn-add" id="addBtn">+ Adicionar</button>
+                    <button class="btn-save" id="saveBtn" style="display:none;">💾 Salvar</button>
+                    <button class="btn-cancel" id="cancelBtn" style="display:none;">Cancelar</button>
+                </div>
             </div>
             
             <!-- Toggle para mostrar/ocultar lista -->
-            <div class="toggle-expand" id="toggleList" style="margin-top: 12px;">
-                <span class="expand-icon" id="listIcon">▼</span>
+            <div class="toggle-expand" id="toggleList" style="margin-top: 16px;">
+                <span class="expand-icon open" id="listIcon">▼</span>
                 <span id="listToggleText">Mostrar lista de fertilizantes</span>
             </div>
             
-            <div id="list" style="display: none;"></div>
+            <div id="list"></div>
         </div>
 
         <button class="btn-primary" id="calcBtn">💰 Calcular Melhores Combinações</button>
@@ -1674,12 +1682,23 @@
                 }, 0);
             }
 
-            // Renderiza lista (mesmo oculta, precisa renderizar para mostrar o contador)
+            // Renderiza lista E mostra ela por padrão na primeira vez
             Renderer.fertilizerList();
             
-            // Atualiza o texto do toggle com o contador
+            // Se tem fertilizantes, mostra a lista por padrão
+            const list = document.getElementById('list');
             const listText = document.getElementById('listToggleText');
-            listText.textContent = `Mostrar lista (${state.fertilizers.length} fertilizantes)`;
+            const listIcon = document.getElementById('listIcon');
+            
+            if (state.fertilizers.length > 0) {
+                list.style.display = 'block';
+                listText.textContent = `Ocultar lista (${state.fertilizers.length} fertilizantes)`;
+                listIcon.classList.add('open');
+            } else {
+                list.style.display = 'none';
+                listText.textContent = 'Mostrar lista de fertilizantes';
+                listIcon.classList.remove('open');
+            }
 
             document.getElementById('crop').addEventListener('change', () => {
                 state.crop = document.getElementById('crop').value;
@@ -1698,19 +1717,32 @@
                 icon.classList.toggle('open');
             });
 
+            document.getElementById('toggleFormCard').addEventListener('click', () => {
+                const formCard = document.getElementById('formCard');
+                const icon = document.getElementById('formIcon');
+                
+                if (formCard.style.display === 'none') {
+                    formCard.style.display = 'block';
+                    icon.classList.add('open');
+                } else {
+                    formCard.style.display = 'none';
+                    icon.classList.remove('open');
+                }
+            });
+
             document.getElementById('toggleList').addEventListener('click', () => {
                 const list = document.getElementById('list');
                 const icon = document.getElementById('listIcon');
                 const text = document.getElementById('listToggleText');
                 
-                if (list.style.display === 'none') {
+                if (list.style.display === 'none' || !list.style.display) {
                     list.style.display = 'block';
                     icon.classList.add('open');
-                    text.textContent = 'Ocultar lista de fertilizantes';
+                    text.textContent = `Ocultar lista (${state.fertilizers.length} fertilizantes)`;
                 } else {
                     list.style.display = 'none';
                     icon.classList.remove('open');
-                    text.textContent = 'Mostrar lista de fertilizantes';
+                    text.textContent = `Mostrar lista (${state.fertilizers.length} fertilizantes)`;
                 }
             });
 
