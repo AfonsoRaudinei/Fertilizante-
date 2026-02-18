@@ -308,7 +308,6 @@
 
         .empty { text-align: center; padding: 24px; color: var(--gray-600); font-size: 13px; }
 
-        /* MODAL DE FILTROS */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -502,7 +501,6 @@
             box-shadow: 0 6px 16px rgba(0,122,255,0.4);
         }
 
-        /* Toast, Save Badge, Loading */
         .toast-container {
             position: fixed;
             top: 20px;
@@ -636,8 +634,8 @@
                         <div><label>N (%)</label><input type="number" id="n" value="0" step="0.1" min="0" max="100"></div>
                         <div><label>P₂O₅ (%)</label><input type="number" id="p" value="0" step="0.1" min="0" max="100"></div>
                         <div><label>K₂O (%)</label><input type="number" id="k" value="0" step="0.1" min="0" max="100"></div>
-                        <div><label>Preço (R$/ton)</label><input type="number" id="price" step="10" min="0"></div>
-                        <div><label>Frete (R$/ton)</label><input type="number" id="freight" value="0" step="10" min="0"></div>
+                        <div><label>Preço (R$/ton)</label><input type="number" id="price" step="10" min="0" maxlength="7"></div>
+                        <div><label>Frete (R$/ton)</label><input type="number" id="freight" value="0" step="10" min="0" maxlength="7"></div>
                     </div>
 
                     <div class="toggle-expand" id="toggleSecondary">
@@ -658,7 +656,6 @@
                 </div>
             </div>
             
-            <!-- Toggle para mostrar/ocultar lista -->
             <div class="toggle-expand" id="toggleList" style="margin-top: 16px;">
                 <span class="expand-icon open" id="listIcon">▼</span>
                 <span id="listToggleText">Mostrar lista de fertilizantes</span>
@@ -671,31 +668,22 @@
         <div id="results"></div>
     </div>
 
-    <!-- MODAL DE FILTROS -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <div class="modal-header">
                 <h3>🎯 Filtros de Combinações</h3>
                 <p>Configure os critérios para calcular as melhores combinações:</p>
             </div>
-            <div class="modal-body" id="modalBody">
-                
-                <!-- Filtro 1: Limite K em fertilizante de P -->
+            <div class="modal-body">
                 <div class="filter-section">
-                    <div class="filter-title">
-                        <span>⚠️ Limite K₂O em Fertilizante de Fósforo</span>
-                    </div>
+                    <div class="filter-title">⚠️ Limite K₂O em Fertilizante de Fósforo</div>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <input type="number" id="kLimitInP" value="20" step="5" min="0" 
-                               style="flex: 1; max-width: 120px;">
+                        <input type="number" id="kLimitInP" value="20" step="5" min="0" style="flex: 1; max-width: 120px;">
                         <span style="font-size: 13px; color: var(--gray-600);">kg/ha</span>
                     </div>
-                    <p class="filter-help">
-                        Máximo de K₂O permitido em fertilizantes formulados (com P+K). Zero = sem limite.
-                    </p>
+                    <p class="filter-help">Máximo de K₂O permitido em fertilizantes formulados (com P+K). Zero = sem limite.</p>
                 </div>
 
-                <!-- Filtro 2: Preferir KCl com Boro -->
                 <div class="filter-section">
                     <div class="filter-checkbox-row">
                         <input type="checkbox" id="preferKClWithB">
@@ -706,33 +694,20 @@
                     </div>
                 </div>
 
-                <!-- Filtro 3: Exclusão manual de fertilizantes -->
                 <div class="filter-section">
-                    <div class="filter-title">
-                        <span>🚫 Excluir Fertilizantes Específicos</span>
-                    </div>
-                    <p class="filter-help" style="margin-bottom: 8px;">
-                        Marque os fertilizantes que não devem entrar nas combinações:
-                    </p>
+                    <div class="filter-title">🚫 Excluir Fertilizantes Específicos</div>
+                    <p class="filter-help" style="margin-bottom: 8px;">Marque os fertilizantes que não devem entrar nas combinações:</p>
                     <div id="fertilizersCheckList"></div>
                 </div>
 
-                <!-- Filtro 4: Limite de custo -->
                 <div class="filter-section">
-                    <div class="filter-title">
-                        <span>💰 Limite de Custo por Hectare (opcional)</span>
-                    </div>
+                    <div class="filter-title">💰 Limite de Custo por Hectare (opcional)</div>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <input type="number" id="costLimit" value="0" step="100" min="0" 
-                               placeholder="0 = sem limite"
-                               style="flex: 1; max-width: 150px;">
+                        <input type="number" id="costLimit" value="0" step="100" min="0" placeholder="0 = sem limite" style="flex: 1; max-width: 150px;">
                         <span style="font-size: 13px; color: var(--gray-600);">R$/ha</span>
                     </div>
-                    <p class="filter-help">
-                        Descarta combinações que excedam este custo. Zero = sem limite.
-                    </p>
+                    <p class="filter-help">Descarta combinações que excedam este custo. Zero = sem limite.</p>
                 </div>
-
             </div>
             <div class="modal-footer">
                 <button class="modal-btn cancel" id="modalCancel">Cancelar</button>
@@ -754,138 +729,18 @@
             TOAST_DURATION: 3000
         };
 
-        // Base de dados padrão de fertilizantes Cibra
         const DEFAULT_FERTILIZERS = [
-            // Fontes puras
             { name: "MAP 11-52/44 GR", n: 11, p: 52, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 3800, freight: 0 },
             { name: "KCL 60 GR", n: 0, p: 0, k: 60, ca: 0, s: 0, b: 0, other: 0, price: 2800, freight: 0 },
             { name: "UREIA 46 GR", n: 46, p: 0, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2600, freight: 0 },
             { name: "SAM 20,5/23 GR", n: 20.5, p: 0, k: 0, ca: 0, s: 23, b: 0, other: 0, price: 2400, freight: 0 },
             { name: "SSP 20/16 GR", n: 0, p: 20, k: 0, ca: 16, s: 11, b: 0, other: 0, price: 1800, freight: 0 },
-            { name: "SSP 19/16 + 16CA + 11S/SO4 GR", n: 0, p: 19, k: 0, ca: 16, s: 11, b: 0, other: 0, price: 1850, freight: 0 },
             { name: "TSP 46/36 GR", n: 0, p: 46, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 3200, freight: 0 },
-            
-            // Formulados NPK - Série 02-XX-XX
-            { name: "02-14-12 MG", n: 2, p: 14, k: 12, ca: 0, s: 0, b: 0, other: 0, price: 2200, freight: 0 },
-            { name: "02-17-24 MG", n: 2, p: 17, k: 24, ca: 0, s: 0, b: 0, other: 0, price: 2400, freight: 0 },
             { name: "02-20-20 MG", n: 2, p: 20, k: 20, ca: 0, s: 0, b: 0, other: 0, price: 2350, freight: 0 },
-            { name: "02-24-12 MG", n: 2, p: 24, k: 12, ca: 0, s: 0, b: 0, other: 0, price: 2300, freight: 0 },
-            { name: "02-25-00 MG", n: 2, p: 25, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2100, freight: 0 },
-            { name: "02-25-25 MG", n: 2, p: 25, k: 25, ca: 0, s: 0, b: 0, other: 0, price: 2500, freight: 0 },
-            { name: "02-30-10 MG", n: 2, p: 30, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2400, freight: 0 },
-            
-            // Formulados NPK - Série 03-XX-XX
-            { name: "03-28-00 MG", n: 3, p: 28, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2200, freight: 0 },
-            { name: "03-30-15 MG", n: 3, p: 30, k: 15, ca: 0, s: 0, b: 0, other: 0, price: 2500, freight: 0 },
-            { name: "03-32-08 MG", n: 3, p: 32, k: 8, ca: 0, s: 0, b: 0, other: 0, price: 2450, freight: 0 },
-            
-            // Formulados NPK - Série 04-XX-XX
-            { name: "04-14-08 MG", n: 4, p: 14, k: 8, ca: 0, s: 0, b: 0, other: 0, price: 2100, freight: 0 },
             { name: "04-20-20 MG", n: 4, p: 20, k: 20, ca: 0, s: 0, b: 0, other: 0, price: 2400, freight: 0 },
-            { name: "04-26-10 MG", n: 4, p: 26, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2350, freight: 0 },
-            { name: "04-30-10 MG", n: 4, p: 30, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2450, freight: 0 },
-            { name: "04-35-10 MG", n: 4, p: 35, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2550, freight: 0 },
-            { name: "04-40-08 MG", n: 4, p: 40, k: 8, ca: 0, s: 0, b: 0, other: 0, price: 2600, freight: 0 },
-            
-            // Formulados NPK - Série 05-XX-XX
-            { name: "05-20-30 MG", n: 5, p: 20, k: 30, ca: 0, s: 0, b: 0, other: 0, price: 2500, freight: 0 },
-            { name: "05-25-15 MG", n: 5, p: 25, k: 15, ca: 0, s: 0, b: 0, other: 0, price: 2400, freight: 0 },
-            { name: "05-25-25 MG", n: 5, p: 25, k: 25, ca: 0, s: 0, b: 0, other: 0, price: 2550, freight: 0 },
-            { name: "05-25-30 MG", n: 5, p: 25, k: 30, ca: 0, s: 0, b: 0, other: 0, price: 2600, freight: 0 },
-            { name: "05-35-00 MG", n: 5, p: 35, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2400, freight: 0 },
-            
-            // Formulados NPK - Série 06-XX-XX
-            { name: "06-28-20 + 1%Zn", n: 6, p: 28, k: 20, ca: 0, s: 0, b: 0, other: 1, price: 2700, freight: 0 },
-            { name: "06-30-06 MG", n: 6, p: 30, k: 6, ca: 0, s: 0, b: 0, other: 0, price: 2500, freight: 0 },
-            { name: "06-30-10 +0,5B+0,75Zn MG", n: 6, p: 30, k: 10, ca: 0, s: 0, b: 0.5, other: 0.75, price: 2700, freight: 0 },
-            { name: "06-37-00 MG", n: 6, p: 37, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2600, freight: 0 },
-            
-            // Formulados NPK - Série 07-XX-XX
-            { name: "07-34-09 MG", n: 7, p: 34, k: 9, ca: 0, s: 0, b: 0, other: 0, price: 2700, freight: 0 },
-            { name: "07-40-00 MG", n: 7, p: 40, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2750, freight: 0 },
-            
-            // Formulados NPK - Série 08-XX-XX
-            { name: "08-00-36 MG", n: 8, p: 0, k: 36, ca: 0, s: 0, b: 0, other: 0, price: 2400, freight: 0 },
-            { name: "08-20-20 MG", n: 8, p: 20, k: 20, ca: 0, s: 0, b: 0, other: 0, price: 2500, freight: 0 },
-            { name: "08-28-16 MG", n: 8, p: 28, k: 16, ca: 0, s: 0, b: 0, other: 0, price: 2700, freight: 0 },
-            { name: "08-28-16 + 1% ZN MG", n: 8, p: 28, k: 16, ca: 0, s: 0, b: 0, other: 1, price: 2750, freight: 0 },
-            { name: "08-40-07 +0,5B+0,75ZN MG", n: 8, p: 40, k: 7, ca: 0, s: 0, b: 0.5, other: 0.75, price: 2900, freight: 0 },
             { name: "08-40-08 MG", n: 8, p: 40, k: 8, ca: 0, s: 0, b: 0, other: 0, price: 2850, freight: 0 },
-            
-            // Formulados NPK - Série 09-XX-XX e 10-XX-XX
-            { name: "09-46-00 MG", n: 9, p: 46, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2900, freight: 0 },
-            { name: "10-10-10 MG", n: 10, p: 10, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2200, freight: 0 },
-            { name: "10-15-15 MG", n: 10, p: 15, k: 15, ca: 0, s: 0, b: 0, other: 0, price: 2400, freight: 0 },
-            { name: "10-20-10 MG", n: 10, p: 20, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2450, freight: 0 },
-            { name: "10-30-10 MG", n: 10, p: 30, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2650, freight: 0 },
-            { name: "10-49-00 + 0,75% ZN MG", n: 10, p: 49, k: 0, ca: 0, s: 0, b: 0, other: 0.75, price: 3000, freight: 0 },
-            { name: "10-50-00 MG", n: 10, p: 50, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 3050, freight: 0 },
-            
-            // Formulados NPK - Série 12-XX-XX até 20-XX-XX
-            { name: "12-15-15 MG", n: 12, p: 15, k: 15, ca: 0, s: 0, b: 0, other: 0, price: 2500, freight: 0 },
-            { name: "13-10-10 MG", n: 13, p: 10, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2400, freight: 0 },
-            { name: "13-11-21 MG", n: 13, p: 11, k: 21, ca: 0, s: 0, b: 0, other: 0, price: 2550, freight: 0 },
-            { name: "15-00-15 MG", n: 15, p: 0, k: 15, ca: 0, s: 0, b: 0, other: 0, price: 2300, freight: 0 },
-            { name: "15-00-30 MG", n: 15, p: 0, k: 30, ca: 0, s: 0, b: 0, other: 0, price: 2500, freight: 0 },
-            { name: "15-15-15 MG", n: 15, p: 15, k: 15, ca: 0, s: 0, b: 0, other: 0, price: 2550, freight: 0 },
-            { name: "16-16-16 MG", n: 16, p: 16, k: 16, ca: 0, s: 0, b: 0, other: 0, price: 2650, freight: 0 },
-            { name: "18-18-18 MG", n: 18, p: 18, k: 18, ca: 0, s: 0, b: 0, other: 0, price: 2750, freight: 0 },
-            { name: "20-00-10 MG", n: 20, p: 0, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2400, freight: 0 },
-            { name: "20-00-20 MG", n: 20, p: 0, k: 20, ca: 0, s: 0, b: 0, other: 0, price: 2600, freight: 0 },
-            { name: "20-00-30 MG", n: 20, p: 0, k: 30, ca: 0, s: 0, b: 0, other: 0, price: 2750, freight: 0 },
-            { name: "20-05-20 MG", n: 20, p: 5, k: 20, ca: 0, s: 0, b: 0, other: 0, price: 2700, freight: 0 },
-            { name: "20-10-10 MG", n: 20, p: 10, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2650, freight: 0 },
-            
-            // Formulados NPK - Série 25-XX-XX e acima
-            { name: "25-00-25 MG", n: 25, p: 0, k: 25, ca: 0, s: 0, b: 0, other: 0, price: 2900, freight: 0 },
-            { name: "26-00-26 MG", n: 26, p: 0, k: 26, ca: 0, s: 0, b: 0, other: 0, price: 3000, freight: 0 },
-            { name: "27-00-24 MG", n: 27, p: 0, k: 24, ca: 0, s: 0, b: 0, other: 0, price: 2950, freight: 0 },
-            { name: "30-00-20 MG", n: 30, p: 0, k: 20, ca: 0, s: 0, b: 0, other: 0, price: 3050, freight: 0 },
-            { name: "33-00-00 MG", n: 33, p: 0, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2700, freight: 0 },
-            { name: "36-00-12 MG", n: 36, p: 0, k: 12, ca: 0, s: 0, b: 0, other: 0, price: 3100, freight: 0 },
-            
-            // NITROCAP
-            { name: "NITROCAP 18-10-05 0,5B 0,75Zn GR", n: 18, p: 10, k: 5, ca: 0, s: 0, b: 0.5, other: 0.75, price: 2800, freight: 0 },
-            { name: "NITROCAP 20-00-20 MG", n: 20, p: 0, k: 20, ca: 0, s: 0, b: 0, other: 0, price: 2650, freight: 0 },
-            { name: "NITROCAP 20-00-30 MG", n: 20, p: 0, k: 30, ca: 0, s: 0, b: 0, other: 0, price: 2800, freight: 0 },
-            { name: "NITROCAP 20-10-10 MG", n: 20, p: 10, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2700, freight: 0 },
-            { name: "NITROCAP 21-00-21 MG", n: 21, p: 0, k: 21, ca: 0, s: 0, b: 0, other: 0, price: 2750, freight: 0 },
-            { name: "NITROCAP 25-00-25 MG", n: 25, p: 0, k: 25, ca: 0, s: 0, b: 0, other: 0, price: 2950, freight: 0 },
-            { name: "NITROCAP 27-00-24 MG", n: 27, p: 0, k: 24, ca: 0, s: 0, b: 0, other: 0, price: 2900, freight: 0 },
-            { name: "NITROCAP 30-00-20 MG", n: 30, p: 0, k: 20, ca: 0, s: 0, b: 0, other: 0, price: 3000, freight: 0 },
-            { name: "NITROCAP 30-10-10 MG", n: 30, p: 10, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 3100, freight: 0 },
-            { name: "NITROCAP 33-00-00 MG", n: 33, p: 0, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2800, freight: 0 },
-            { name: "NITROCAP 36-00-12 MG", n: 36, p: 0, k: 12, ca: 0, s: 0, b: 0, other: 0, price: 3150, freight: 0 },
-            { name: "NITROCAP 44-00-00", n: 44, p: 0, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 3000, freight: 0 },
-            { name: "NITROCAP 46 GR", n: 46, p: 0, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 3100, freight: 0 },
-            
-            // CIBRAMIX
-            { name: "CIBRAMIX 00-14-18 MG", n: 0, p: 14, k: 18, ca: 0, s: 0, b: 0, other: 0, price: 2200, freight: 0 },
-            { name: "CIBRAMIX 00-18-18 MG", n: 0, p: 18, k: 18, ca: 0, s: 0, b: 0, other: 0, price: 2300, freight: 0 },
-            { name: "CIBRAMIX 00-20-00 MG", n: 0, p: 20, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 1900, freight: 0 },
-            { name: "CIBRAMIX 00-20-20 MG", n: 0, p: 20, k: 20, ca: 0, s: 0, b: 0, other: 0, price: 2350, freight: 0 },
-            { name: "CIBRAMIX 00-20-30 MG", n: 0, p: 20, k: 30, ca: 0, s: 0, b: 0, other: 0, price: 2450, freight: 0 },
-            { name: "CIBRAMIX 00-22-00 MG", n: 0, p: 22, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2000, freight: 0 },
-            { name: "CIBRAMIX 00-25-00 MG", n: 0, p: 25, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2100, freight: 0 },
             { name: "CIBRAMIX 00-25-25 MG", n: 0, p: 25, k: 25, ca: 0, s: 0, b: 0, other: 0, price: 2500, freight: 0 },
-            { name: "CIBRAMIX 00-30-10 MG", n: 0, p: 30, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2400, freight: 0 },
-            { name: "CIBRAMIX 00-30-15 MG", n: 0, p: 30, k: 15, ca: 0, s: 0, b: 0, other: 0, price: 2500, freight: 0 },
-            { name: "CIBRAMIX 00-32-00 MG", n: 0, p: 32, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2300, freight: 0 },
-            { name: "CIBRAMIX 00-33-00 MG", n: 0, p: 33, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2350, freight: 0 },
-            { name: "CIBRAMIX 00-36-00 MG", n: 0, p: 36, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2500, freight: 0 },
-            { name: "CIBRAMIX 00-44-00 MG", n: 0, p: 44, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2700, freight: 0 },
-            
-            // KCl com Boro (para teste do filtro)
-            { name: "00-00-54 +1B MG", n: 0, p: 0, k: 54, ca: 0, s: 0, b: 1, other: 0, price: 2900, freight: 0 },
-            { name: "00-00-57 +0,5B MG", n: 0, p: 0, k: 57, ca: 0, s: 0, b: 0.5, other: 0, price: 2950, freight: 0 },
-            
-            // Microessenciais
-            { name: "MS09E 05 26 25 S9", n: 5, p: 26, k: 25, ca: 0, s: 9, b: 0, other: 0, price: 2800, freight: 0 },
-            { name: "MS09E 08 37 11 S9", n: 8, p: 37, k: 11, ca: 0, s: 9, b: 0, other: 0, price: 2900, freight: 0 },
-            { name: "ES - Microessentials - S9 10 46 00", n: 10, p: 46, k: 0, ca: 0, s: 9, b: 0, other: 0, price: 3000, freight: 0 },
-            { name: "ES - Aspire 00 00 58 + 0,5 B", n: 0, p: 0, k: 58, ca: 0, s: 0, b: 0.5, other: 0, price: 2950, freight: 0 },
-            { name: "ES - Cloreto de Potassio 60K2O Granulado PLUS 08 40 06 + 0,05 B", n: 8, p: 40, k: 6, ca: 0, s: 0, b: 0.05, other: 0, price: 2850, freight: 0 },
-            { name: "ES - Cloreto de Potassio 60K2O Granulado PLUS 08 37 11 + 0,09 B", n: 8, p: 37, k: 11, ca: 0, s: 0, b: 0.09, other: 0, price: 2900, freight: 0 }
+            { name: "00-00-54 +1B MG", n: 0, p: 0, k: 54, ca: 0, s: 0, b: 1, other: 0, price: 2900, freight: 0 }
         ];
 
         const CROP_CONFIG = {
@@ -984,7 +839,6 @@
                     },
                     fertilizers: state.fertilizers
                 };
-
                 try {
                     localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(data));
                     this.showSaveBadge();
@@ -997,9 +851,7 @@
                 try {
                     const data = localStorage.getItem(CONSTANTS.STORAGE_KEY);
                     if (!data) {
-                        // Primeira vez: carrega fertilizantes padrão
                         state.fertilizers = DEFAULT_FERTILIZERS.map(f => ({...f}));
-                        console.log(`✅ Carregados ${state.fertilizers.length} fertilizantes padrão`);
                         return false;
                     }
 
@@ -1007,15 +859,10 @@
                     state.crop = parsed.crop || 'soja';
                     state.fertilizers = Array.isArray(parsed.fertilizers) ? parsed.fertilizers : [];
                     
-                    // Se não tem fertilizantes, carrega os padrões
                     if (state.fertilizers.length === 0) {
                         state.fertilizers = DEFAULT_FERTILIZERS.map(f => ({...f}));
-                        console.log(`✅ Carregados ${state.fertilizers.length} fertilizantes padrão (lista estava vazia)`);
-                    } else {
-                        console.log(`✅ Carregados ${state.fertilizers.length} fertilizantes do localStorage`);
                     }
                     
-                    // Restaura filtros
                     if (parsed.filters) {
                         state.filters.kLimitInP = parsed.filters.kLimitInP || 20;
                         state.filters.preferKClWithB = parsed.filters.preferKClWithB || false;
@@ -1029,9 +876,7 @@
 
                     return parsed.needs || null;
                 } catch (e) {
-                    // Em caso de erro, carrega fertilizantes padrão
                     state.fertilizers = DEFAULT_FERTILIZERS.map(f => ({...f}));
-                    console.log(`⚠️ Erro ao carregar, usando ${state.fertilizers.length} fertilizantes padrão`);
                     return false;
                 }
             },
@@ -1118,13 +963,10 @@
                         text: 'Nenhum fertilizante cadastrado'
                     });
                     container.appendChild(empty);
-                    
-                    // Atualiza texto do toggle
                     document.getElementById('listToggleText').textContent = 'Mostrar lista de fertilizantes';
                     return;
                 }
 
-                // Atualiza texto do toggle com contador
                 const listText = document.getElementById('listToggleText');
                 const isVisible = document.getElementById('list').style.display !== 'none';
                 listText.textContent = isVisible 
@@ -1387,79 +1229,10 @@
 
         const ModalHandler = {
             open() {
-                const modalBody = document.getElementById('modalBody');
-                DOMUtils.clearContainer(modalBody);
-
-                // Renderiza lista de fertilizantes com checkboxes
-                state.fertilizers.forEach((fert, index) => {
-                    const item = DOMUtils.createElement('div', { className: 'modal-fert-item' });
-                    
-                    const checkbox = DOMUtils.createElement('input', {
-                        className: 'modal-checkbox',
-                        attrs: {
-                            type: 'checkbox',
-                            id: `modal-fert-${index}`,
-                            checked: state.excludedIds.has(index)
-                        }
-                    });
-
-                    checkbox.addEventListener('change', (e) => {
-                        if (e.target.checked) {
-                            state.excludedIds.add(index);
-                            item.classList.add('excluded');
-                        } else {
-                            state.excludedIds.delete(index);
-                            item.classList.remove('excluded');
-                        }
-                    });
-
-                    const info = DOMUtils.createElement('div', { className: 'modal-fert-info' });
-                    const name = DOMUtils.createElement('div', {
-                        className: 'modal-fert-name',
-                        text: fert.name
-                    });
-                    const formula = DOMUtils.createElement('div', {
-                        className: 'modal-fert-formula',
-                        text: `${fert.n}-${fert.p}-${fert.k}`
-                    });
-
-                    info.appendChild(name);
-                    info.appendChild(formula);
-
-                    item.appendChild(checkbox);
-                    item.appendChild(info);
-
-                    // Clique no item também marca/desmarca
-                    item.addEventListener('click', (e) => {
-                        if (e.target !== checkbox) {
-                            checkbox.checked = !checkbox.checked;
-                            checkbox.dispatchEvent(new Event('change'));
-                        }
-                    });
-
-                    if (state.excludedIds.has(index)) {
-                        item.classList.add('excluded');
-                    }
-
-                    modalBody.appendChild(item);
-                });
-
-                document.getElementById('modalOverlay').classList.add('show');
-            },
-
-            close() {
-                document.getElementById('modalOverlay').classList.remove('show');
-            }
-        };
-
-        const ModalHandler = {
-            open() {
-                // Restaura valores dos filtros
                 document.getElementById('kLimitInP').value = state.filters.kLimitInP;
                 document.getElementById('preferKClWithB').checked = state.filters.preferKClWithB;
                 document.getElementById('costLimit').value = state.filters.costLimit;
 
-                // Popula lista de fertilizantes para exclusão
                 const checkList = document.getElementById('fertilizersCheckList');
                 DOMUtils.clearContainer(checkList);
 
@@ -1504,7 +1277,6 @@
                         item.appendChild(checkbox);
                         item.appendChild(info);
 
-                        // Clique no item também marca/desmarca
                         item.addEventListener('click', (e) => {
                             if (e.target !== checkbox) {
                                 checkbox.checked = !checkbox.checked;
@@ -1527,7 +1299,6 @@
                 state.filters.kLimitInP = parseFloat(document.getElementById('kLimitInP').value) || 0;
                 state.filters.preferKClWithB = document.getElementById('preferKClWithB').checked;
                 state.filters.costLimit = parseFloat(document.getElementById('costLimit').value) || 0;
-                // excludedFertIds já está sendo atualizado em tempo real
             }
         };
 
@@ -1556,29 +1327,24 @@
                     const preferKClWithB = state.filters.preferKClWithB;
                     const costLimit = state.filters.costLimit;
 
-                    // FILTRO 1: Remove fertilizantes excluídos manualmente
                     let validFerts = state.fertilizers.filter((_, index) => !state.filters.excludedFertIds.has(index));
 
-                    // FILTRO 2: Remove fertilizantes com P+K se K exceder limite
                     validFerts = validFerts.filter(f => {
                         if (f.p > 0 && f.k > 0 && kLimitInP > 0) {
                             const doseForP = (needs.P * 100) / f.p;
                             const kFromThisFert = (doseForP * f.k) / 100;
                             
                             if (kFromThisFert > kLimitInP) {
-                                console.log(`Excluindo ${f.name}: K=${kFromThisFert.toFixed(1)} > limite ${kLimitInP}`);
                                 return false;
                             }
                         }
                         return true;
                     });
 
-                    // FILTRO 3: Se preferir KCl+B, dá prioridade (aplica boost no cálculo de custo)
                     const hasBBoost = (fert) => {
                         if (!preferKClWithB) return 1;
-                        // Se fertilizante tem K>0 e B>0, aplica desconto de 5% no custo
                         if (fert.k > 0 && fert.b > 0) {
-                            return 0.95; // 5% de desconto simulado
+                            return 0.95;
                         }
                         return 1;
                     };
@@ -1597,7 +1363,6 @@
 
                             let dose1 = 0, dose2 = 0;
 
-                            // Prioridade P
                             if (needs.P > 0) {
                                 if (f1.p > 0 && f2.p === 0) {
                                     dose1 = (needs.P * 100) / f1.p;
@@ -1610,7 +1375,6 @@
                                 }
                             }
 
-                            // Depois K
                             const kGot1 = (dose1 * f1.k) / 100;
                             const kGot2 = (dose2 * f2.k) / 100;
                             const kNeed = Math.max(0, needs.K - kGot1 - kGot2);
@@ -1623,7 +1387,6 @@
                                 }
                             }
 
-                            // Por último N
                             const nGot1 = (dose1 * f1.n) / 100;
                             const nGot2 = (dose2 * f2.n) / 100;
                             const nNeed = Math.max(0, needs.N - nGot1 - nGot2);
@@ -1637,13 +1400,11 @@
                                 const ton1 = (dose1 / 1000) * area;
                                 const ton2 = (dose2 / 1000) * area;
                                 
-                                // Aplica boost de KCl+B
                                 const cost1 = ton1 * (f1.price + f1.freight) * hasBBoost(f1);
                                 const cost2 = ton2 * (f2.price + f2.freight) * hasBBoost(f2);
                                 const total = cost1 + cost2;
                                 const perHa = total / area;
 
-                                // FILTRO 4: Remove se exceder limite de custo
                                 if (costLimit > 0 && perHa > costLimit) {
                                     continue;
                                 }
@@ -1682,10 +1443,8 @@
                 }, 0);
             }
 
-            // Renderiza lista E mostra ela por padrão na primeira vez
             Renderer.fertilizerList();
             
-            // Se tem fertilizantes, mostra a lista por padrão
             const list = document.getElementById('list');
             const listText = document.getElementById('listToggleText');
             const listIcon = document.getElementById('listIcon');
@@ -1750,10 +1509,8 @@
             document.getElementById('saveBtn').addEventListener('click', () => FormHandler.saveEdit());
             document.getElementById('cancelBtn').addEventListener('click', () => FormHandler.cancel());
             
-            // Abre modal de filtros ao clicar em Calcular
             document.getElementById('calcBtn').addEventListener('click', () => ModalHandler.open());
             
-            // Modal handlers
             document.getElementById('modalCancel').addEventListener('click', () => ModalHandler.close());
             document.getElementById('modalConfirm').addEventListener('click', () => {
                 ModalHandler.saveFilters();
