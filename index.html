@@ -16,6 +16,7 @@
             --gray-700: #515154;
             --gray-600: #86868B;
             --gray-400: #C7C7CC;
+            --gray-300: #C0C0C5;
             --gray-200: #D1D1D6;
             --gray-100: #F5F5F7;
             --radius-sm: 6px;
@@ -231,6 +232,11 @@
     .icon-btn.delete:hover {
         background: rgba(255, 59, 48, 0.1);
         color: var(--danger);
+    }
+
+    button[onclick="clearAllPrices()"]:hover {
+        background: var(--gray-300);
+        transform: translateY(-1px);
     }
 
     .result-card {
@@ -484,9 +490,14 @@
         </div>
     </div>
 
-    <div class="toggle-expand" id="toggleList">
-        <span class="expand-icon open" id="listIcon">▼</span>
-        <span id="listText">Mostrar lista</span>
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+        <div class="toggle-expand" id="toggleList" style="flex: 1; margin: 0;">
+            <span class="expand-icon open" id="listIcon">▼</span>
+            <span id="listText">Mostrar lista</span>
+        </div>
+        <button onclick="clearAllPrices()" style="padding: 8px 16px; background: var(--gray-200); border: none; border-radius: var(--radius-md); font-size: 12px; font-weight: 600; color: var(--gray-700); cursor: pointer; white-space: nowrap; transition: all 0.2s;">
+            🧹 Limpar Preços
+        </button>
     </div>
 
     <div id="list"></div>
@@ -749,6 +760,22 @@
         const list = document.getElementById('list');
         const isVisible = list.style.display !== 'none';
         text.textContent = `${isVisible ? 'Ocultar' : 'Mostrar'} lista (${state.fertilizers.length})`;
+    }
+
+    function clearAllPrices() {
+        if (!confirm('Limpar todos os preços e fretes?\n\nIsso zerará os valores de R$/ton e Frete de todos os fertilizantes.')) {
+            return;
+        }
+
+        state.fertilizers.forEach(f => {
+            f.price = 0;
+            f.freight = 0;
+        });
+
+        renderList();
+        save();
+        
+        alert('✅ Preços e fretes limpos com sucesso!');
     }
 
     function calculate() {
