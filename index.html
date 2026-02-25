@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -27,382 +26,379 @@
             --shadow-md: 0 4px 12px rgba(0,122,255,0.3);
         }
 
-```
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-        background: linear-gradient(180deg, var(--gray-100) 0%, #E5E5E7 100%);
-        padding: 20px;
-        color: var(--gray-900);
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(180deg, var(--gray-100) 0%, #E5E5E7 100%);
+            padding: 20px;
+            color: var(--gray-900);
+        }
 
-    .card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: var(--radius-xl);
-        padding: 20px;
-        margin-bottom: 16px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
-    }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+        }
 
-    h1 { font-size: 22px; font-weight: 600; margin-bottom: 16px; }
-    h2 { font-size: 15px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-700); }
+        h1 { font-size: 22px; font-weight: 600; margin-bottom: 16px; }
+        h2 { font-size: 15px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-700); }
 
-    .header-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-    }
+        .header-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
 
-    label {
-        display: block;
-        font-size: 11px;
-        font-weight: 500;
-        color: var(--gray-600);
-        margin-bottom: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
 
-    input, select {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid var(--gray-200);
-        border-radius: var(--radius-md);
-        font-size: 15px;
-        transition: all 0.2s;
-        background: white;
-    }
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            transition: all 0.2s;
+            background: white;
+        }
 
-    input:focus, select:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-    }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
 
-    input[type="number"] { max-width: 120px; }
+        input[type="number"] { max-width: 120px; }
 
-    .nutrient-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-top: 12px;
-    }
+        .nutrient-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
 
-    .nutrient-grid > div { display: flex; flex-direction: column; }
+        .nutrient-grid > div { display: flex; flex-direction: column; }
 
-    .fert-row {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 8px;
-        margin-bottom: 12px;
-    }
+        .fert-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
 
-    .toggle-expand {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px;
-        background: var(--gray-100);
-        border-radius: var(--radius-md);
-        cursor: pointer;
-        user-select: none;
-        transition: all 0.2s;
-        margin: 12px 0;
-    }
+        .toggle-expand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: var(--gray-100);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            margin: 12px 0;
+        }
 
-    .toggle-expand:hover { background: var(--gray-200); }
+        .toggle-expand:hover { background: var(--gray-200); }
 
-    .expand-icon {
-        font-size: 12px;
-        transition: transform 0.2s;
-    }
+        .expand-icon {
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
 
-    .expand-icon.open { transform: rotate(180deg); }
+        .expand-icon.open { transform: rotate(180deg); }
 
-    .secondary-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s;
-        margin-bottom: 12px;
-    }
+        .secondary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s;
+            margin-bottom: 12px;
+        }
 
-    .secondary-grid.show { max-height: 200px; }
+        .secondary-grid.show { max-height: 200px; }
 
-    .btn-add, .btn-calc {
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, var(--success) 0%, #2BA84A 100%);
-        color: white;
-        border: none;
-        border-radius: var(--radius-lg);
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: var(--shadow-sm);
-    }
+        .btn-add, .btn-calc {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--success) 0%, #2BA84A 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
 
-    .btn-calc {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        box-shadow: var(--shadow-md);
-    }
+        .btn-calc {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            box-shadow: var(--shadow-md);
+        }
 
-    .btn-add:hover, .btn-calc:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-    }
+        .btn-add:hover, .btn-calc:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
 
-    .btn-save, .btn-cancel {
-        padding: 12px 20px;
-        border: none;
-        border-radius: var(--radius-md);
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        margin-right: 8px;
-    }
+        .btn-save, .btn-cancel {
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 8px;
+        }
 
-    .btn-save {
-        background: var(--primary);
-        color: white;
-    }
+        .btn-save {
+            background: var(--primary);
+            color: white;
+        }
 
-    .btn-cancel {
-        background: var(--gray-200);
-        color: var(--gray-900);
-    }
+        .btn-cancel {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
 
-    .fert-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px;
-        background: white;
-        border: 1px solid var(--gray-200);
-        border-radius: var(--radius-md);
-        margin-bottom: 8px;
-    }
+        .fert-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            margin-bottom: 8px;
+        }
 
-    .fert-info {
-        flex: 1;
-    }
+        .fert-info {
+            flex: 1;
+        }
 
-    .fert-name {
-        font-weight: 600;
-        font-size: 14px;
-        color: var(--gray-900);
-        margin-bottom: 4px;
-    }
+        .fert-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
 
-    .fert-formula {
-        font-size: 12px;
-        color: var(--gray-600);
-        font-family: 'Courier New', monospace;
-    }
+        .fert-formula {
+            font-size: 12px;
+            color: var(--gray-600);
+            font-family: 'Courier New', monospace;
+        }
 
-    .fert-actions {
-        display: flex;
-        gap: 8px;
-    }
+        .fert-actions {
+            display: flex;
+            gap: 8px;
+        }
 
-    .icon-btn {
-        width: 32px;
-        height: 32px;
-        border: none;
-        background: var(--gray-100);
-        border-radius: var(--radius-sm);
-        cursor: pointer;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-    }
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
 
-    .icon-btn:hover {
-        background: var(--gray-200);
-        transform: scale(1.05);
-    }
+        .icon-btn:hover {
+            background: var(--gray-200);
+            transform: scale(1.05);
+        }
 
-    .icon-btn.delete:hover {
-        background: rgba(255, 59, 48, 0.1);
-        color: var(--danger);
-    }
+        .icon-btn.delete:hover {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--danger);
+        }
 
-    button[onclick="clearAllPrices()"]:hover {
-        background: var(--gray-300);
-        transform: translateY(-1px);
-    }
+        button[onclick="clearAllPrices()"]:hover {
+            background: var(--gray-300);
+            transform: translateY(-1px);
+        }
 
-    .result-card {
-        background: white;
-        border: 2px solid var(--gray-200);
-        border-radius: var(--radius-lg);
-        padding: 16px;
-        margin-bottom: 12px;
-    }
+        .result-card {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 12px;
+        }
 
-    .result-card.best {
-        border-color: var(--success);
-        background: linear-gradient(135deg, rgba(52, 199, 89, 0.05), white);
-    }
+        .result-card.best {
+            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(52, 199, 89, 0.05), white);
+        }
 
-    .result-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-    }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
 
-    .result-title {
-        font-size: 16px;
-        font-weight: 600;
-    }
+        .result-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
 
-    .badge {
-        padding: 4px 12px;
-        background: var(--success);
-        color: white;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-    }
+        .badge {
+            padding: 4px 12px;
+            background: var(--success);
+            color: white;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
 
-    .result-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-top: 12px;
-    }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
 
-    .result-item {
-        text-align: center;
-    }
+        .result-item {
+            text-align: center;
+        }
 
-    .result-label {
-        font-size: 11px;
-        color: var(--gray-600);
-        margin-bottom: 4px;
-    }
+        .result-label {
+            font-size: 11px;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+        }
 
-    .result-value {
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--gray-900);
-    }
+        .result-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
 
-    /* MODAL */
-    .modal-overlay {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.5);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        padding: 20px;
-    }
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
 
-    .modal-overlay.show { display: flex; }
+        .modal-overlay.show { display: flex; }
 
-    .modal {
-        background: white;
-        border-radius: var(--radius-xl);
-        max-width: 600px;
-        width: 100%;
-        max-height: 85vh;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
+        .modal {
+            background: white;
+            border-radius: var(--radius-xl);
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
 
-    .modal-header {
-        padding: 20px;
-        border-bottom: 2px solid var(--gray-200);
-        background: linear-gradient(135deg, var(--gray-100), white);
-    }
+        .modal-header {
+            padding: 20px;
+            border-bottom: 2px solid var(--gray-200);
+            background: linear-gradient(135deg, var(--gray-100), white);
+        }
 
-    .modal-header h3 {
-        font-size: 17px;
-        font-weight: 600;
-        margin-bottom: 6px;
-    }
+        .modal-header h3 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
 
-    .modal-header p {
-        font-size: 13px;
-        color: var(--gray-600);
-    }
+        .modal-header p {
+            font-size: 13px;
+            color: var(--gray-600);
+        }
 
-    .modal-body {
-        padding: 20px;
-        overflow-y: auto;
-        flex: 1;
-    }
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
 
-    .filter-section {
-        background: var(--gray-100);
-        padding: 16px;
-        border-radius: var(--radius-lg);
-        margin-bottom: 16px;
-        border: 2px solid var(--gray-200);
-    }
+        .filter-section {
+            background: var(--gray-100);
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+            border: 2px solid var(--gray-200);
+        }
 
-    .filter-title {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 12px;
-    }
+        .filter-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
 
-    .filter-help {
-        font-size: 11px;
-        color: var(--gray-600);
-        margin-top: 6px;
-    }
+        .filter-help {
+            font-size: 11px;
+            color: var(--gray-600);
+            margin-top: 6px;
+        }
 
-    .modal-footer {
-        padding: 16px 20px;
-        border-top: 2px solid var(--gray-200);
-        display: flex;
-        gap: 10px;
-        background: var(--gray-100);
-    }
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 2px solid var(--gray-200);
+            display: flex;
+            gap: 10px;
+            background: var(--gray-100);
+        }
 
-    .modal-btn {
-        flex: 1;
-        padding: 14px;
-        border: none;
-        border-radius: var(--radius-lg);
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-    }
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
 
-    .modal-btn.cancel {
-        background: white;
-        color: var(--gray-900);
-        border: 2px solid var(--gray-400);
-    }
+        .modal-btn.cancel {
+            background: white;
+            color: var(--gray-900);
+            border: 2px solid var(--gray-400);
+        }
 
-    .modal-btn.confirm {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-    }
+        .modal-btn.confirm {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
 
-    .empty { text-align: center; padding: 24px; color: var(--gray-600); font-size: 13px; }
+        .empty { text-align: center; padding: 24px; color: var(--gray-600); font-size: 13px; }
 
-    @media (max-width: 768px) {
-        .header-grid, .nutrient-grid, .result-grid { grid-template-columns: 1fr; }
-        .fert-row { grid-template-columns: repeat(2, 1fr); }
-    }
-</style>
-```
-
+        @media (max-width: 768px) {
+            .header-grid, .nutrient-grid, .result-grid { grid-template-columns: 1fr; }
+            .fert-row { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
 </head>
 <body>
     <div class="card">
@@ -426,31 +422,89 @@
         </div>
     </div>
 
-```
-<div class="card">
-    <h2>🎯 Necessidades (kg/ha)</h2>
-    <div id="nutrientInputs"></div>
-</div>
-
-<div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 style="margin: 0;">📋 Fertilizantes</h2>
-        <div class="toggle-expand" style="margin: 0; padding: 6px 12px;" id="toggleForm">
-            <span class="expand-icon open" id="formIcon">▼</span>
-            <span style="font-size: 11px;">Formulário</span>
-        </div>
+    <div class="card">
+        <h2>🎯 Necessidades (kg/ha)</h2>
+        <div id="nutrientInputs"></div>
     </div>
 
-    <div id="formCard">
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <div>
-                <label>Nome</label>
-                <input type="text" id="name" placeholder="Ex: MAP, KCl, Ureia">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h2 style="margin: 0;">📋 Fertilizantes</h2>
+            <div class="toggle-expand" style="margin: 0; padding: 6px 12px;" id="toggleForm">
+                <span class="expand-icon open" id="formIcon">▼</span>
+                <span style="font-size: 11px;">Formulário</span>
             </div>
+        </div>
+
+        <div id="formCard">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px;">
+                <div>
+                    <label>Nome</label>
+                    <input type="text" id="name" placeholder="Ex: MAP, KCl, Ureia">
+                </div>
+                <div>
+                    <label>Marca</label>
+                    <select id="brand">
+                        <option value="">Selecione</option>
+                        <option value="Cibra">Cibra</option>
+                        <option value="Yara">Yara</option>
+                        <option value="Mosaic">Mosaic</option>
+                        <option value="Eurochem">Eurochem</option>
+                        <option value="Heringer">Heringer</option>
+                        <option value="Nutrien">Nutrien</option>
+                        <option value="Fertipar">Fertipar</option>
+                        <option value="Outra">Outra</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="fert-row">
+                <div><label>N (%)</label><input type="number" id="n" value="0" step="0.1" min="0" max="100"></div>
+                <div><label>P₂O₅ (%)</label><input type="number" id="p" value="0" step="0.1" min="0" max="100"></div>
+                <div><label>K₂O (%)</label><input type="number" id="k" value="0" step="0.1" min="0" max="100"></div>
+                <div><label>Preço (R$/ton)</label><input type="number" id="price" step="10" min="0"></div>
+                <div><label>Frete (R$/ton)</label><input type="number" id="freight" value="0" step="10" min="0"></div>
+            </div>
+
+            <div class="toggle-expand" id="toggleSecondary">
+                <span class="expand-icon" id="secIcon">▶</span>
+                <span>Ca, S, B e outros</span>
+            </div>
+
+            <div class="secondary-grid" id="secondary">
+                <div><label>Ca %</label><input type="number" id="ca" value="0" step="0.1" min="0" max="100"></div>
+                <div><label>S %</label><input type="number" id="s" value="0" step="0.1" min="0" max="100"></div>
+                <div><label>B %</label><input type="number" id="b" value="0" step="0.01" min="0" max="100"></div>
+                <div><label>Outros %</label><input type="number" id="other" value="0" step="0.1" min="0" max="100"></div>
+            </div>
+
+            <button class="btn-add" id="addBtn">+ Adicionar</button>
+            <div id="editButtons" style="display: none; margin-top: 12px;">
+                <button class="btn-save" id="saveBtn">💾 Salvar</button>
+                <button class="btn-cancel" id="cancelBtn">Cancelar</button>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+            <div class="toggle-expand" id="toggleList" style="flex: 1; margin: 0;">
+                <span class="expand-icon open" id="listIcon">▼</span>
+                <span id="listText">Mostrar lista</span>
+            </div>
+            <button onclick="clearAllPrices()" style="padding: 8px 16px; background: var(--gray-200); border: none; border-radius: var(--radius-md); font-size: 12px; font-weight: 600; color: var(--gray-700); cursor: pointer; white-space: nowrap; transition: all 0.2s;">
+                🧹 Limpar Preços
+            </button>
+        </div>
+
+        <div id="list"></div>
+    </div>
+
+    <div class="card">
+        <h2>🎯 Filtros de Cálculo</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;">
             <div>
                 <label>Marca</label>
-                <select id="brand">
-                    <option value="">Selecione</option>
+                <select id="filterBrand">
+                    <option value="">Todas</option>
                     <option value="Cibra">Cibra</option>
                     <option value="Yara">Yara</option>
                     <option value="Mosaic">Mosaic</option>
@@ -458,548 +512,487 @@
                     <option value="Heringer">Heringer</option>
                     <option value="Nutrien">Nutrien</option>
                     <option value="Fertipar">Fertipar</option>
-                    <option value="Outra">Outra</option>
                 </select>
             </div>
-        </div>
-
-        <div class="fert-row">
-            <div><label>N (%)</label><input type="number" id="n" value="0" step="0.1" min="0" max="100"></div>
-            <div><label>P₂O₅ (%)</label><input type="number" id="p" value="0" step="0.1" min="0" max="100"></div>
-            <div><label>K₂O (%)</label><input type="number" id="k" value="0" step="0.1" min="0" max="100"></div>
-            <div><label>Preço (R$/ton)</label><input type="number" id="price" step="10" min="0"></div>
-            <div><label>Frete (R$/ton)</label><input type="number" id="freight" value="0" step="10" min="0"></div>
-        </div>
-
-        <div class="toggle-expand" id="toggleSecondary">
-            <span class="expand-icon" id="secIcon">▶</span>
-            <span>Ca, S, B e outros</span>
-        </div>
-
-        <div class="secondary-grid" id="secondary">
-            <div><label>Ca %</label><input type="number" id="ca" value="0" step="0.1" min="0" max="100"></div>
-            <div><label>S %</label><input type="number" id="s" value="0" step="0.1" min="0" max="100"></div>
-            <div><label>B %</label><input type="number" id="b" value="0" step="0.01" min="0" max="100"></div>
-            <div><label>Outros %</label><input type="number" id="other" value="0" step="0.1" min="0" max="100"></div>
-        </div>
-
-        <button class="btn-add" id="addBtn">+ Adicionar</button>
-        <div id="editButtons" style="display: none; margin-top: 12px;">
-            <button class="btn-save" id="saveBtn">💾 Salvar</button>
-            <button class="btn-cancel" id="cancelBtn">Cancelar</button>
+            <div>
+                <label>Limite K₂O em Fert. P (kg/ha)</label>
+                <input type="number" id="kLimitInP" value="20" step="5" min="0">
+            </div>
+            <div>
+                <label>Custo Máx. (R$/ha)</label>
+                <input type="number" id="costLimit" value="0" step="100" min="0" placeholder="0 = sem limite">
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0;">
+                    <input type="checkbox" id="preferKClWithB" style="width: 18px; height: 18px;">
+                    <span style="font-size: 13px;">Preferir KCl+B</span>
+                </label>
+            </div>
         </div>
     </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
-        <div class="toggle-expand" id="toggleList" style="flex: 1; margin: 0;">
-            <span class="expand-icon open" id="listIcon">▼</span>
-            <span id="listText">Mostrar lista</span>
-        </div>
-        <button onclick="clearAllPrices()" style="padding: 8px 16px; background: var(--gray-200); border: none; border-radius: var(--radius-md); font-size: 12px; font-weight: 600; color: var(--gray-700); cursor: pointer; white-space: nowrap; transition: all 0.2s;">
-            🧹 Limpar Preços
-        </button>
-    </div>
+    <button class="btn-calc" id="calcBtn">💰 Calcular Melhores Combinações</button>
 
-    <div id="list"></div>
-</div>
+    <div id="results"></div>
 
-<div class="card">
-    <h2>🎯 Filtros de Cálculo</h2>
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;">
-        <div>
-            <label>Marca</label>
-            <select id="filterBrand">
-                <option value="">Todas</option>
-                <option value="Cibra">Cibra</option>
-                <option value="Yara">Yara</option>
-                <option value="Mosaic">Mosaic</option>
-                <option value="Eurochem">Eurochem</option>
-                <option value="Heringer">Heringer</option>
-                <option value="Nutrien">Nutrien</option>
-                <option value="Fertipar">Fertipar</option>
-            </select>
-        </div>
-        <div>
-            <label>Limite K₂O em Fert. P (kg/ha)</label>
-            <input type="number" id="kLimitInP" value="20" step="5" min="0">
-        </div>
-        <div>
-            <label>Custo Máx. (R$/ha)</label>
-            <input type="number" id="costLimit" value="0" step="100" min="0" placeholder="0 = sem limite">
-        </div>
-        <div style="display: flex; align-items: flex-end;">
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0;">
-                <input type="checkbox" id="preferKClWithB" style="width: 18px; height: 18px;">
-                <span style="font-size: 13px;">Preferir KCl+B</span>
-            </label>
-        </div>
-    </div>
-</div>
+    <script>
+        const CROP_CONFIG = {
+            soja: { label: 'Soja', nutrients: ['P', 'K'], order: ['P', 'K', 'N'] },
+            milho: { label: 'Milho', nutrients: ['N', 'K', 'P'], order: ['N', 'K', 'P'] }
+        };
 
-<button class="btn-calc" id="calcBtn">💰 Calcular Melhores Combinações</button>
+        const DEFAULT_FERTILIZERS = [
+            { name: "MAP 11-52/44", brand: "Mosaic", n: 11, p: 52, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 3800, freight: 0 },
+            { name: "KCL 60", brand: "Mosaic", n: 0, p: 0, k: 60, ca: 0, s: 0, b: 0, other: 0, price: 2800, freight: 0 },
+            { name: "UREIA 46", brand: "Yara", n: 46, p: 0, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2600, freight: 0 },
+            { name: "08-28-16", brand: "Cibra", n: 8, p: 28, k: 16, ca: 0, s: 0, b: 0, other: 0, price: 2700, freight: 0 },
+            { name: "10-50-00", brand: "Cibra", n: 10, p: 50, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 3050, freight: 0 },
+            { name: "04-30-10", brand: "Cibra", n: 4, p: 30, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2450, freight: 0 },
+            { name: "20-00-20", brand: "Yara", n: 20, p: 0, k: 20, ca: 0, s: 0, b: 0, other: 0, price: 2600, freight: 0 },
+            { name: "KCL+B 58", brand: "Eurochem", n: 0, p: 0, k: 58, ca: 0, s: 0, b: 0.5, other: 0, price: 2950, freight: 0 },
+            { name: "SSP 20/16", brand: "Heringer", n: 0, p: 20, k: 0, ca: 16, s: 11, b: 0, other: 0, price: 1800, freight: 0 },
+            { name: "SAM 20,5/23", brand: "Mosaic", n: 20.5, p: 0, k: 0, ca: 0, s: 23, b: 0, other: 0, price: 2400, freight: 0 },
+            
+            // Mosaic - Linha MS09E
+            { name: "MS09E 05 26 25 S9", brand: "Mosaic", n: 5, p: 26, k: 25, ca: 0, s: 9, b: 0, other: 0, price: 2800, freight: 0 },
+            { name: "MS09E 08 37 11 S9", brand: "Mosaic", n: 8, p: 37, k: 11, ca: 0, s: 9, b: 0, other: 0, price: 2900, freight: 0 },
+            
+            // Eurochem/Mosaic - Linha ES
+            { name: "ES Microessentials S9 10 46 00", brand: "Mosaic", n: 10, p: 46, k: 0, ca: 0, s: 9, b: 0, other: 0, price: 3000, freight: 0 },
+            { name: "ES Aspire 00 00 58 + 0,5B", brand: "Mosaic", n: 0, p: 0, k: 58, ca: 0, s: 0, b: 0.5, other: 0, price: 2950, freight: 0 },
+            { name: "ES KCl 60 PLUS 08 40 06 + 0,05B", brand: "Mosaic", n: 8, p: 40, k: 6, ca: 0, s: 0, b: 0.05, other: 0, price: 2850, freight: 0 },
+            { name: "ES KCl 60 PLUS 08 37 11 + 0,09B", brand: "Mosaic", n: 8, p: 37, k: 11, ca: 0, s: 0, b: 0.09, other: 0, price: 2900, freight: 0 }
+        ];
 
-<div id="results"></div>
+        const state = {
+            crop: 'soja',
+            fertilizers: [],
+            editingIndex: -1,
+            filters: { kLimitInP: 20, preferKClWithB: false, costLimit: 0, filterBrand: '' }
+        };
 
-<script>
-    const CROP_CONFIG = {
-        soja: { label: 'Soja', nutrients: ['P', 'K'], order: ['P', 'K', 'N'] },
-        milho: { label: 'Milho', nutrients: ['N', 'K', 'P'], order: ['N', 'K', 'P'] }
-    };
+        function init() {
+            // Carrega do localStorage ou usa padrões
+            const saved = localStorage.getItem('fertCalc');
+            if (saved) {
+                const data = JSON.parse(saved);
+                state.crop = data.crop || 'soja';
+                state.fertilizers = data.fertilizers || [];
+                state.filters = data.filters || state.filters;
+                if (data.area) document.getElementById('area').value = data.area;
+                if (data.price) document.getElementById('grainPrice').value = data.price;
+            }
 
-    const DEFAULT_FERTILIZERS = [
-        { name: "MAP 11-52/44", brand: "Mosaic", n: 11, p: 52, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 3800, freight: 0 },
-        { name: "KCL 60", brand: "Mosaic", n: 0, p: 0, k: 60, ca: 0, s: 0, b: 0, other: 0, price: 2800, freight: 0 },
-        { name: "UREIA 46", brand: "Yara", n: 46, p: 0, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 2600, freight: 0 },
-        { name: "08-28-16", brand: "Cibra", n: 8, p: 28, k: 16, ca: 0, s: 0, b: 0, other: 0, price: 2700, freight: 0 },
-        { name: "10-50-00", brand: "Cibra", n: 10, p: 50, k: 0, ca: 0, s: 0, b: 0, other: 0, price: 3050, freight: 0 },
-        { name: "04-30-10", brand: "Cibra", n: 4, p: 30, k: 10, ca: 0, s: 0, b: 0, other: 0, price: 2450, freight: 0 },
-        { name: "20-00-20", brand: "Yara", n: 20, p: 0, k: 20, ca: 0, s: 0, b: 0, other: 0, price: 2600, freight: 0 },
-        { name: "KCL+B 58", brand: "Eurochem", n: 0, p: 0, k: 58, ca: 0, s: 0, b: 0.5, other: 0, price: 2950, freight: 0 },
-        { name: "SSP 20/16", brand: "Heringer", n: 0, p: 20, k: 0, ca: 16, s: 11, b: 0, other: 0, price: 1800, freight: 0 },
-        { name: "SAM 20,5/23", brand: "Mosaic", n: 20.5, p: 0, k: 0, ca: 0, s: 23, b: 0, other: 0, price: 2400, freight: 0 },
-        
-        // Mosaic - Linha MS09E
-        { name: "MS09E 05 26 25 S9", brand: "Mosaic", n: 5, p: 26, k: 25, ca: 0, s: 9, b: 0, other: 0, price: 2800, freight: 0 },
-        { name: "MS09E 08 37 11 S9", brand: "Mosaic", n: 8, p: 37, k: 11, ca: 0, s: 9, b: 0, other: 0, price: 2900, freight: 0 },
-        
-        // Eurochem/Mosaic - Linha ES
-        { name: "ES Microessentials S9 10 46 00", brand: "Mosaic", n: 10, p: 46, k: 0, ca: 0, s: 9, b: 0, other: 0, price: 3000, freight: 0 },
-        { name: "ES Aspire 00 00 58 + 0,5B", brand: "Mosaic", n: 0, p: 0, k: 58, ca: 0, s: 0, b: 0.5, other: 0, price: 2950, freight: 0 },
-        { name: "ES KCl 60 PLUS 08 40 06 + 0,05B", brand: "Mosaic", n: 8, p: 40, k: 6, ca: 0, s: 0, b: 0.05, other: 0, price: 2850, freight: 0 },
-        { name: "ES KCl 60 PLUS 08 37 11 + 0,09B", brand: "Mosaic", n: 8, p: 37, k: 11, ca: 0, s: 0, b: 0.09, other: 0, price: 2900, freight: 0 }
-    ];
+            // Se não tem fertilizantes, carrega os padrões
+            if (state.fertilizers.length === 0) {
+                state.fertilizers = DEFAULT_FERTILIZERS.map(f => ({...f}));
+            }
 
-    const state = {
-        crop: 'soja',
-        fertilizers: [],
-        editingIndex: -1,
-        filters: { kLimitInP: 20, preferKClWithB: false, costLimit: 0, filterBrand: '' }
-    };
+            // Restaura valores dos filtros nos inputs
+            document.getElementById('kLimitInP').value = state.filters.kLimitInP;
+            document.getElementById('preferKClWithB').checked = state.filters.preferKClWithB;
+            document.getElementById('costLimit').value = state.filters.costLimit;
+            document.getElementById('filterBrand').value = state.filters.filterBrand || '';
 
-    function init() {
-        // Carrega do localStorage ou usa padrões
-        const saved = localStorage.getItem('fertCalc');
-        if (saved) {
-            const data = JSON.parse(saved);
-            state.crop = data.crop || 'soja';
-            state.fertilizers = data.fertilizers || [];
-            state.filters = data.filters || state.filters;
-            if (data.area) document.getElementById('area').value = data.area;
-            if (data.price) document.getElementById('grainPrice').value = data.price;
+            document.getElementById('crop').value = state.crop;
+            renderNutrients();
+            renderList();
+            updateListToggle();
+
+            console.log(`✅ ${state.fertilizers.length} fertilizantes carregados`);
         }
 
-        // Se não tem fertilizantes, carrega os padrões
-        if (state.fertilizers.length === 0) {
-            state.fertilizers = DEFAULT_FERTILIZERS.map(f => ({...f}));
-        }
+        function renderNutrients() {
+            const container = document.getElementById('nutrientInputs');
+            const config = CROP_CONFIG[state.crop];
+            document.getElementById('grainLabel').textContent = `${config.label} (R$/sc)`;
 
-        // Restaura valores dos filtros nos inputs
-        document.getElementById('kLimitInP').value = state.filters.kLimitInP;
-        document.getElementById('preferKClWithB').checked = state.filters.preferKClWithB;
-        document.getElementById('costLimit').value = state.filters.costLimit;
-        document.getElementById('filterBrand').value = state.filters.filterBrand || '';
-
-        document.getElementById('crop').value = state.crop;
-        renderNutrients();
-        renderList();
-        updateListToggle();
-
-        console.log(`✅ ${state.fertilizers.length} fertilizantes carregados`);
-    }
-
-    function renderNutrients() {
-        const container = document.getElementById('nutrientInputs');
-        const config = CROP_CONFIG[state.crop];
-        document.getElementById('grainLabel').textContent = `${config.label} (R$/sc)`;
-
-        container.innerHTML = '<div class="nutrient-grid">' + 
-            config.order.map(n => `
-                <div>
-                    <label>${n === 'P' ? 'P₂O₅' : n === 'K' ? 'K₂O' : 'N'} (kg/ha)</label>
-                    <input type="number" id="need${n}" value="0" step="1" min="0" 
-                           ${config.nutrients.includes(n) ? '' : 'disabled'}>
-                </div>
-            `).join('') + '</div>';
-    }
-
-    function renderList() {
-        const container = document.getElementById('list');
-        container.innerHTML = '';
-
-        if (state.fertilizers.length === 0) {
-            container.innerHTML = '<div class="empty">Nenhum fertilizante cadastrado</div>';
-            return;
-        }
-
-        state.fertilizers.forEach((f, i) => {
-            const item = document.createElement('div');
-            item.className = 'fert-item';
-            item.innerHTML = `
-                <div class="fert-info">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                        <div class="fert-name">${f.name}</div>
-                        ${f.brand ? `<span style="font-size: 10px; padding: 2px 8px; background: var(--gray-200); color: var(--gray-700); border-radius: 10px; font-weight: 500;">${f.brand}</span>` : ''}
+            container.innerHTML = '<div class="nutrient-grid">' + 
+                config.order.map(n => `
+                    <div>
+                        <label>${n === 'P' ? 'P₂O₅' : n === 'K' ? 'K₂O' : 'N'} (kg/ha)</label>
+                        <input type="number" id="need${n}" value="0" step="1" min="0" 
+                               ${config.nutrients.includes(n) ? '' : 'disabled'}>
                     </div>
-                    <div class="fert-formula">${f.n}-${f.p}-${f.k} | R$ ${f.price}/ton</div>
-                </div>
-                <div class="fert-actions">
-                    <button class="icon-btn" onclick="editFert(${i})">✏️</button>
-                    <button class="icon-btn delete" onclick="deleteFert(${i})">×</button>
-                </div>
-            `;
-            container.appendChild(item);
-        });
-    }
-
-    function addFert() {
-        const name = document.getElementById('name').value.trim();
-        if (!name) return alert('Preencha o nome do fertilizante');
-
-        const fert = {
-            name,
-            brand: document.getElementById('brand').value || '',
-            n: parseFloat(document.getElementById('n').value) || 0,
-            p: parseFloat(document.getElementById('p').value) || 0,
-            k: parseFloat(document.getElementById('k').value) || 0,
-            ca: parseFloat(document.getElementById('ca').value) || 0,
-            s: parseFloat(document.getElementById('s').value) || 0,
-            b: parseFloat(document.getElementById('b').value) || 0,
-            other: parseFloat(document.getElementById('other').value) || 0,
-            price: parseFloat(document.getElementById('price').value) || 0,
-            freight: parseFloat(document.getElementById('freight').value) || 0
-        };
-
-        if (fert.n + fert.p + fert.k + fert.ca + fert.s + fert.b + fert.other > 100) {
-            return alert('Soma dos nutrientes não pode passar de 100%');
+                `).join('') + '</div>';
         }
 
-        state.fertilizers.push(fert);
-        clearForm();
-        renderList();
-        updateListToggle();
-        save();
-    }
+        function renderList() {
+            const container = document.getElementById('list');
+            container.innerHTML = '';
 
-    function editFert(index) {
-        state.editingIndex = index;
-        const f = state.fertilizers[index];
+            if (state.fertilizers.length === 0) {
+                container.innerHTML = '<div class="empty">Nenhum fertilizante cadastrado</div>';
+                return;
+            }
 
-        document.getElementById('name').value = f.name;
-        document.getElementById('brand').value = f.brand || '';
-        document.getElementById('n').value = f.n;
-        document.getElementById('p').value = f.p;
-        document.getElementById('k').value = f.k;
-        document.getElementById('ca').value = f.ca;
-        document.getElementById('s').value = f.s;
-        document.getElementById('b').value = f.b;
-        document.getElementById('other').value = f.other;
-        document.getElementById('price').value = f.price;
-        document.getElementById('freight').value = f.freight;
-
-        document.getElementById('addBtn').style.display = 'none';
-        document.getElementById('editButtons').style.display = 'block';
-
-        // Scroll para o formulário
-        document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function saveEdit() {
-        if (state.editingIndex === -1) return;
-
-        const fert = {
-            name: document.getElementById('name').value.trim(),
-            brand: document.getElementById('brand').value || '',
-            n: parseFloat(document.getElementById('n').value) || 0,
-            p: parseFloat(document.getElementById('p').value) || 0,
-            k: parseFloat(document.getElementById('k').value) || 0,
-            ca: parseFloat(document.getElementById('ca').value) || 0,
-            s: parseFloat(document.getElementById('s').value) || 0,
-            b: parseFloat(document.getElementById('b').value) || 0,
-            other: parseFloat(document.getElementById('other').value) || 0,
-            price: parseFloat(document.getElementById('price').value) || 0,
-            freight: parseFloat(document.getElementById('freight').value) || 0
-        };
-
-        if (fert.n + fert.p + fert.k + fert.ca + fert.s + fert.b + fert.other > 100) {
-            return alert('Soma dos nutrientes não pode passar de 100%');
+            state.fertilizers.forEach((f, i) => {
+                const item = document.createElement('div');
+                item.className = 'fert-item';
+                item.innerHTML = `
+                    <div class="fert-info">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                            <div class="fert-name">${f.name}</div>
+                            ${f.brand ? `<span style="font-size: 10px; padding: 2px 8px; background: var(--gray-200); color: var(--gray-700); border-radius: 10px; font-weight: 500;">${f.brand}</span>` : ''}
+                        </div>
+                        <div class="fert-formula">${f.n}-${f.p}-${f.k} | R$ ${f.price}/ton</div>
+                    </div>
+                    <div class="fert-actions">
+                        <button class="icon-btn" onclick="editFert(${i})">✏️</button>
+                        <button class="icon-btn delete" onclick="deleteFert(${i})">×</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
         }
 
-        state.fertilizers[state.editingIndex] = fert;
-        cancelEdit();
-        renderList();
-        save();
-    }
+        function addFert() {
+            const name = document.getElementById('name').value.trim();
+            if (!name) return alert('Preencha o nome do fertilizante');
 
-    function cancelEdit() {
-        state.editingIndex = -1;
-        clearForm();
-        document.getElementById('addBtn').style.display = 'block';
-        document.getElementById('editButtons').style.display = 'none';
-    }
+            const fert = {
+                name,
+                brand: document.getElementById('brand').value || '',
+                n: parseFloat(document.getElementById('n').value) || 0,
+                p: parseFloat(document.getElementById('p').value) || 0,
+                k: parseFloat(document.getElementById('k').value) || 0,
+                ca: parseFloat(document.getElementById('ca').value) || 0,
+                s: parseFloat(document.getElementById('s').value) || 0,
+                b: parseFloat(document.getElementById('b').value) || 0,
+                other: parseFloat(document.getElementById('other').value) || 0,
+                price: parseFloat(document.getElementById('price').value) || 0,
+                freight: parseFloat(document.getElementById('freight').value) || 0
+            };
 
-    function deleteFert(index) {
-        if (confirm('Excluir este fertilizante?')) {
-            state.fertilizers.splice(index, 1);
+            if (fert.n + fert.p + fert.k + fert.ca + fert.s + fert.b + fert.other > 100) {
+                return alert('Soma dos nutrientes não pode passar de 100%');
+            }
+
+            state.fertilizers.push(fert);
+            clearForm();
             renderList();
             updateListToggle();
             save();
         }
-    }
 
-    function clearForm() {
-        document.getElementById('name').value = '';
-        document.getElementById('brand').value = '';
-        ['n', 'p', 'k', 'ca', 's', 'b', 'other', 'price'].forEach(id => {
-            document.getElementById(id).value = '0';
-        });
-        document.getElementById('freight').value = '0';
-    }
+        function editFert(index) {
+            state.editingIndex = index;
+            const f = state.fertilizers[index];
 
-    function updateListToggle() {
-        const text = document.getElementById('listText');
-        const list = document.getElementById('list');
-        const isVisible = list.style.display !== 'none';
-        text.textContent = `${isVisible ? 'Ocultar' : 'Mostrar'} lista (${state.fertilizers.length})`;
-    }
+            document.getElementById('name').value = f.name;
+            document.getElementById('brand').value = f.brand || '';
+            document.getElementById('n').value = f.n;
+            document.getElementById('p').value = f.p;
+            document.getElementById('k').value = f.k;
+            document.getElementById('ca').value = f.ca;
+            document.getElementById('s').value = f.s;
+            document.getElementById('b').value = f.b;
+            document.getElementById('other').value = f.other;
+            document.getElementById('price').value = f.price;
+            document.getElementById('freight').value = f.freight;
 
-    function clearAllPrices() {
-        if (!confirm('Limpar todos os preços e fretes?\n\nIsso zerará os valores de R$/ton e Frete de todos os fertilizantes.')) {
-            return;
+            document.getElementById('addBtn').style.display = 'none';
+            document.getElementById('editButtons').style.display = 'block';
+
+            // Scroll para o formulário
+            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
         }
 
-        state.fertilizers.forEach(f => {
-            f.price = 0;
-            f.freight = 0;
-        });
+        function saveEdit() {
+            if (state.editingIndex === -1) return;
 
-        renderList();
-        save();
-        
-        alert('✅ Preços e fretes limpos com sucesso!');
-    }
+            const fert = {
+                name: document.getElementById('name').value.trim(),
+                brand: document.getElementById('brand').value || '',
+                n: parseFloat(document.getElementById('n').value) || 0,
+                p: parseFloat(document.getElementById('p').value) || 0,
+                k: parseFloat(document.getElementById('k').value) || 0,
+                ca: parseFloat(document.getElementById('ca').value) || 0,
+                s: parseFloat(document.getElementById('s').value) || 0,
+                b: parseFloat(document.getElementById('b').value) || 0,
+                other: parseFloat(document.getElementById('other').value) || 0,
+                price: parseFloat(document.getElementById('price').value) || 0,
+                freight: parseFloat(document.getElementById('freight').value) || 0
+            };
 
-    function calculate() {
-        const area = parseFloat(document.getElementById('area').value);
-        const grainPrice = parseFloat(document.getElementById('grainPrice').value);
-        
-        if (!area || !grainPrice) return alert('Preencha área e preço do grão');
-        if (state.fertilizers.length < 2) return alert('Cadastre pelo menos 2 fertilizantes');
+            if (fert.n + fert.p + fert.k + fert.ca + fert.s + fert.b + fert.other > 100) {
+                return alert('Soma dos nutrientes não pode passar de 100%');
+            }
 
-        const needs = {
-            N: parseFloat(document.getElementById('needN')?.value) || 0,
-            P: parseFloat(document.getElementById('needP')?.value) || 0,
-            K: parseFloat(document.getElementById('needK')?.value) || 0
-        };
-
-        if (needs.N === 0 && needs.P === 0 && needs.K === 0) {
-            return alert('Preencha as necessidades nutricionais');
+            state.fertilizers[state.editingIndex] = fert;
+            cancelEdit();
+            renderList();
+            save();
         }
 
-        // Lê filtros diretamente dos inputs
-        const kLimit = parseFloat(document.getElementById('kLimitInP').value) || 0;
-        const preferKClWithB = document.getElementById('preferKClWithB').checked;
-        const costLimit = parseFloat(document.getElementById('costLimit').value) || 0;
-        const filterBrand = document.getElementById('filterBrand').value;
+        function cancelEdit() {
+            state.editingIndex = -1;
+            clearForm();
+            document.getElementById('addBtn').style.display = 'block';
+            document.getElementById('editButtons').style.display = 'none';
+        }
 
-        // Salva filtros no state
-        state.filters = { kLimitInP: kLimit, preferKClWithB, costLimit, filterBrand };
+        function deleteFert(index) {
+            if (confirm('Excluir este fertilizante?')) {
+                state.fertilizers.splice(index, 1);
+                renderList();
+                updateListToggle();
+                save();
+            }
+        }
 
-        // Aplica filtros
-        let validFerts = state.fertilizers.filter(f => {
-            // Filtro de marca
-            if (filterBrand && f.brand !== filterBrand) return false;
+        function clearForm() {
+            document.getElementById('name').value = '';
+            document.getElementById('brand').value = '';
+            ['n', 'p', 'k', 'ca', 's', 'b', 'other', 'price'].forEach(id => {
+                document.getElementById(id).value = '0';
+            });
+            document.getElementById('freight').value = '0';
+        }
+
+        function updateListToggle() {
+            const text = document.getElementById('listText');
+            const list = document.getElementById('list');
+            const isVisible = list.style.display !== 'none';
+            text.textContent = `${isVisible ? 'Ocultar' : 'Mostrar'} lista (${state.fertilizers.length})`;
+        }
+
+        function clearAllPrices() {
+            if (!confirm('Limpar todos os preços e fretes?\n\nIsso zerará os valores de R$/ton e Frete de todos os fertilizantes.')) {
+                return;
+            }
+
+            state.fertilizers.forEach(f => {
+                f.price = 0;
+                f.freight = 0;
+            });
+
+            renderList();
+            save();
             
-            // Filtro de K em fertilizante de P
-            if (f.p > 0 && f.k > 0 && kLimit > 0) {
-                const doseForP = (needs.P * 100) / f.p;
-                const kFromFert = (doseForP * f.k) / 100;
-                return kFromFert <= kLimit;
-            }
-            return true;
-        });
-
-        if (validFerts.length < 2) return alert('Poucos fertilizantes válidos após aplicar filtros');
-
-        const combinations = [];
-
-        for (let i = 0; i < validFerts.length; i++) {
-            for (let j = i + 1; j < validFerts.length; j++) {
-                const f1 = validFerts[i];
-                const f2 = validFerts[j];
-                let dose1 = 0, dose2 = 0;
-
-                // Prioridade: P > K > N
-                if (needs.P > 0) {
-                    if (f1.p > 0 && f2.p === 0) dose1 = (needs.P * 100) / f1.p;
-                    else if (f2.p > 0 && f1.p === 0) dose2 = (needs.P * 100) / f2.p;
-                    else if (f1.p > f2.p) dose1 = (needs.P * 100) / f1.p;
-                    else if (f2.p > 0) dose2 = (needs.P * 100) / f2.p;
-                }
-
-                const kGot = (dose1 * f1.k + dose2 * f2.k) / 100;
-                const kNeed = Math.max(0, needs.K - kGot);
-
-                if (kNeed > 0) {
-                    if (f1.k > 0 && (dose1 === 0 || f1.p === 0)) dose1 = Math.max(dose1, (kNeed * 100) / f1.k);
-                    else if (f2.k > 0 && (dose2 === 0 || f2.p === 0)) dose2 = Math.max(dose2, (kNeed * 100) / f2.k);
-                }
-
-                const nGot = (dose1 * f1.n + dose2 * f2.n) / 100;
-                const nNeed = Math.max(0, needs.N - nGot);
-
-                if (nNeed > 0) {
-                    if (f1.n > 0 && dose1 === 0) dose1 = (nNeed * 100) / f1.n;
-                    else if (f2.n > 0 && dose2 === 0) dose2 = (nNeed * 100) / f2.n;
-                }
-
-                if (dose1 > 0 || dose2 > 0) {
-                    const ton1 = (dose1 / 1000) * area;
-                    const ton2 = (dose2 / 1000) * area;
-                    
-                    // Aplica boost KCl+B
-                    const boost1 = (preferKClWithB && f1.k > 0 && f1.b > 0) ? 0.95 : 1;
-                    const boost2 = (preferKClWithB && f2.k > 0 && f2.b > 0) ? 0.95 : 1;
-                    
-                    const cost1 = ton1 * (f1.price + f1.freight) * boost1;
-                    const cost2 = ton2 * (f2.price + f2.freight) * boost2;
-                    const total = cost1 + cost2;
-                    const perHa = total / area;
-
-                    // Filtro de custo
-                    if (costLimit > 0 && perHa > costLimit) continue;
-
-                    combinations.push({
-                        f1: { name: f1.name, dose: dose1, ton: ton1, cost: cost1 },
-                        f2: { name: f2.name, dose: dose2, ton: ton2, cost: cost2 },
-                        total, perHa, sacks: perHa / grainPrice
-                    });
-                }
-            }
+            alert('✅ Preços e fretes limpos com sucesso!');
         }
 
-        if (combinations.length === 0) return alert('Nenhuma combinação válida encontrada');
+        function calculate() {
+            const area = parseFloat(document.getElementById('area').value);
+            const grainPrice = parseFloat(document.getElementById('grainPrice').value);
+            
+            if (!area || !grainPrice) return alert('Preencha área e preço do grão');
+            if (state.fertilizers.length < 2) return alert('Cadastre pelo menos 2 fertilizantes');
 
-        combinations.sort((a, b) => a.total - b.total);
-        renderResults(combinations.slice(0, 2));
-        save();
-    }
+            const needs = {
+                N: parseFloat(document.getElementById('needN')?.value) || 0,
+                P: parseFloat(document.getElementById('needP')?.value) || 0,
+                K: parseFloat(document.getElementById('needK')?.value) || 0
+            };
 
-    function renderResults(combinations) {
-        const container = document.getElementById('results');
-        container.innerHTML = '';
+            if (needs.N === 0 && needs.P === 0 && needs.K === 0) {
+                return alert('Preencha as necessidades nutricionais');
+            }
 
-        const nutrientLabels = state.crop === 'soja' 
-            ? { left: 'Fósforo (P₂O₅)', right: 'Potássio (K₂O)' }
-            : { left: 'Nitrogênio (N)', right: 'Potássio (K₂O)' };
+            // Lê filtros diretamente dos inputs
+            const kLimit = parseFloat(document.getElementById('kLimitInP').value) || 0;
+            const preferKClWithB = document.getElementById('preferKClWithB').checked;
+            const costLimit = parseFloat(document.getElementById('costLimit').value) || 0;
+            const filterBrand = document.getElementById('filterBrand').value;
 
-        combinations.forEach((c, i) => {
-            const card = document.createElement('div');
-            card.className = 'result-card' + (i === 0 ? ' best' : '');
-            card.innerHTML = `
-                <div class="result-header">
-                    <div class="result-title">${c.f1.name} + ${c.f2.name}</div>
-                    ${i === 0 ? '<span class="badge">🥇 Melhor</span>' : '<span class="badge" style="background: var(--warning);">🥈 2ª Opção</span>'}
-                </div>
+            // Salva filtros no state
+            state.filters = { kLimitInP: kLimit, preferKClWithB, costLimit, filterBrand };
+
+            // Aplica filtros
+            let validFerts = state.fertilizers.filter(f => {
+                // Filtro de marca
+                if (filterBrand && f.brand !== filterBrand) return false;
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; padding: 16px; background: var(--gray-100); border-radius: var(--radius-md);">
-                    <div>
-                        <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase; margin-bottom: 8px;">${nutrientLabels.left}</div>
-                        <div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">${c.f1.name}</div>
-                        <div style="font-size: 18px; font-weight: 700; color: var(--primary);">${c.f1.dose.toFixed(1)} kg/ha</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase; margin-bottom: 8px;">${nutrientLabels.right}</div>
-                        <div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">${c.f2.name}</div>
-                        <div style="font-size: 18px; font-weight: 700; color: var(--success);">${c.f2.dose.toFixed(1)} kg/ha</div>
-                    </div>
-                </div>
+                // Filtro de K em fertilizante de P
+                if (f.p > 0 && f.k > 0 && kLimit > 0) {
+                    const doseForP = (needs.P * 100) / f.p;
+                    const kFromFert = (doseForP * f.k) / 100;
+                    return kFromFert <= kLimit;
+                }
+                return true;
+            });
 
-                <div class="result-grid">
-                    <div class="result-item">
-                        <div class="result-label">CUSTO TOTAL</div>
-                        <div class="result-value">R$ ${c.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+            if (validFerts.length < 2) return alert('Poucos fertilizantes válidos após aplicar filtros');
+
+            const combinations = [];
+
+            for (let i = 0; i < validFerts.length; i++) {
+                for (let j = i + 1; j < validFerts.length; j++) {
+                    const f1 = validFerts[i];
+                    const f2 = validFerts[j];
+                    let dose1 = 0, dose2 = 0;
+
+                    // Prioridade: P > K > N
+                    if (needs.P > 0) {
+                        if (f1.p > 0 && f2.p === 0) dose1 = (needs.P * 100) / f1.p;
+                        else if (f2.p > 0 && f1.p === 0) dose2 = (needs.P * 100) / f2.p;
+                        else if (f1.p > f2.p) dose1 = (needs.P * 100) / f1.p;
+                        else if (f2.p > 0) dose2 = (needs.P * 100) / f2.p;
+                    }
+
+                    const kGot = (dose1 * f1.k + dose2 * f2.k) / 100;
+                    const kNeed = Math.max(0, needs.K - kGot);
+
+                    if (kNeed > 0) {
+                        if (f1.k > 0 && (dose1 === 0 || f1.p === 0)) dose1 = Math.max(dose1, (kNeed * 100) / f1.k);
+                        else if (f2.k > 0 && (dose2 === 0 || f2.p === 0)) dose2 = Math.max(dose2, (kNeed * 100) / f2.k);
+                    }
+
+                    const nGot = (dose1 * f1.n + dose2 * f2.n) / 100;
+                    const nNeed = Math.max(0, needs.N - nGot);
+
+                    if (nNeed > 0) {
+                        if (f1.n > 0 && dose1 === 0) dose1 = (nNeed * 100) / f1.n;
+                        else if (f2.n > 0 && dose2 === 0) dose2 = (nNeed * 100) / f2.n;
+                    }
+
+                    if (dose1 > 0 || dose2 > 0) {
+                        const ton1 = (dose1 / 1000) * area;
+                        const ton2 = (dose2 / 1000) * area;
+                        
+                        // Aplica boost KCl+B
+                        const boost1 = (preferKClWithB && f1.k > 0 && f1.b > 0) ? 0.95 : 1;
+                        const boost2 = (preferKClWithB && f2.k > 0 && f2.b > 0) ? 0.95 : 1;
+                        
+                        const cost1 = ton1 * (f1.price + f1.freight) * boost1;
+                        const cost2 = ton2 * (f2.price + f2.freight) * boost2;
+                        const total = cost1 + cost2;
+                        const perHa = total / area;
+
+                        // Filtro de custo
+                        if (costLimit > 0 && perHa > costLimit) continue;
+
+                        combinations.push({
+                            f1: { name: f1.name, dose: dose1, ton: ton1, cost: cost1 },
+                            f2: { name: f2.name, dose: dose2, ton: ton2, cost: cost2 },
+                            total, perHa, sacks: perHa / grainPrice
+                        });
+                    }
+                }
+            }
+
+            if (combinations.length === 0) return alert('Nenhuma combinação válida encontrada');
+
+            combinations.sort((a, b) => a.total - b.total);
+            renderResults(combinations.slice(0, 2));
+            save();
+        }
+
+        function renderResults(combinations) {
+            const container = document.getElementById('results');
+            container.innerHTML = '';
+
+            const nutrientLabels = state.crop === 'soja' 
+                ? { left: 'Fósforo (P₂O₅)', right: 'Potássio (K₂O)' }
+                : { left: 'Nitrogênio (N)', right: 'Potássio (K₂O)' };
+
+            combinations.forEach((c, i) => {
+                const card = document.createElement('div');
+                card.className = 'result-card' + (i === 0 ? ' best' : '');
+                card.innerHTML = `
+                    <div class="result-header">
+                        <div class="result-title">${c.f1.name} + ${c.f2.name}</div>
+                        ${i === 0 ? '<span class="badge">🥇 Melhor</span>' : '<span class="badge" style="background: var(--warning);">🥈 2ª Opção</span>'}
                     </div>
-                    <div class="result-item">
-                        <div class="result-label">R$/HECTARE</div>
-                        <div class="result-value">R$ ${c.perHa.toFixed(2)}</div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; padding: 16px; background: var(--gray-100); border-radius: var(--radius-md);">
+                        <div>
+                            <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase; margin-bottom: 8px;">${nutrientLabels.left}</div>
+                            <div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">${c.f1.name}</div>
+                            <div style="font-size: 18px; font-weight: 700; color: var(--primary);">${c.f1.dose.toFixed(1)} kg/ha</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase; margin-bottom: 8px;">${nutrientLabels.right}</div>
+                            <div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">${c.f2.name}</div>
+                            <div style="font-size: 18px; font-weight: 700; color: var(--success);">${c.f2.dose.toFixed(1)} kg/ha</div>
+                        </div>
                     </div>
-                    <div class="result-item">
-                        <div class="result-label">SACAS/HA</div>
-                        <div class="result-value">${c.sacks.toFixed(2)}</div>
+
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-label">CUSTO TOTAL</div>
+                            <div class="result-value">R$ ${c.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">R$/HECTARE</div>
+                            <div class="result-value">R$ ${c.perHa.toFixed(2)}</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">SACAS/HA</div>
+                            <div class="result-value">${c.sacks.toFixed(2)}</div>
+                        </div>
                     </div>
-                </div>
-            `;
-            container.appendChild(card);
+                `;
+                container.appendChild(card);
+            });
+
+            // Scroll para resultados
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function save() {
+            const data = {
+                crop: state.crop,
+                area: document.getElementById('area').value,
+                price: document.getElementById('grainPrice').value,
+                fertilizers: state.fertilizers,
+                filters: state.filters
+            };
+            localStorage.setItem('fertCalc', JSON.stringify(data));
+        }
+
+        // Event Listeners
+        document.getElementById('crop').addEventListener('change', () => {
+            state.crop = document.getElementById('crop').value;
+            renderNutrients();
+            save();
         });
 
-        // Scroll para resultados
-        container.scrollIntoView({ behavior: 'smooth' });
-    }
+        document.getElementById('addBtn').addEventListener('click', addFert);
+        document.getElementById('saveBtn').addEventListener('click', saveEdit);
+        document.getElementById('cancelBtn').addEventListener('click', cancelEdit);
+        document.getElementById('calcBtn').addEventListener('click', calculate);
 
-    function save() {
-        const data = {
-            crop: state.crop,
-            area: document.getElementById('area').value,
-            price: document.getElementById('grainPrice').value,
-            fertilizers: state.fertilizers,
-            filters: state.filters
-        };
-        localStorage.setItem('fertCalc', JSON.stringify(data));
-    }
+        document.getElementById('toggleForm').addEventListener('click', () => {
+            const card = document.getElementById('formCard');
+            const icon = document.getElementById('formIcon');
+            if (card.style.display === 'none') {
+                card.style.display = 'block';
+                icon.classList.add('open');
+            } else {
+                card.style.display = 'none';
+                icon.classList.remove('open');
+            }
+        });
 
-    // Event Listeners
-    document.getElementById('crop').addEventListener('change', () => {
-        state.crop = document.getElementById('crop').value;
-        renderNutrients();
-        save();
-    });
+        document.getElementById('toggleSecondary').addEventListener('click', () => {
+            document.getElementById('secondary').classList.toggle('show');
+            document.getElementById('secIcon').classList.toggle('open');
+        });
 
-    document.getElementById('addBtn').addEventListener('click', addFert);
-    document.getElementById('saveBtn').addEventListener('click', saveEdit);
-    document.getElementById('cancelBtn').addEventListener('click', cancelEdit);
-    document.getElementById('calcBtn').addEventListener('click', calculate);
+        document.getElementById('toggleList').addEventListener('click', () => {
+            const list = document.getElementById('list');
+            const icon = document.getElementById('listIcon');
+            if (list.style.display === 'none') {
+                list.style.display = 'block';
+                icon.classList.add('open');
+            } else {
+                list.style.display = 'none';
+                icon.classList.remove('open');
+            }
+            updateListToggle();
+        });
 
-    document.getElementById('toggleForm').addEventListener('click', () => {
-        const card = document.getElementById('formCard');
-        const icon = document.getElementById('formIcon');
-        if (card.style.display === 'none') {
-            card.style.display = 'block';
-            icon.classList.add('open');
-        } else {
-            card.style.display = 'none';
-            icon.classList.remove('open');
-        }
-    });
+        // Auto-save
+        ['area', 'grainPrice', 'kLimitInP', 'costLimit', 'filterBrand'].forEach(id => {
+            document.getElementById(id).addEventListener('input', save);
+        });
 
-    document.getElementById('toggleSecondary').addEventListener('click', () => {
-        document.getElementById('secondary').classList.toggle('show');
-        document.getElementById('secIcon').classList.toggle('open');
-    });
+        document.getElementById('preferKClWithB').addEventListener('change', save);
 
-    document.getElementById('toggleList').addEventListener('click', () => {
-        const list = document.getElementById('list');
-        const icon = document.getElementById('listIcon');
-        if (list.style.display === 'none') {
-            list.style.display = 'block';
-            icon.classList.add('open');
-        } else {
-            list.style.display = 'none';
-            icon.classList.remove('open');
-        }
-        updateListToggle();
-    });
-
-    // Auto-save
-    ['area', 'grainPrice', 'kLimitInP', 'costLimit', 'filterBrand'].forEach(id => {
-        document.getElementById(id).addEventListener('input', save);
-    });
-
-    document.getElementById('preferKClWithB').addEventListener('change', save);
-
-    // Inicializa
-    init();
-</script>
-```
-
+        // Inicializa
+        init();
+    </script>
 </body>
 </html>
