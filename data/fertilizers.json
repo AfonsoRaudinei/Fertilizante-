@@ -1,0 +1,541 @@
+[
+  {
+    "name": "Ureia 45-00-00",
+    "manufacturer": "Yara",
+    "delivery": "Imediata",
+    "price": 3400,
+    "freight": 220,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 45 }
+    ]
+  },
+  {
+    "name": "MAP 11-52-00",
+    "manufacturer": "Mosaic",
+    "delivery": "Mai-Jul",
+    "price": 4200,
+    "freight": 240,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 11 },
+      { "type": "P₂O₅", "value": 52 }
+    ]
+  },
+  {
+    "name": "KCl 00-00-60",
+    "manufacturer": "Nutrien",
+    "delivery": "Imediata",
+    "price": 3150,
+    "freight": 230,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "K₂O", "value": 60 }
+    ]
+  },
+  {
+    "name": "SSP 00-18-00",
+    "manufacturer": "Heringer",
+    "delivery": "Julho",
+    "price": 1700,
+    "freight": 180,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "P₂O₅", "value": 18 },
+      { "type": "S", "value": 12 }
+    ]
+  },
+  {
+    "name": "NPK 20-05-20",
+    "manufacturer": "EuroChem",
+    "delivery": "Mai-Jul",
+    "price": 3550,
+    "freight": 210,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 20 },
+      { "type": "P₂O₅", "value": 5 },
+      { "type": "K₂O", "value": 20 }
+    ]
+  },
+  {
+    "name": "NPK 08-28-16",
+    "manufacturer": "ICL",
+    "delivery": "Mai-Jul",
+    "price": 3650,
+    "freight": 225,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 8 },
+      { "type": "P₂O₅", "value": 28 },
+      { "type": "K₂O", "value": 16 }
+    ]
+  },
+  {
+    "name": "KCL 60% GR",
+    "manufacturer": "Motta Fertilizantes",
+    "delivery": "Mai-Jul",
+    "price": 3767.27,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "K₂O", "value": 60 }
+    ]
+  },
+  {
+    "name": "SSP 19%",
+    "manufacturer": "Motta Fertilizantes",
+    "delivery": "Mai-Jul",
+    "price": 3392.66,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "P₂O₅", "value": 19 }
+    ]
+  },
+  {
+    "name": "TSP 46%",
+    "manufacturer": "Motta Fertilizantes",
+    "delivery": "Mai-Jul",
+    "price": 6113.86,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "P₂O₅", "value": 46 }
+    ]
+  },
+  {
+    "name": "K-UP 500 B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 6349.54,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "SULFAMMO MeTA 17 B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 6824.05,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "SULFAMMO MeTA 214 K B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 6099.17,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "SULFAMMO MeTA 29 B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 7527.95,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "SULFAMMO ULTRA B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 7257.92,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "SULFAMMO MeTA S B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 6618.25,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "TOP-PHOS 280 HP B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 6416.39,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "TOP-PHOS 319 MASTER B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 6184.37,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "TOP-PHOS 328 MASTER B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 7200.25,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "TOP-PHOS 88 MASTER B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 7510.91,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "TOP-PHOS 842 MASTER B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 8909.54,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "NP PLUS 640 MASTER B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 8857.11,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "INPZZA 470 MASTER B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 7185.83,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "INPZZA 540 MASTER B1",
+    "manufacturer": "TIMAC",
+    "delivery": "Julho",
+    "price": 8440.27,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": []
+  },
+  {
+    "name": "MAP 11-52/44 GR",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 7353.61,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 11 },
+      { "type": "P₂O₅", "value": 52 }
+    ]
+  },
+  {
+    "name": "SAM 20,5/23 GR",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 2578.19,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 20.5 },
+      { "type": "S", "value": 23 }
+    ]
+  },
+  {
+    "name": "SSP 19/16 + 1SCA + 11S/04 GR",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 3238.04,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": [
+      { "type": "P₂O₅", "value": 19 }
+    ]
+  },
+  {
+    "name": "SSP 19/16 + 16CA + 10S/04 GR",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 3238.04,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": true,
+    "nutrients": [
+      { "type": "P₂O₅", "value": 19 }
+    ]
+  },
+  {
+    "name": "SSP 20/16 GR",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 3387.70,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "P₂O₅", "value": 20 }
+    ]
+  },
+  {
+    "name": "TSP 46/36 GR",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 6319.62,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "P₂O₅", "value": 46 }
+    ]
+  },
+  {
+    "name": "UREIA 46 GR",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 6081.53,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 46 }
+    ]
+  },
+  {
+    "name": "NITROCAP 18-10-05 0,58 0,75ZN GR",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 4421.69,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 18 },
+      { "type": "P₂O₅", "value": 10 },
+      { "type": "K₂O", "value": 5 }
+    ]
+  },
+  {
+    "name": "NITROCAP 20-00-20 MG",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 3965.92,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 20 },
+      { "type": "K₂O", "value": 20 }
+    ]
+  },
+  {
+    "name": "NITROCAP 20-00-30 MG",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 4169.57,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 20 },
+      { "type": "K₂O", "value": 30 }
+    ]
+  },
+  {
+    "name": "NITROCAP 20-10-10 MG",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 4496.52,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 20 },
+      { "type": "P₂O₅", "value": 10 },
+      { "type": "K₂O", "value": 10 }
+    ]
+  },
+  {
+    "name": "NITROCAP 21-00-21 MG",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 4163.19,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 21 },
+      { "type": "K₂O", "value": 21 }
+    ]
+  },
+  {
+    "name": "NITROCAP 25-00-25 MG",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 4999.11,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 25 },
+      { "type": "K₂O", "value": 25 }
+    ]
+  },
+  {
+    "name": "NITROCAP 27-00-24 MG",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 5244.81,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 27 },
+      { "type": "K₂O", "value": 24 }
+    ]
+  },
+  {
+    "name": "NITROCAP 30-00-20 MG",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 5114.87,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 30 },
+      { "type": "K₂O", "value": 20 }
+    ]
+  },
+  {
+    "name": "NITROCAP 30-10-10 MG",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 5904.88,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 30 },
+      { "type": "P₂O₅", "value": 10 },
+      { "type": "K₂O", "value": 10 }
+    ]
+  },
+  {
+    "name": "NITROCAP 33-00-00 MG",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 4469.31,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 33 }
+    ]
+  },
+  {
+    "name": "NITROCAP 36-00-12 MG",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 5741.40,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 36 },
+      { "type": "K₂O", "value": 12 }
+    ]
+  },
+  {
+    "name": "NITROCAP 46-00-00 I",
+    "manufacturer": "Cibra",
+    "delivery": "Julho",
+    "price": 6705.90,
+    "freight": 0,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 46 }
+    ]
+  }
+]
