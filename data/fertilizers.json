@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Ureia 45-00-00",
+    "manufacturer": "Yara",
+    "delivery": "Imediata",
+    "price": 3400,
+    "freight": 220,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 45 }
+    ]
+  },
+  {
+    "name": "MAP 11-52-00",
+    "manufacturer": "Mosaic",
+    "delivery": "Mai-Jul",
+    "price": 4200,
+    "freight": 240,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 11 },
+      { "type": "P₂O₅", "value": 52 }
+    ]
+  },
+  {
+    "name": "KCl 00-00-60",
+    "manufacturer": "Nutrien",
+    "delivery": "Imediata",
+    "price": 3150,
+    "freight": 230,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "K₂O", "value": 60 }
+    ]
+  },
+  {
+    "name": "SSP 00-18-00",
+    "manufacturer": "Heringer",
+    "delivery": "Julho",
+    "price": 1700,
+    "freight": 180,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "P₂O₅", "value": 18 },
+      { "type": "S", "value": 12 }
+    ]
+  },
+  {
+    "name": "NPK 20-05-20",
+    "manufacturer": "EuroChem",
+    "delivery": "Mai-Jul",
+    "price": 3550,
+    "freight": 210,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 20 },
+      { "type": "P₂O₅", "value": 5 },
+      { "type": "K₂O", "value": 20 }
+    ]
+  },
+  {
+    "name": "NPK 08-28-16",
+    "manufacturer": "ICL",
+    "delivery": "Mai-Jul",
+    "price": 3650,
+    "freight": 225,
+    "minLoad": 0,
+    "active": true,
+    "needsReview": false,
+    "nutrients": [
+      { "type": "N", "value": 8 },
+      { "type": "P₂O₅", "value": 28 },
+      { "type": "K₂O", "value": 16 }
+    ]
+  }
+]
