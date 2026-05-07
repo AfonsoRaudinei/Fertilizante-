@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FertiCalc — Seed Produtos</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:#F5F5F7;color:#1D1D1F;font-size:13px;padding:20px}
+h1{font-size:1.1em;font-weight:700;margin-bottom:4px}
+.sub{font-size:.78em;color:#6B7280;margin-bottom:16px}
+.card{background:#fff;border-radius:12px;border:1px solid #E5E7EB;padding:16px;margin-bottom:12px}
+.card-title{font-size:.68em;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stat{background:#F5F5F7;border-radius:8px;padding:10px;text-align:center}
+.stat-n{font-size:1.3em;font-weight:700;color:#007AFF}
+.stat-l{font-size:.62em;color:#9CA3AF;text-transform:uppercase;letter-spacing:.3px}
+.btn{width:100%;height:42px;border:none;background:#007AFF;color:#fff;font-size:.9em;font-weight:700;border-radius:10px;cursor:pointer;transition:.15s}
+.btn:hover{background:#0051D5;transform:translateY(-1px)}
+.btn:disabled{background:#9CA3AF;transform:none;cursor:not-allowed}
+.btn-danger{background:#fff;color:#FF3B30;border:1px solid rgba(255,59,48,.3);margin-top:8px}
+.btn-danger:hover{background:#FFEBEE;transform:none}
+.list{max-height:320px;overflow-y:auto;border-top:1px solid #E5E7EB;margin-top:8px}
+.list::-webkit-scrollbar{width:3px}
+.list::-webkit-scrollbar-thumb{background:#D1D1D6;border-radius:2px}
+.item{display:flex;align-items:center;justify-content:space-between;padding:7px 2px;border-bottom:1px solid #F0F0F0;font-size:.78em}
+.item:last-child{border:none}
+.item-name{font-weight:600;color:#1D1D1F;flex:1}
+.item-sup{color:#6B7280;font-size:.9em;margin-top:1px}
+.item-price{color:#007AFF;font-weight:700;white-space:nowrap;margin-left:10px}
+.badge{font-size:.62em;font-weight:600;padding:2px 5px;border-radius:4px;margin-left:5px}
+.b-ok{background:#E8F5E9;color:#2E7D32}
+.b-rev{background:#FFF3E0;color:#E65100}
+#result{display:none;padding:12px;background:#E8F5E9;border-radius:8px;font-size:.82em;font-weight:600;color:#2E7D32;text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<h1>FertiCalc — Seed de Produtos</h1>
+<div class="sub">Importa todas as listas (Cibra, TIMAC, Motta) para o localStorage do FertiCalc</div>
+
+<div class="card">
+  <div class="card-title">Resumo da importação</div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-n" id="s-total">0</div><div class="stat-l">Total</div></div>
+    <div class="stat"><div class="stat-n" id="s-ok" style="color:#34C759">0</div><div class="stat-l">Com fórmula</div></div>
+    <div class="stat"><div class="stat-n" id="s-rev" style="color:#FF9500">0</div><div class="stat-l">Revisar</div></div>
+    <div class="stat"><div class="stat-n" id="s-forn" style="color:#007AFF">3</div><div class="stat-l">Fornecedores</div></div>
+  </div>
+  <button class="btn" onclick="importar()" id="btn-imp">⚡ Importar todos os produtos</button>
+  <button class="btn btn-danger" onclick="limpar()">Limpar tudo do localStorage</button>
+  <div id="result"></div>
+</div>
+
+<div class="card">
+  <div class="card-title">Preview dos produtos (<span id="prev-cnt">0</span>)</div>
+  <div class="list" id="prev-list"></div>
+</div>
+
+<script>
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5)+Math.random().toString(36).slice(2,5);
+
+function parseNPK(name){
+  const n={};
+  // Especiais Cibra
+  if(/KCL\s*60/i.test(name)){n.K2O=60;return n}
+  const kcl=name.match(/KCL\s*(\d+)/i);if(kcl){n.K2O=parseFloat(kcl[1]);return n}
+  const ur=name.match(/UREIA\s*(\d+)/i);if(ur){n.N=parseFloat(ur[1]);return n}
+  const map=name.match(/MAP\s*(\d+)[-–](\d+)/i);if(map){n.N=parseFloat(map[1]);n.P2O5=parseFloat(map[2]);return n}
+  const tsp=name.match(/TSP\s*(\d+)/i);if(tsp){n.P2O5=parseFloat(tsp[1]);return n}
+  const ssp=name.match(/SSP\s*(\d+)/i);if(ssp){n.P2O5=parseFloat(ssp[1]);return n}
+  const sam=name.match(/SAM\s*([\d.]+)[/,\s]([\d.]+)/i);if(sam){n.N=parseFloat(sam[1]);n.S=parseFloat(sam[2]);return n}
+  // NPK no nome
+  const npk=name.match(/(\d{2})[-–](\d{2})[-–](\d{2})/);
+  if(npk){n.N=parseInt(npk[1]);n.P2O5=parseInt(npk[2]);n.K2O=parseInt(npk[3]);return n}
+  // CIBRAMIX com formato "XX-XX-XX"
+  const npk2=name.match(/(\d+)-(\d+)-(\d+)/);
+  if(npk2){n.N=parseInt(npk2[1]);n.P2O5=parseInt(npk2[2]);n.K2O=parseInt(npk2[3]);return n}
+  return null;
+}
+
+function mkProd(name,supplier,delivery,price,freight=0){
+  const nuts=parseNPK(name);
+  return{
+    id:uid(),active:true,
+    status:nuts&&Object.keys(nuts).length>0?'ok':'review',
+    name,supplier,delivery,
+    priceTon:price,freightTon:freight,minLoadTon:0,
+    nutrients:nuts||{},micros:{},
+    createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()
+  };
+}
+
+// ===== CIBRA (da imagem 1 — extraído manualmente) =====
+const CIBRA=[
+  ['CIBRAMIX I 00-14-18 MG',3612.18],['CIBRAMIX 00-20-00',3503.34],['CIBRAMIX I 00-20-20 MG',4359.66],
+  ['CIBRAMIX 00-22-00',3734.63],['CIBRAMIX I 00-25-00 MG',4081.56],['CIBRAMIX I 00-25-23 MG',5136.93],
+  ['CIBRAMIX I 00-30-10',5074.74],['CIBRAMIX 00-30-15 MG',5285.62],['CIBRAMIX 00-32-00 MG',4884.27],
+  ['CIBRAMIX 00-44-00 MG',6278.80],['CIBRAMIX I 02-17-24 MG',4244.85],['CIBRAMIX 02-18-18 MG',4142.78],
+  ['CIBRAMIX I 02-20-20 MG',4414.89],['CIBRAMIX 02-24-12 MG',4347.34],['CIBRAMIX 02-25-00 MG',3993.13],
+  ['CIBRAMIX 02-25-25 MG',5197.19],['CIBRAMIX 02-26-00 MG',4340.06],['CIBRAMIX I 03-26-00 MG I',4523.73],
+  ['CIBRAMIX 03-28-06 MG',5462.46],['CIBRAMIX 03-32-08 MG',5455.69],['CIBRAMIX 03-44-00 MG',6353.63],
+  ['CIBRAMIX I 04-14-08 MG',5848.92],['CIBRAMIX 04-30-10 MG',4523.73],['CIBRAMIX I 04-30-10 MG',4789.00],
+  ['CIBRAMIX I 05-25-25 MG',5203.99],['CIBRAMIX 05-35-00 MG',5380.86],['CIBRAMIX I 06-30-06 MG',5387.66],
+  ['CIBRAMIX I 06-30-06 MG',5349.57],['CIBRAMIX I 06-37-00 MG',5816.22],['CIBRAMIX I 07-34-09 MG',5755.00],
+  ['CIBRAMIX I 07-40-00 MG',6027.10],['CIBRAMIX I 08-28-08 MG',6442.06],['CIBRAMIX I 09-46-00 MG',6782.19],
+  ['CIBRAMIX I 10-15-15 MG',4183.60],['CIBRAMIX 10-20-10 MG',4510.12],['CIBRAMIX I 10-20-10 MG',5557.75],
+  ['CIBRAMIX I 10-50-00 MG',7840.01],['KCL 60 GR',3584.97],['MAP 11-52/44 GR',7333.61],
+  ['SAM 20,5/23 GR',2578.19],['SSP 19/16 + 16CA + 11S/SO4 GR',2953.88],
+  ['SSP 19/16 + 16CA + 10S/SO4 r',3238.04],['SSP 20/16 GR',3387.70],['TSP 46/36 GR',6319.62],
+  ['UREIA 46 GR',3460.41],['10-30-10 MG',5401.27],['10-49-00 + 0,75% ZN MG',7183.55],
+  ['10-50-00 MG',7115.92],['10-15-15 MG',4176.88],['13-10-10 MG',3503.34],
+  ['00-00-54 +1B MG',3795.85],['00-00-57 +0,5B MG',3687.01],['00-14-18 MG',3496.56],
+  ['00-17-24 MG',4027.14],['00-18-18 MG',3891.09],['00-20-20 MG',3894.30],
+  ['00-20-25 MG',4408.09],['00-20-30 MG',4618.97],['00-22-00 MG',3591.77],
+  ['00-25-00 MG',3931.90],['00-25-25 MG',5176.78],['00-30-10 MG',4925.08],
+  ['00-30-15 MG',5129.16],['00-30-20 MG',5374.06],['00-32-00 MG',4727.83],
+  ['00-33-00 MG',4843.45],['00-36-00 MG',5190.38],['00-24-12 MG',3435.31],
+  ['00-24-16 MG',4129.18],['02-20-20 MG',4265.23],['02-24-12 MG',4380.88],
+  ['02-25-00 MG',3993.13],['02-25-23 MG',5081.56],['02-30-10 MG',4986.31],
+  ['03-28-00 MG',4367.27],['03-30-15 MG',5224.40],['03-32-08 MG',5163.17],
+  ['04-14-08 MG',3904.07],['04-20-30 MG',4374.07],['04-26-10 MG',4659.78],
+  ['04-30-10 MG',5047.53],['04-35-10 MG',6108.74],['04-40-08 MG',6108.74],
+  ['04-50-20 MG',4823.04],['05-25-15 MG',4761.82],['05-25-25 MG',5176.78],
+  ['05-25-30 MG',5394.46],['05-35-00 MG',5244.81],['06-28-20 + 1%Zn MG',5350.92],
+  ['06-30-06 MG',4999.91],['06-30-10 +0,5B+0,75Zn MG',5544.12],['06-30-10 MG',5496.50],
+  ['07-34-09 MG',5605.34],['07-40-00 MG',5870.65],['08-20-00 MG',3183.63],
+  ['08-20-20 MG',4625.77],['08-28-16 MG',5299.23],['08-28-16 + 1% ZN MG',5330.52],
+  ['08-40-07 +0,5B+0,75ZN MG',6605.31],['08-40-08 MG',6292.41],['09-46-00 MG',6612.13],
+  ['10-15-15 MG',3326.47],['10-15-15 MG',3833.91],['10-20-10 MG',4367.27],
+  ['13-11-21 MG',4149.59],['15-00-15 MG',2829.88],['15-00-30 MG',3707.45],
+  ['15-15-15 MG',4510.12],['16-16-16 MG',4836.65],['18-18-18 MG',5482.90],
+  ['20-00-10 MG',3095.18],['20-00-20 MG',3793.86],['20-05-20 MG',4408.09],
+  ['20-10-00 MG',4292.44],['20-10-20 MG',4789.00],['26-00-26 MG',4993.11],
+  ['27-00-24 MG',5034.33],['30-00-20 MG',5244.81],['33-00-00 MG',3456.41],
+  ['36-00-12 MG',5337.32],['NITROCAP 18-10-05 0,5B 0,75Zn GR',4421.69],
+  ['NITROCAP 20-00-20 MG',3965.92],['NITROCAP 20-00-30 MG',4618.91],
+  ['NITROCAP 20-10-10 MG',4466.32],['NITROCAP 21-00-21 MG',4163.19],
+  ['NITROCAP 25-00-25 MG',4993.11],['NITROCAP 27-00-24 MG',4993.11],
+  ['NITROCAP 30-00-20 MG',5411.41],['NITROCAP 30-10-10 MG',3904.66],
+  ['NITROCAP 33-00-00 MG',3469.31],['NITROCAP 36-00-12 MG',5741.40],
+  ['NITROCAP 45-00-00 I',6021.55],['NITROCAP 46 GR',4299.11],
+].map(([name,price])=>mkProd(name,'Cibra','Julho',price,0));
+
+// ===== TIMAC (da imagem 2) =====
+const TIMAC=[
+  ['K-UP 500 B1',6349.54],
+  ['SULFAMMO MeTA 17 B1',6824.05],
+  ['SULFAMMO MeTA 214 K B1',6099.17],
+  ['SULFAMMO MeTA 29 B1',7527.95],
+  ['SULFAMMO ULTRA B1',7257.92],
+  ['SULFAMMO MeTA S B1',6618.25],
+  ['TOP-PHOS 280 HP B1',6416.39],
+  ['TOP-PHOS 319 MASTER B1',6184.37],
+  ['TOP-PHOS 328 MASTER B1',7200.25],
+  ['TOP-PHOS 88 MASTER B1',7510.91],
+  ['TOP-PHOS 842 MASTER B1',8909.54],
+  ['NP PLUS 640 MASTER B1',8857.11],
+  ['INPZZA 470 MASTER B1',7185.83],
+  ['INPZZA 540 MASTER B1',8440.27],
+].map(([name,price])=>mkProd(name,'TIMAC','Julho',price,0));
+
+// ===== MOTTA (da imagem 3) =====
+const MOTTA=[
+  mkProd('KCL 60% GR','Motta Fertilizantes','Mai-Jul',3767.27,0),
+  mkProd('SSP 19%','Motta Fertilizantes','Mai-Jul',3392.66,0),
+  mkProd('TSP 46%','Motta Fertilizantes','Mai-Jul',6113.86,0),
+  mkProd('KCL 60% GR','Motta Fertilizantes','Mai-Jul',3590.57,0),
+  mkProd('SSP 19%','Motta Fertilizantes','Mai-Jul',3208.90,0),
+  mkProd('TSP 46%','Motta Fertilizantes','Mai-Jul',5930.10,0),
+];
+
+const TODOS=[...CIBRA,...TIMAC,...MOTTA];
+const TOK=TODOS.filter(p=>p.status==='ok').length;
+const TREV=TODOS.filter(p=>p.status==='review').length;
+
+document.getElementById('s-total').textContent=TODOS.length;
+document.getElementById('s-ok').textContent=TOK;
+document.getElementById('s-rev').textContent=TREV;
+document.getElementById('prev-cnt').textContent=TODOS.length;
+
+const brl=n=>'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtN=n=>{if(!n)return'—';return['N','P2O5','K2O','S'].filter(k=>n[k]>0).map(k=>k.replace('P2O5','P₂O₅').replace('K2O','K₂O')+' '+n[k]+'%').join(' · ')||'—'};
+
+document.getElementById('prev-list').innerHTML=TODOS.map(p=>`
+  <div class="item">
+    <div style="flex:1;min-width:0">
+      <div class="item-name">${p.name}<span class="badge ${p.status==='ok'?'b-ok':'b-rev'}">${p.status==='ok'?'OK':'Revisar'}</span></div>
+      <div class="item-sup">${p.supplier} · ${p.delivery} · ${fmtN(p.nutrients)}</div>
+    </div>
+    <div class="item-price">${brl(p.priceTon)}/t</div>
+  </div>`).join('');
+
+function importar(){
+  const existing=JSON.parse(localStorage.getItem('fc_ferts')||'[]');
+  const merged=[...existing];
+  let added=0,skipped=0;
+  TODOS.forEach(p=>{
+    const dup=existing.some(e=>e.name.toLowerCase()===p.name.toLowerCase()&&e.supplier.toLowerCase()===p.supplier.toLowerCase()&&e.delivery.toLowerCase()===p.delivery.toLowerCase());
+    if(dup){skipped++}else{merged.push(p);added++}
+  });
+  localStorage.setItem('fc_ferts',JSON.stringify(merged));
+  const r=document.getElementById('result');
+  r.style.display='block';
+  r.textContent=`✅ ${added} produtos adicionados${skipped?' · '+skipped+' duplicados ignorados':''}. Abra o FertiCalc.`;
+  document.getElementById('btn-imp').disabled=true;
+  document.getElementById('btn-imp').textContent='Importação concluída ✓';
+}
+
+function limpar(){
+  if(!confirm('Limpar TODOS os produtos do FertiCalc?'))return;
+  localStorage.removeItem('fc_ferts');
+  const r=document.getElementById('result');
+  r.style.display='block';r.style.background='#FFEBEE';r.style.color='#C62828';
+  r.textContent='🗑 localStorage limpo.';
+}
+</script>
+</body>
+</html>
