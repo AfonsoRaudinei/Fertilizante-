@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#007AFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FertiCalc">
+<title>FertiCalc — SoloForte</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<!-- SIDEBAR OVERLAY -->
+<div id="sovly" onclick="closeSB()"></div>
+<aside id="sbar">
+  <div class="sb-hd">
+    <div class="sb-logo">🌱</div>
+    <div><div class="sb-brand">FertiCalc</div><div class="sb-sub">SoloForte · v1.0</div></div>
+    <button class="sb-x" onclick="closeSB()">✕</button>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Principal</div>
+    <div class="si on" onclick="navTo('calc')"><div class="si-ico">🧪</div>Fertilizantes</div>
+    <div class="si" onclick="navTo('import')"><div class="si-ico">📥</div>Importar lista</div>
+    <div class="sb-sec">Configurações</div>
+    <div class="si" onclick="navTo('dev')"><div class="si-ico">🏭</div>Fabricantes / Frete</div>
+    <div class="si" onclick="navTo('dev')"><div class="si-ico">🌿</div>Culturas</div>
+    <div class="si" onclick="navTo('dev')"><div class="si-ico">⚙️</div>Configurações</div>
+    <div class="sb-sec">Inteligência</div>
+    <div class="si" onclick="navTo('ia-cfg')"><div class="si-ico">🤖</div>IA Contextual<span class="sb-badge">Beta</span></div>
+  </nav>
+  <div class="sb-foot">SoloForte · Offline · PWA</div>
+</aside>
+
+<!-- HEADER -->
+<header id="hdr">
+  <button class="hm" onclick="openSB()">
+    <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+      <rect width="17" height="1.5" rx=".75" fill="currentColor"/>
+      <rect y="4.75" width="13" height="1.5" rx=".75" fill="currentColor"/>
+      <rect y="9.5" width="17" height="1.5" rx=".75" fill="currentColor"/>
+    </svg>
+  </button>
+  <span class="ht" id="hdr-title">Fertilizantes</span>
+  <div class="hr" id="hdr-right">
+    <div style="display:flex;align-items:center;gap:4px" id="key-status-wrap">
+      <div class="key-dot missing" id="key-dot"></div>
+      <span style="font-size:.7em;color:var(--txm)" id="key-label">Sem chave</span>
+    </div>
+    <button class="btn-xs" onclick="toggleCfg()">⚙ API Key</button>
+    <button class="btn-add" onclick="openAddProduct()">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+        <path d="M5.5 1v9M1 5.5h9" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Novo Produto
+    </button>
+  </div>
+</header>
+
+<!-- API KEY CONFIG -->
+<div id="cfg-panel">
+  <div style="font-size:.64em;font-weight:600;color:var(--txm);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">OpenRouter API Key</div>
+  <div style="display:flex;gap:6px;align-items:center">
+    <input type="password" class="inp" id="api-key-input" placeholder="sk-or-v1-..." style="flex:1;font-size:.78em">
+    <button class="btn-xs save-btn" onclick="saveKey()">Salvar</button>
+    <button class="btn-xs danger-btn" onclick="clearKey()">Limpar</button>
+  </div>
+  <div style="font-size:.64em;color:var(--txm);margin-top:5px">Salva localmente · Nunca exposta no console · Modelo: deepseek/deepseek-chat:free</div>
+</div>
+
+<!-- MAIN -->
+<div id="body">
+
+  <!-- ESQUERDO: Lista 240px fixo -->
+  <section id="lp">
+    <div class="ph">
+      <span class="pt">Cadastrados</span>
+      <span class="pc" id="fert-cnt">0 produtos</span>
+    </div>
+    <div class="pl" id="flist"></div>
+  </section>
+
+  <!-- DIREITO: Calculadora + Resultado (resto da tela) -->
+  <section id="rp">
+
+    <!-- VIEW: Calculadora -->
+    <div class="view active" id="view-calc">
+      <div class="filters">
+        <div class="ftitle">Parâmetros do cálculo</div>
+        <div class="g2" style="margin-bottom:8px">
+          <div class="fi">
+            <span class="sl">Cultura</span>
+            <select class="sel" id="fc"><option value="soja">Soja</option><option value="milho">Milho</option></select>
+          </div>
+          <div class="fi">
+            <span class="sl">Área (ha)</span>
+            <input type="number" class="inp" id="fa" value="900" max="9999999">
+          </div>
+        </div>
+
+        <span class="sl" style="margin-bottom:5px">Metas nutricionais (kg/ha)</span>
+        <div class="g4" style="margin-bottom:8px">
+          <div class="fi"><span class="sl">N</span><input type="number" class="inp" id="fn" value="0" max="9999999"></div>
+          <div class="fi"><span class="sl">P₂O₅</span><input type="number" class="inp" id="fp" value="90" max="9999999"></div>
+          <div class="fi"><span class="sl">K₂O</span><input type="number" class="inp" id="fk" value="120" max="9999999"></div>
+          <div class="fi"><span class="sl">S</span><input type="number" class="inp" id="fs" value="0" max="9999999"></div>
+        </div>
+
+        <div class="g2" style="margin-bottom:8px">
+          <div class="fi">
+            <span class="sl">Máx. produtos</span>
+            <div class="seg">
+              <button class="sgb on" data-m="1" onclick="sMax(1)">1</button>
+              <button class="sgb" data-m="2" onclick="sMax(2)">2</button>
+              <button class="sgb" data-m="3" onclick="sMax(3)">3</button>
+              <button class="sgb" data-m="4" onclick="sMax(4)">4</button>
+              <button class="sgb" data-m="5" onclick="sMax(5)">5</button>
+            </div>
+          </div>
+          <div class="fi">
+            <span class="sl">Mostrar top</span>
+            <div class="seg">
+              <button class="sgb on" data-n="1" onclick="sShow(1)">1</button>
+              <button class="sgb" data-n="2" onclick="sShow(2)">2</button>
+              <button class="sgb" data-n="3" onclick="sShow(3)">3</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <div class="crit-bar" id="crit-bar">
+            <button class="ctab on" data-c="balanced" onclick="setCrit('balanced')">Balanceado</button>
+            <button class="ctab" data-c="cost" onclick="setCrit('cost')">Menor custo</button>
+            <button class="ctab" data-c="freight" onclick="setCrit('freight')">Menor frete</button>
+            <button class="ctab" data-c="error" onclick="setCrit('error')">Menor erro</button>
+            <button class="ctab" data-c="ton" onclick="setCrit('ton')">Menor tonelada</button>
+          </div>
+          <button class="btn-c" style="width:auto;padding:0 20px;margin:0;flex-shrink:0" onclick="run()">⚡ Calcular</button>
+        </div>
+      </div>
+
+      <div id="res-scroll">
+        <div class="empty-r" id="emp-calc">
+          <div style="font-size:28px;margin-bottom:6px">📊</div>
+          <div style="font-size:.9em;font-weight:700">Aguardando cálculo</div>
+          <div style="font-size:.75em;color:var(--txm);max-width:200px;line-height:1.55">Configure os parâmetros e clique Calcular</div>
+          <div style="margin-top:10px;padding:9px 14px;background:var(--bll);border-radius:var(--r);font-size:.71em;color:var(--bld);text-align:center;line-height:1.5">
+            Teste PRD: Área 900ha<br>P₂O₅ 90 · K₂O 120 · Máx 2
+          </div>
+        </div>
+        <div id="res-cards" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- VIEW: Importar -->
+    <div class="view" id="view-import">
+      <div id="import-view">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div style="font-size:.88em;font-weight:700">Importar lista</div>
+            <div style="font-size:.7em;color:var(--txm)" id="imp-step-label">Etapa 1 de 3 — Cole a lista</div>
+          </div>
+          <div style="display:flex;gap:4px">
+            <div class="step-dot done" id="sd-1"></div>
+            <div class="step-dot" id="sd-2"></div>
+            <div class="step-dot" id="sd-3"></div>
+          </div>
+        </div>
+
+        <div id="imp-s1">
+          <div class="ig">
+            <span class="ilbl">Cole a lista (um produto por linha)</span>
+            <textarea class="ta" id="raw-input" placeholder="Cibra | CIBRAMIX 10-40-10 MG | Julho | R$ - | R$ 5.401,27&#10;Motta Fertilizantes | KCL 60% GR | Mai-Jul | R$ - | R$ 3.767,27&#10;Yara | UREIA 46% N | Agosto | R$ 2.890,00&#10;Heringer | MAP 11-52 | Jun-Jul | R$ 4.120,00"></textarea>
+          </div>
+          <div class="g3">
+            <div class="fi"><span class="ilbl">Fornecedor padrão</span><input class="inp" id="def-forn" placeholder="Ex: Cibra"></div>
+            <div class="fi"><span class="ilbl">Entrega padrão</span><input class="inp" id="def-entrega" placeholder="Ex: Julho"></div>
+            <div class="fi"><span class="ilbl">Frete/t padrão (R$)</span><input type="number" class="inp" id="def-frete" placeholder="0" max="9999999"></div>
+          </div>
+          <div style="display:flex;gap:7px;margin-top:10px">
+            <button class="btn-outline" onclick="navTo('calc')">Cancelar</button>
+            <button class="btn-c" style="flex:1;margin:0" onclick="previsualizar()">Pré-visualizar →</button>
+          </div>
+        </div>
+
+        <div id="imp-s2" style="display:none">
+          <div class="stat-row" id="imp-stats"></div>
+          <div id="dup-section" style="display:none;margin-bottom:10px">
+            <div style="font-size:.7em;font-weight:600;color:var(--txm);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Duplicados — como proceder?</div>
+            <label class="dup-opt"><input type="radio" name="dup" value="ignore" checked><span style="font-size:.8em">Ignorar (manter existentes)</span></label>
+            <label class="dup-opt"><input type="radio" name="dup" value="update"><span style="font-size:.8em">Atualizar preço dos existentes</span></label>
+            <label class="dup-opt"><input type="radio" name="dup" value="keep"><span style="font-size:.8em">Importar mesmo assim</span></label>
+          </div>
+          <div style="font-size:.68em;font-weight:600;color:var(--txm);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px" id="prev-label"></div>
+          <div class="prev-list" id="prev-list"></div>
+          <div style="display:flex;gap:7px;margin-top:10px">
+            <button class="btn-outline" onclick="impGoStep(1)">← Voltar</button>
+            <button class="btn-c" style="flex:1;margin:0" onclick="importar()">Importar agora →</button>
+          </div>
+        </div>
+
+        <div id="imp-s3" style="display:none;text-align:center;padding:20px 0">
+          <div style="font-size:32px;margin-bottom:10px">✅</div>
+          <div style="font-size:.95em;font-weight:700;margin-bottom:4px" id="done-title"></div>
+          <div style="font-size:.78em;color:var(--txs);margin-bottom:16px" id="done-sub"></div>
+          <div style="display:flex;gap:7px;justify-content:center">
+            <button class="btn-outline" onclick="novaImport()">Nova importação</button>
+            <button class="btn-c" style="width:auto;padding:0 18px;margin:0" onclick="navTo('calc')">Ver calculadora</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- DRAWER: Produto -->
+<div class="drw-ovly" id="drw-prod">
+  <div class="drw">
+    <div class="drw-t" id="drw-prod-title">Novo Produto</div>
+    <div class="ig"><span class="ilbl">Nome do produto *</span><input class="inp" id="p-nome" placeholder="Ex: 10-40-10 MG"></div>
+    <div class="g2">
+      <div class="ig"><span class="ilbl">Fornecedor</span><input class="inp" id="p-forn" placeholder="Cibra"></div>
+      <div class="ig"><span class="ilbl">Entrega</span><input class="inp" id="p-entrega" placeholder="Julho"></div>
+    </div>
+    <div class="g3">
+      <div class="ig"><span class="ilbl">Preço/t (R$)</span><input type="number" class="inp" id="p-preco" placeholder="3000" max="9999999"></div>
+      <div class="ig"><span class="ilbl">Frete/t (R$)</span><input type="number" class="inp" id="p-frete" placeholder="0" max="9999999"></div>
+      <div class="ig"><span class="ilbl">Carga mín. (t)</span><input type="number" class="inp" id="p-carga" placeholder="0" max="9999999"></div>
+    </div>
+    <div style="margin-top:4px">
+      <span class="ilbl" style="display:block;margin-bottom:7px">Nutrientes</span>
+      <div id="nut-tags" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px;min-height:22px"></div>
+      <button class="btn-ghost" onclick="showNutForm()">+ Adicionar nutriente</button>
+    </div>
+    <div class="nut-form-box" id="nut-form">
+      <div class="g2" style="margin-bottom:8px">
+        <div class="ig" style="margin-bottom:0"><span class="ilbl">Nutriente</span>
+          <select class="inp" id="nt-sel" style="cursor:pointer">
+            <option value="N">N</option><option value="P2O5">P₂O₅</option><option value="K2O">K₂O</option>
+            <option value="S">S</option><option value="B">B</option><option value="Zn">Zn</option>
+            <option value="Mg">Mg</option><option value="Ca">Ca</option>
+          </select>
+        </div>
+        <div class="ig" style="margin-bottom:0"><span class="ilbl">Teor (%)</span>
+          <input type="number" class="inp" id="nt-val" placeholder="40" min="0" max="100">
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-c" style="flex:1;margin:0;height:30px;font-size:.78em" onclick="addNut()">Confirmar</button>
+        <button class="btn-outline" style="flex:1;height:30px;font-size:.78em" onclick="hideNutForm()">Cancelar</button>
+      </div>
+    </div>
+    <div class="drw-ftr">
+      <button class="btn-outline" style="flex:1" onclick="closeDrw('drw-prod')">Cancelar</button>
+      <button class="btn-c" style="flex:2;margin:0" onclick="saveProd()">Concluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM TAB BAR (mobile) -->
+<nav id="tab-bar">
+  <button class="tab-btn on" id="tab-prod" onclick="mobTab('prod')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Produtos
+  </button>
+  <button class="tab-btn" id="tab-calc" onclick="mobTab('calc')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 9h8M8 12h5M8 15h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    Calcular
+  </button>
+  <button class="tab-btn" id="tab-res" onclick="mobTab('res')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Resultado
+    <div class="tab-badge" id="tab-res-badge">!</div>
+  </button>
+  <button class="tab-btn" id="tab-imp" onclick="mobTab('imp')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 12l-4 4m0 0l-4-4m4 4V4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Importar
+  </button>
+</nav>
+
+<!-- FAB mobile -->
+<button id="fab-add" onclick="openAddProduct()">+</button>
+
+<div id="tw"></div>
+<script src="app.js"></script>
+</body>
+</html>
