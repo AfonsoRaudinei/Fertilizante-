@@ -58,9 +58,9 @@ body{font-family:var(--fn);background:var(--bgs);color:var(--tx);font-size:13px;
 .btn-xs.danger-btn:hover{background:var(--er-bg)}
 
 /* ===== LAYOUT PRINCIPAL =====
-   240px fixo para lista — resto TUDO para calculadora/resultado
+   60% para lista — 40% para calculadora/resultado
 */
-#body{display:grid;grid-template-columns:240px 1fr;flex:1;overflow:hidden;min-height:0}
+#body{display:grid;grid-template-columns:60% 40%;flex:1;overflow:hidden;min-height:0}
 
 #lp{border-right:1px solid var(--bd);background:var(--bg);display:flex;flex-direction:column;overflow:hidden;min-height:0}
 #rp{background:var(--bgs);display:flex;flex-direction:column;overflow:hidden;min-height:0}
