@@ -1,10 +1,5 @@
 /* ===========================
    FertiCalc — app.js (corrigido)
-   Correções:
-   1) Import: não divide por vírgula (evita quebrar "20,5" e "5.401,27")
-   2) Parser NPK mais robusto (KCL/KCl, percentuais etc.)
-   3) Solver: penaliza falta >> excesso; opcional descarta combos que não atingem meta mínima
-   4) Guards p/ IDs ausentes (ex: hdr-tag)
    =========================== */
 
 /* ===== GLOBAL STATE ===== */
@@ -13,11 +8,12 @@ let editId = null, nuts = {}, mxP = 1, shN = 1, currentCrit = 'balanced';
 let lastResults = null, lastTgts = null, chatHistory = {};
 let parsedImport = [];
 
-/* ===== CONFIG DO SOLVER ===== */
-// Cobertura mínima exigida (nutricional). Se quiser “aceitar faltar mais”, reduza.
-const MIN_COVERAGE = 0.985;         // 98,5% da meta
-const ABS_TOL_KGHA = 0.5;           // tolerância absoluta (kg/ha) para não “matar” por arredondamento
-const MAX_K_COMB = 6;               // trava de performance (já existia implicitamente)
+/* ===== CONFIG ===== */
+const ENABLE_SEED = false;          // não carregar demos
+const REQUIRE_REAL_PRODUCTS = true; // solver só usa produto real
+const MIN_COVERAGE = 0.985;         // 98,5% da meta mínima
+const ABS_TOL_KGHA = 0.5;           // tolerância absoluta
+const MAX_K_COMB = 6;               // trava de performance
 
 /* ===== UTILS ===== */
 const g = (x) => document.getElementById(x);
@@ -44,7 +40,10 @@ function toast(msg, tp = '') {
   if (tw) tw.appendChild(t);
   setTimeout(() => t.remove(), 2600);
 }
-function saveFerts() { localStorage.setItem('fc_ferts', JSON.stringify(ferts)); }
+
+function saveFerts() {
+  localStorage.setItem('fc_ferts', JSON.stringify(ferts));
+}
 
 /* ===== SIDEBAR ===== */
 function openSB() {
@@ -65,7 +64,7 @@ function navTo(sec) {
     document.querySelectorAll('.si')[0]?.classList.add('on');
     showView('view-calc');
     safeText('hdr-title', 'Fertilizantes');
-    safeShow('hdr-tag', 'none');           // guard (pode não existir no HTML)
+    safeShow('hdr-tag', 'none');
     safeShow('hdr-right', 'flex');
 
   } else if (sec === 'import') {
@@ -89,26 +88,32 @@ function showView(id) {
 
 /* ===== API KEY ===== */
 function getKey() { return localStorage.getItem('fc_ai_key') || ''; }
+
 function saveKey() {
   const k = (g('api-key-input')?.value || '').trim();
   if (!k) { toast('Cole a chave primeiro', 'er'); return; }
   if (!k.startsWith('sk-')) { toast('Chave inválida (deve começar com sk-)', 'er'); return; }
   localStorage.setItem('fc_ai_key', k);
   if (g('api-key-input')) g('api-key-input').value = '';
-  updateKeyStatus(); toast('Chave salva', 'ok');
+  updateKeyStatus();
+  toast('Chave salva', 'ok');
   safeShow('cfg-panel', 'none');
 }
+
 function clearKey() {
   localStorage.removeItem('fc_ai_key');
   if (g('api-key-input')) g('api-key-input').value = '';
-  updateKeyStatus(); toast('Chave removida');
+  updateKeyStatus();
+  toast('Chave removida');
 }
+
 function updateKeyStatus() {
   const has = !!getKey();
   const dot = g('key-dot'), lbl = g('key-label');
   if (dot) dot.className = 'key-dot ' + (has ? 'active' : 'missing');
   if (lbl) lbl.textContent = has ? 'IA conectada' : 'Sem chave';
 }
+
 function toggleCfg() {
   const p = g('cfg-panel');
   if (!p) return;
@@ -123,8 +128,8 @@ function renderFerts() {
 
   if (!ferts.length) {
     const fl = g('flist');
-    if (fl) fl.innerHTML =
-      `<div class="pi-empty">
+    if (fl) fl.innerHTML = `
+      <div class="pi-empty">
         <div class="pie-ico">🧪</div>
         <div class="pie-t">Nenhum fertilizante</div>
         <div class="pie-s">Cadastre ou importe produtos para começar</div>
@@ -140,7 +145,8 @@ function renderFerts() {
     const pr = f.priceTon ? 'R$ ' + Number(f.priceTon).toLocaleString('pt-BR') + '/t' : '—';
     const st =
       f.status === 'review' ? '<span class="sbadge s-rev">Revisar</span>' :
-        f.active ? '<span class="sbadge s-ok">OK</span>' : '<span class="sbadge s-off">Inativo</span>';
+      f.active ? '<span class="sbadge s-ok">OK</span>' :
+      '<span class="sbadge s-off">Inativo</span>';
 
     return `<div class="fc" id="fc-${f.id}">
       <div class="fc-hd">
@@ -175,30 +181,39 @@ function expand(id) {
   const o = d.classList.toggle('open');
   if (a) a.textContent = o ? '▲' : '▼';
 }
+
 function toggleAct(id, e) {
   e.stopPropagation();
   const f = ferts.find(x => x.id === id);
   if (!f) return;
   f.active = !f.active;
-  saveFerts(); renderFerts();
+  saveFerts();
+  renderFerts();
   toast(f.active ? 'Ativado' : 'Inativado');
 }
+
 function delProd(id) {
   if (!confirm('Excluir este produto?')) return;
   ferts = ferts.filter(f => f.id !== id);
-  saveFerts(); renderFerts();
+  saveFerts();
+  renderFerts();
   toast('Removido', 'er');
 }
+
 function dupProd(id) {
   const o = ferts.find(f => f.id === id);
   if (!o) return;
   const c = JSON.parse(JSON.stringify(o));
   c.id = uid();
   c.name += ' (cópia)';
+  c.isSeed = false;
+  c.source = 'manual';
   ferts.push(c);
-  saveFerts(); renderFerts();
+  saveFerts();
+  renderFerts();
   toast('Duplicado', 'ok');
 }
+
 function editProd(id) {
   const f = ferts.find(x => x.id === id);
   if (!f) return;
@@ -215,37 +230,53 @@ function editProd(id) {
   renderNutTags();
   openDrw('drw-prod');
 }
+
 function openAddProduct() {
   editId = null;
   nuts = {};
   safeText('drw-prod-title', 'Novo Produto');
-  ['p-nome', 'p-forn', 'p-entrega', 'p-preco', 'p-frete', 'p-carga'].forEach(i => { if (g(i)) g(i).value = ''; });
+  ['p-nome','p-forn','p-entrega','p-preco','p-frete','p-carga'].forEach(i => { if (g(i)) g(i).value = ''; });
   safeShow('nut-form', 'none');
   renderNutTags();
   openDrw('drw-prod');
 }
+
 function openDrw(id) { g(id)?.classList.add('on'); }
 function closeDrw(id) { g(id)?.classList.remove('on'); }
-function showNutForm() { safeShow('nut-form', 'block'); if (g('nt-val')) { g('nt-val').value = ''; g('nt-val').focus(); } }
+
+function showNutForm() {
+  safeShow('nut-form', 'block');
+  if (g('nt-val')) { g('nt-val').value = ''; g('nt-val').focus(); }
+}
 function hideNutForm() { safeShow('nut-form', 'none'); }
+
 function addNut() {
   const k = g('nt-sel')?.value;
   const v = parseFloat(g('nt-val')?.value);
-  if (!k || isNaN(v) || v < 0 || v > 100) { toast('Teor inválido (0–100%)', 'er'); return; }
+  if (!k || isNaN(v) || v < 0 || v > 100) {
+    toast('Teor inválido (0–100%)', 'er');
+    return;
+  }
   nuts[k] = v;
   hideNutForm();
   renderNutTags();
 }
-function removeNut(k) { delete nuts[k]; renderNutTags(); }
+
+function removeNut(k) {
+  delete nuts[k];
+  renderNutTags();
+}
+
 function renderNutTags() {
-  const ord = ['N', 'P2O5', 'K2O', 'S', 'B', 'Zn', 'Mg', 'Ca'];
-  const keys = Object.keys(nuts).sort((a, b) => ord.indexOf(a) - ord.indexOf(b));
+  const ord = ['N','P2O5','K2O','S','B','Zn','Mg','Ca'];
+  const keys = Object.keys(nuts).sort((a,b) => ord.indexOf(a) - ord.indexOf(b));
   const box = g('nut-tags');
   if (!box) return;
-  box.innerHTML = keys.map(k =>
-    `<span class="nt">${fmtNK(k)} ${nuts[k]}%<span class="nt-x" onclick="removeNut('${k}')">×</span></span>`
-  ).join('') || '<span style="font-size:.74em;color:var(--txm)">Nenhum nutriente</span>';
+  box.innerHTML =
+    keys.map(k => `<span class="nt">${fmtNK(k)} ${nuts[k]}%<span class="nt-x" onclick="removeNut('${k}')">×</span></span>`).join('')
+    || '<span style="font-size:.74em;color:var(--txm)">Nenhum nutriente</span>';
 }
+
 function saveProd() {
   const name = (g('p-nome')?.value || '').trim();
   if (!name) { toast('Nome obrigatório', 'er'); return; }
@@ -254,6 +285,8 @@ function saveProd() {
     id: editId || uid(),
     active: true,
     status: Object.keys(nuts).length > 0 ? 'ok' : 'review',
+    isSeed: false,
+    source: 'manual',
     name,
     supplier: (g('p-forn')?.value || '').trim(),
     delivery: (g('p-entrega')?.value || '').trim(),
@@ -271,7 +304,11 @@ function saveProd() {
     ferts.push(p);
     toast('Adicionado', 'ok');
   }
-  saveFerts(); renderFerts(); closeDrw('drw-prod'); editId = null;
+
+  saveFerts();
+  renderFerts();
+  closeDrw('drw-prod');
+  editId = null;
 }
 
 /* ===== PARSER IMPORTAÇÃO ===== */
@@ -279,11 +316,15 @@ function parseBRL(s) {
   if (!s) return 0;
   s = String(s).trim().replace(/R\$\s*/i, '').replace(/\s/g, '');
   if (s === '-' || !s) return 0;
+
   if (s.includes(',') && s.includes('.')) {
-    s = s.lastIndexOf(',') > s.lastIndexOf('.') ? s.replace(/\./g, '').replace(',', '.') : s.replace(/,/g, '');
+    s = s.lastIndexOf(',') > s.lastIndexOf('.')
+      ? s.replace(/\./g, '').replace(',', '.')
+      : s.replace(/,/g, '');
   } else if (s.includes(',')) {
     s = s.replace(',', '.');
   }
+
   return parseFloat(s) || 0;
 }
 
@@ -291,20 +332,23 @@ function parseNPK(name) {
   name = String(name || '').trim();
   const n = {};
 
-  // KCL / KCl / Cloreto de Potássio (muriate of potash)
-  // Exemplos: "KCL 60 GR", "KCL 60% GR", "KCl 60%", "Cloreto Potassio 60"
-  if (/(^|\b)(kcl|kcl\.|kcl-?|kcl\s)|\bcloreto\b.*\bpot(á|a)ssio\b|\bmop\b/i.test(name)) {
-    const m = name.match(/(kcl|kcl\.|kcl-?)\s*(\d{1,2}(?:[.,]\d+)?)\s*%?/i) || name.match(/\b(\d{1,2}(?:[.,]\d+)?)\s*%?\b/);
-    const v = m ? parseFloat(String(m[2] ?? m[1]).replace(',', '.')) : 60;
-    n.K2O = v;
+  // KCL / KCl / Cloreto de Potássio
+  if (/(^|\b)(KCL|KCl)\b|\bcloreto\b.*\bpot(á|a)ssio\b/i.test(name)) {
+    const m =
+      name.match(/(KCL|KCl)\s*(\d{1,2}(?:[.,]\d+)?)\s*%?/i) ||
+      name.match(/\b(\d{1,2}(?:[.,]\d+)?)\s*%?\b/);
+    n.K2O = m ? parseFloat(String(m[2] || m[1]).replace(',', '.')) : 60;
     return n;
   }
 
   // Ureia
   const ur = name.match(/UREIA\s*(\d{1,2}(?:[.,]\d+)?)\s*%?/i);
-  if (ur) { n.N = parseFloat(String(ur[1]).replace(',', '.')); return n; }
+  if (ur) {
+    n.N = parseFloat(String(ur[1]).replace(',', '.'));
+    return n;
+  }
 
-  // MAP (ex: MAP 11-52)
+  // MAP
   const map = name.match(/MAP\s*(\d{1,2}(?:[.,]\d+)?)\s*[-–]\s*(\d{1,2}(?:[.,]\d+)?)/i);
   if (map) {
     n.N = parseFloat(String(map[1]).replace(',', '.'));
@@ -312,15 +356,21 @@ function parseNPK(name) {
     return n;
   }
 
-  // TSP (ex: TSP 46/36 ou TSP 46)
+  // TSP
   const tsp = name.match(/TSP\s*(\d{1,2}(?:[.,]\d+)?)/i);
-  if (tsp) { n.P2O5 = parseFloat(String(tsp[1]).replace(',', '.')); return n; }
+  if (tsp) {
+    n.P2O5 = parseFloat(String(tsp[1]).replace(',', '.'));
+    return n;
+  }
 
-  // SSP (ex: SSP 19/16 ... normalmente o primeiro número é P2O5)
+  // SSP
   const ssp = name.match(/SSP\s*(\d{1,2}(?:[.,]\d+)?)/i);
-  if (ssp) { n.P2O5 = parseFloat(String(ssp[1]).replace(',', '.')); return n; }
+  if (ssp) {
+    n.P2O5 = parseFloat(String(ssp[1]).replace(',', '.'));
+    return n;
+  }
 
-  // SAM (ex: SAM 20,5/23)
+  // SAM
   const sam = name.match(/SAM\s*([\d.,]+)\s*[/,]\s*([\d.,]+)/i);
   if (sam) {
     n.N = parseFloat(String(sam[1]).replace(',', '.'));
@@ -328,7 +378,7 @@ function parseNPK(name) {
     return n;
   }
 
-  // NPK padrão 00-14-18 / 10-40-10 etc (aceita 1-2 dígitos por campo)
+  // Fórmula NPK padrão
   const npk = name.match(/(\d{1,2})\s*[-–]\s*(\d{1,2})\s*[-–]\s*(\d{1,2})/);
   if (npk) {
     n.N = parseInt(npk[1], 10);
@@ -344,7 +394,7 @@ function parseLine(line, defF, defE, defFr) {
   line = String(line || '').trim();
   if (!line) return null;
 
-  // CORREÇÃO: não dividir por vírgula (isso quebra decimais e preços BR)
+  // CORREÇÃO: não dividir por vírgula
   const ps = line.split(/[|;\t]/).map(s => s.trim()).filter(Boolean);
 
   let sup = '', name = '', del = '', price = 0, fr = defFr;
@@ -377,19 +427,21 @@ function parseLine(line, defF, defE, defFr) {
   }
 
   if (!name) return null;
-  const nuts = parseNPK(name);
+  const parsed = parseNPK(name);
 
   return {
     id: uid(),
     active: true,
-    status: (nuts && Object.keys(nuts).length > 0) ? 'ok' : 'review',
+    status: parsed && Object.keys(parsed).length > 0 ? 'ok' : 'review',
+    isSeed: false,
+    source: 'import',
     name: name.trim(),
     supplier: (sup || '').trim(),
     delivery: (del || '').trim(),
     priceTon: price,
     freightTon: fr,
     minLoadTon: 0,
-    nutrients: nuts || {}
+    nutrients: parsed || {}
   };
 }
 
@@ -403,7 +455,7 @@ function isDup(p) {
 
 /* ===== IMPORT STEPS ===== */
 function impGoStep(n) {
-  [1, 2, 3].forEach(i => {
+  [1,2,3].forEach(i => {
     const si = g('imp-s' + i);
     if (si) si.style.display = i === n ? 'block' : 'none';
     const d = g('sd-' + i);
@@ -412,6 +464,7 @@ function impGoStep(n) {
   const labels = ['', 'Etapa 1 de 3 — Cole a lista', 'Etapa 2 de 3 — Pré-visualização', 'Etapa 3 de 3 — Concluído'];
   safeText('imp-step-label', labels[n] || '');
 }
+
 function previsualizar() {
   const raw = (g('raw-input')?.value || '').trim();
   if (!raw) { toast('Cole alguma lista primeiro', 'er'); return; }
@@ -428,34 +481,43 @@ function previsualizar() {
   const revs = parsedImport.filter(p => p.status === 'review');
 
   const st = g('imp-stats');
-  if (st) st.innerHTML =
-    `<div class="stat"><div class="stat-n">${parsedImport.length}</div><div class="stat-l">Lidas</div></div>
-     <div class="stat s-ok"><div class="stat-n">${oks.length}</div><div class="stat-l">OK</div></div>
-     <div class="stat s-wn"><div class="stat-n">${revs.length}</div><div class="stat-l">Revisar</div></div>
-     <div class="stat s-bl"><div class="stat-n">${dups.length}</div><div class="stat-l">Duplicadas</div></div>`;
+  if (st) {
+    st.innerHTML = `
+      <div class="stat"><div class="stat-n">${parsedImport.length}</div><div class="stat-l">Lidas</div></div>
+      <div class="stat s-ok"><div class="stat-n">${oks.length}</div><div class="stat-l">OK</div></div>
+      <div class="stat s-wn"><div class="stat-n">${revs.length}</div><div class="stat-l">Revisar</div></div>
+      <div class="stat s-bl"><div class="stat-n">${dups.length}</div><div class="stat-l">Duplicadas</div></div>`;
+  }
 
   safeShow('dup-section', dups.length ? 'block' : 'none');
-
   safeText('prev-label', parsedImport.length + ' produtos para importar');
 
   const pl = g('prev-list');
-  if (pl) pl.innerHTML = parsedImport.map(p => {
-    const dup = isDup(p);
-    const cls = dup ? 'p-dup' : p.status === 'review' ? 'p-rev' : 'p-ok';
-    const badge = dup ? '<span class="mini-badge mb-dup">Dup</span>' : p.status === 'review' ? '<span class="mini-badge mb-rev">Revisar</span>' : '<span class="mini-badge mb-ok">OK</span>';
-    const pr = p.priceTon ? 'R$ ' + p.priceTon.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '/t' : '—';
-    return `<div class="pcard ${cls}">
-      <div class="p-info">
-        <div class="p-name">${p.name}${badge}</div>
-        <div class="p-nuts">${fmtN(p.nutrients)}</div>
-        <div class="p-meta">${p.supplier || '—'} · ${p.delivery || '—'}</div>
-      </div>
-      <div class="p-price">${pr}</div>
-    </div>`;
-  }).join('');
+  if (pl) {
+    pl.innerHTML = parsedImport.map(p => {
+      const dup = isDup(p);
+      const cls = dup ? 'p-dup' : p.status === 'review' ? 'p-rev' : 'p-ok';
+      const badge = dup
+        ? '<span class="mini-badge mb-dup">Dup</span>'
+        : p.status === 'review'
+          ? '<span class="mini-badge mb-rev">Revisar</span>'
+          : '<span class="mini-badge mb-ok">OK</span>';
+      const pr = p.priceTon ? 'R$ ' + p.priceTon.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '/t' : '—';
+
+      return `<div class="pcard ${cls}">
+        <div class="p-info">
+          <div class="p-name">${p.name}${badge}</div>
+          <div class="p-nuts">${fmtN(p.nutrients)}</div>
+          <div class="p-meta">${p.supplier || '—'} · ${p.delivery || '—'}</div>
+        </div>
+        <div class="p-price">${pr}</div>
+      </div>`;
+    }).join('');
+  }
 
   impGoStep(2);
 }
+
 function importar() {
   const dupAct = document.querySelector('input[name="dup"]:checked')?.value || 'ignore';
   let added = 0, updated = 0, skipped = 0;
@@ -468,15 +530,28 @@ function importar() {
     );
 
     if (di >= 0) {
-      if (dupAct === 'ignore') skipped++;
-      else if (dupAct === 'update') { ferts[di].priceTon = p.priceTon; updated++; }
-      else { ferts.push({ ...p, id: uid() }); added++; }
+      if (dupAct === 'ignore') {
+        skipped++;
+      } else if (dupAct === 'update') {
+        ferts[di].priceTon = p.priceTon;
+        ferts[di].freightTon = p.freightTon;
+        ferts[di].nutrients = p.nutrients;
+        ferts[di].status = p.status;
+        ferts[di].isSeed = false;
+        ferts[di].source = 'import';
+        updated++;
+      } else {
+        ferts.push({ ...p, id: uid() });
+        added++;
+      }
     } else {
-      ferts.push(p); added++;
+      ferts.push(p);
+      added++;
     }
   });
 
-  saveFerts(); renderFerts();
+  saveFerts();
+  renderFerts();
 
   safeText('done-title', `${added + updated} produto${(added + updated) !== 1 ? 's' : ''} importado${(added + updated) !== 1 ? 's' : ''}`);
   safeText('done-sub', `${added} adicionado${added !== 1 ? 's' : ''}${updated ? ' · ' + updated + ' atualizado' + (updated !== 1 ? 's' : '') : ''}${skipped ? ' · ' + skipped + ' ignorado' + (skipped !== 1 ? 's' : '') : ''}`);
@@ -484,7 +559,41 @@ function importar() {
   toast(`${added + updated} importado${(added + updated) !== 1 ? 's' : ''}!`, 'ok');
   impGoStep(3);
 }
-function novaImport() { parsedImport = []; if (g('raw-input')) g('raw-input').value = ''; impGoStep(1); }
+
+function novaImport() {
+  parsedImport = [];
+  if (g('raw-input')) g('raw-input').value = '';
+  impGoStep(1);
+}
+
+/* ===== LIMPEZA DE PRODUTOS DEMO ANTIGOS ===== */
+function isLegacySeedProduct(f) {
+  if (!f || typeof f !== 'object') return false;
+
+  // seed antigo do seu código original costumava ter createdAt/updatedAt + micros
+  const legacyMarkers =
+    !!f.createdAt &&
+    !!f.updatedAt &&
+    typeof f.micros === 'object';
+
+  const supplierMatches =
+    ['cibra', 'timac', 'motta fertilizantes'].includes((f.supplier || '').toLowerCase());
+
+  return legacyMarkers && supplierMatches;
+}
+
+function purgeDemoProducts() {
+  const before = ferts.length;
+
+  ferts = ferts.filter(f =>
+    !(f.isSeed === true || f.source === 'seed' || isLegacySeedProduct(f))
+  );
+
+  if (ferts.length !== before) {
+    saveFerts();
+    toast('Produtos demo antigos removidos', 'ok');
+  }
+}
 
 /* ===== SOLVER ===== */
 function getValid() {
@@ -492,9 +601,11 @@ function getValid() {
     f.active &&
     f.status === 'ok' &&
     (f.priceTon || 0) > 0 &&
-    Object.values(f.nutrients || {}).some(v => (v || 0) > 0)
+    Object.values(f.nutrients || {}).some(v => v > 0) &&
+    (!REQUIRE_REAL_PRODUCTS || (!f.isSeed && f.source !== 'seed'))
   );
 }
+
 function combs(arr, k) {
   if (k === 1) return arr.map(x => [x]);
   const r = [];
@@ -504,8 +615,7 @@ function combs(arr, k) {
   return r;
 }
 
-/* Greedy melhorado: para cada produto, testa doses candidatas (por nutriente)
-   e escolhe a dose que minimiza (falta pesada + excesso leve) */
+/* escolhe a melhor dose por produto testando candidatos */
 function chooseDoseForProduct(p, active, rem, tgts) {
   const candidates = [];
 
@@ -513,10 +623,10 @@ function chooseDoseForProduct(p, active, rem, tgts) {
     const t = p.nutrients[n] || 0;
     const r = rem[n] || 0;
     if (t > 0 && r > 0.01) {
-      const dose = 100 * r / t; // kg/ha do produto para suprir o restante do nutriente n
-      candidates.push(dose);
+      candidates.push(100 * r / t);
     }
   }
+
   if (!candidates.length) return 0;
 
   let bestDose = 0, bestScore = Infinity;
@@ -530,15 +640,18 @@ function chooseDoseForProduct(p, active, rem, tgts) {
 
       const del = (dose * (p.nutrients[n] || 0)) / 100;
       const newRem = Math.max(0, (rem[n] || 0) - del);
-      const over = Math.max(0, del - (rem[n] || 0)); // excesso gerado “sobre o que faltava”
+      const over = Math.max(0, del - (rem[n] || 0));
 
-      short += (newRem / meta);
-      excess += (over / meta);
+      short += newRem / meta;
+      excess += over / meta;
     }
 
-    // falta pesa muito mais que excesso
+    // falta pesa MUITO mais que excesso
     const score = (short * short * 120) + (excess * excess * 12);
-    if (score < bestScore) { bestScore = score; bestDose = dose; }
+    if (score < bestScore) {
+      bestScore = score;
+      bestDose = dose;
+    }
   }
 
   return bestDose;
@@ -549,7 +662,6 @@ function calcCombo(prods, tgts, area) {
   const active = NUTS.filter(n => (tgts[n] || 0) > 0);
   if (!active.length) return null;
 
-  // Ordena por “utilidade”: soma ponderada dos teores dos nutrientes ativos
   const sorted = [...prods].sort((a, b) => {
     const sa = active.reduce((s, n) => s + (a.nutrients[n] || 0), 0);
     const sb = active.reduce((s, n) => s + (b.nutrients[n] || 0), 0);
@@ -572,6 +684,7 @@ function calcCombo(prods, tgts, area) {
     });
 
     const tonHa = dose / 1000;
+
     doses.push({
       prod: p,
       dose,
@@ -592,9 +705,10 @@ function calcCombo(prods, tgts, area) {
   const tC = doses.reduce((s, d) => s + d.costTotal, 0);
 
   const finDel = {};
-  active.forEach(n => { finDel[n] = doses.reduce((s, d) => s + (d.del[n] || 0), 0); });
+  active.forEach(n => {
+    finDel[n] = doses.reduce((s, d) => s + (d.del[n] || 0), 0);
+  });
 
-  // Erros (separando falta vs excesso)
   let short = 0, excess = 0, errAbs = 0;
   active.forEach(n => {
     const meta = tgts[n] || 0;
@@ -605,14 +719,14 @@ function calcCombo(prods, tgts, area) {
     else excess += diff / meta;
     errAbs += Math.abs(diff) / meta;
   });
+
   short /= active.length;
   excess /= active.length;
-  let err = errAbs / active.length;
+  const err = errAbs / active.length;
 
-  // “sob” (excesso absoluto em kg/ha) — mantido p/ UI
   const sob = active.reduce((s, n) => s + Math.max(0, (finDel[n] || 0) - (tgts[n] || 0)), 0);
 
-  // Regra nutricional: descarta se ficar abaixo da cobertura mínima (com tolerância)
+  // exige cobertura mínima
   for (const n of active) {
     const meta = tgts[n] || 0;
     const del = finDel[n] || 0;
@@ -623,30 +737,39 @@ function calcCombo(prods, tgts, area) {
   return { doses, tCH, tFH, tT, tC, err, short, excess, sob, finDel, active, area };
 }
 
-// Score: falta manda, excesso é bem menor; custo vira desempate
 function scoreC(c, cr) {
-  const wShort = 12000;   // falta (muito forte)
-  const wExcess = 3000;   // excesso (menor)
-  const wProd = 20;       // penaliza muitos produtos
-  const wCost = 0.08;     // custo como desempate (balanced)
+  const wShort = 12000;
+  const wExcess = 3000;
+  const wProd = 20;
+  const wCost = 0.08;
   const wFreight = 0.04;
 
   switch (cr) {
     case 'cost':
       return c.tCH * 0.75 + c.short * wShort + c.excess * (wExcess * 0.7) + c.doses.length * wProd;
+
     case 'freight':
       return c.tFH * 0.75 + c.short * wShort + c.excess * (wExcess * 0.7) + c.tCH * 0.10 + c.doses.length * wProd;
+
     case 'error':
       return c.short * wShort + c.excess * wExcess + c.tCH * 0.10 + c.doses.length * wProd;
+
     case 'ton':
       return c.tT * 0.60 + c.short * wShort + c.excess * (wExcess * 0.5) + c.tCH * 0.05;
-    default: // balanced nutricional
+
+    default: // balanced
       return c.short * wShort + c.excess * wExcess + c.doses.length * wProd + c.tCH * wCost + c.tFH * wFreight;
   }
 }
 
-function sMax(n) { mxP = n; document.querySelectorAll('[data-m]').forEach(b => b.classList.toggle('on', +b.dataset.m === n)); }
-function sShow(n) { shN = n; document.querySelectorAll('[data-n]').forEach(b => b.classList.toggle('on', +b.dataset.n === n)); }
+function sMax(n) {
+  mxP = n;
+  document.querySelectorAll('[data-m]').forEach(b => b.classList.toggle('on', +b.dataset.m === n));
+}
+function sShow(n) {
+  shN = n;
+  document.querySelectorAll('[data-n]').forEach(b => b.classList.toggle('on', +b.dataset.n === n));
+}
 function setCrit(cr) {
   currentCrit = cr;
   document.querySelectorAll('.ctab').forEach(b => b.classList.toggle('on', b.dataset.c === cr));
@@ -666,10 +789,17 @@ function run() {
     K2O: parseFloat(g('fk')?.value) || 0,
     S: parseFloat(g('fs')?.value) || 0
   };
-  if (!Object.values(tgts).some(v => v > 0)) { toast('Defina ao menos uma meta', 'er'); return; }
+
+  if (!Object.values(tgts).some(v => v > 0)) {
+    toast('Defina ao menos uma meta', 'er');
+    return;
+  }
 
   const v = getValid();
-  if (!v.length) { toast('Nenhum produto válido', 'er'); return; }
+  if (!v.length) {
+    toast('Nenhum produto válido', 'er');
+    return;
+  }
 
   const all = [];
   for (let k = 1; k <= Math.min(mxP, v.length, MAX_K_COMB); k++) {
@@ -680,12 +810,15 @@ function run() {
   }
 
   if (!all.length) {
-    toast('Não foi possível calcular (talvez cobertura mínima muito alta ou produtos insuficientes)', 'er');
+    toast('Não foi possível calcular com os produtos disponíveis', 'er');
     return;
   }
 
   all.sort((a, b) => scoreC(a, currentCrit) - scoreC(b, currentCrit));
-  lastResults = all; lastTgts = tgts; chatHistory = {};
+
+  lastResults = all;
+  lastTgts = tgts;
+  chatHistory = {};
 
   safeShow('emp-calc', 'none');
   safeShow('res-cards', 'block');
@@ -694,16 +827,26 @@ function run() {
 }
 
 /* ===== UI RESULTADOS ===== */
-const CRL = { balanced: 'Balanceado', cost: 'Menor custo', freight: 'Menor frete', error: 'Menor erro', ton: 'Menor tonelada' };
-const RKL = ['1ª', '2ª', '3ª'];
+const CRL = {
+  balanced: 'Balanceado',
+  cost: 'Menor custo',
+  freight: 'Menor frete',
+  error: 'Menor erro',
+  ton: 'Menor tonelada'
+};
+const RKL = ['1ª','2ª','3ª'];
 
-function renderCards(rs, tgts, cr) { const rc = g('res-cards'); if (rc) rc.innerHTML = rs.map((r, i) => buildCard(r, i, tgts, cr)).join(''); }
+function renderCards(rs, tgts, cr) {
+  const rc = g('res-cards');
+  if (rc) rc.innerHTML = rs.map((r, i) => buildCard(r, i, tgts, cr)).join('');
+}
 
 function buildCard(r, i, tgts, cr) {
   const win = i === 0;
 
   const nutHTML = r.active.map(n => {
-    const meta = tgts[n] || 0, del = r.finDel[n] || 0;
+    const meta = tgts[n] || 0;
+    const del = r.finDel[n] || 0;
     const pct = meta > 0 ? Math.min(130, del / meta * 100) : 0;
     const diff = del - meta;
     const ok = Math.abs(diff) < 0.5;
@@ -715,7 +858,10 @@ function buildCard(r, i, tgts, cr) {
         <div class="nb-track">
           <div class="nb-fill${ok ? '' : ov ? ' ov' : ' sh'}" style="width:${Math.min(100, pct)}%"></div>
         </div>
-        <div class="nb-vals"><span>${nd(meta, 0)} meta</span><span>${nd(del, 1)} entregue</span></div>
+        <div class="nb-vals">
+          <span>${nd(meta, 0)} meta</span>
+          <span>${nd(del, 1)} entregue</span>
+        </div>
       </div>
       <span class="nb-bdg ${ok ? 'b-ok' : ov ? 'b-ov' : 'b-sh'}">${ok ? 'OK' : ov ? '+' + nd(diff, 1) + ' kg' : nd(diff, 1) + ' kg'}</span>
     </div>`;
@@ -730,12 +876,21 @@ function buildCard(r, i, tgts, cr) {
       <div class="rr"><span class="rl">Custo total</span><span class="rv">${brl(d.costTotal)}</span></div>
       ${d.frHa > 0 ? `<div class="rr"><span class="rl">Frete/ha</span><span class="rv">${brl(d.frHa)}</span></div>` : ''}
       <div class="nut-pills">
-        ${r.active.filter(n => (d.del[n] || 0) > 0.01).map(n => `<span class="np">${fmtNK(n)} ${nd(d.del[n] || 0, 1)} kg/ha</span>`).join('')}
+        ${r.active
+          .filter(n => (d.del[n] || 0) > 0.01)
+          .map(n => `<span class="np">${fmtNK(n)} ${nd(d.del[n] || 0, 1)} kg/ha</span>`)
+          .join('')}
       </div>
     </div>
   `).join('');
 
-  const qPrompts = ['Por que esta combinação foi escolhida?', 'Qual a vantagem do custo?', 'Há risco de excesso nutricional?', 'Como interpretar a sobra/falta?', 'Vale trocar por outro produto?'];
+  const qPrompts = [
+    'Por que esta combinação foi escolhida?',
+    'Qual a vantagem do custo?',
+    'Há risco de excesso nutricional?',
+    'Como interpretar a sobra/falta?',
+    'Vale trocar por outro produto?'
+  ];
 
   const iaHTML = `<div class="ia-panel">
     <div class="ia-hdr" onclick="toggleIA(${i})">
@@ -745,7 +900,9 @@ function buildCard(r, i, tgts, cr) {
       <div class="ia-arr" id="ia-arr-${i}">▼</div>
     </div>
     <div class="ia-body" id="ia-body-${i}">
-      <div class="quick-prompts">${qPrompts.map(q => `<button class="qp" onclick="askAI('${q.replace(/'/g, "\\'")}',${i})">${q}</button>`).join('')}</div>
+      <div class="quick-prompts">
+        ${qPrompts.map(q => `<button class="qp" onclick="askAI('${q.replace(/'/g, "\\'")}',${i})">${q}</button>`).join('')}
+      </div>
       <div class="ia-chat" id="chat-${i}">
         <div class="msg msg-a">Analisarei a combinação ${i + 1}. Escolha uma pergunta ou escreva.</div>
       </div>
@@ -788,25 +945,31 @@ function buildCard(r, i, tgts, cr) {
 /* ===== IA ===== */
 function buildCtx() {
   if (!lastResults || !lastTgts) return '';
-  const cult = g('fc')?.value, area = g('fa')?.value;
+  const cult = g('fc')?.value;
+  const area = g('fa')?.value;
+
   const lines = [
     `Cultura: ${cult} | Área: ${area} ha | Critério: ${CRL[currentCrit]}`,
     `Metas (kg/ha): N=${lastTgts.N || 0} P₂O₅=${lastTgts.P2O5 || 0} K₂O=${lastTgts.K2O || 0} S=${lastTgts.S || 0}`,
     ''
   ];
+
   lastResults.slice(0, shN).forEach((r, i) => {
-    lines.push(`--- Combinação ${i + 1} ${i === 0 ? '(MELHOR)' : ''}---`);
+    lines.push(`--- Combinação ${i + 1} ${i === 0 ? '(MELHOR)' : ''} ---`);
     r.doses.forEach(d => {
       lines.push(`${d.prod.name} | ${fmtN(d.prod.nutrients)} | R$ ${d.prod.priceTon}/t`);
       lines.push(`  Dose: ${nd(d.dose, 1)} kg/ha | Total: ${nd(d.tonTotal, 2)} t | Custo/ha: ${brl(d.costHa)}`);
     });
     lines.push(`Custo/ha: ${brl(r.tCH)} | Total: ${nd(r.tT, 2)} t | Total R$: ${brl(r.tC)}`);
     r.active.forEach(n => {
-      const m = lastTgts[n], d = r.finDel[n] || 0, diff = d - m;
+      const m = lastTgts[n];
+      const d = r.finDel[n] || 0;
+      const diff = d - m;
       lines.push(`${fmtNK(n)}: meta ${m} → entregue ${nd(d, 1)} [${Math.abs(diff) < 0.5 ? 'OK' : diff > 0 ? 'SOBRA ' + nd(diff, 1) : 'FALTA ' + nd(Math.abs(diff), 1)} kg/ha]`);
     });
     lines.push('');
   });
+
   return lines.join('\n');
 }
 
@@ -817,6 +980,7 @@ function toggleIA(i) {
   const o = b.classList.toggle('open');
   if (a) a.classList.toggle('open', o);
 }
+
 function sendMsg(i) {
   const inp = g('ia-inp-' + i);
   const q = (inp?.value || '').trim();
@@ -827,9 +991,12 @@ function sendMsg(i) {
 
 async function askAI(question, cardIdx) {
   const key = getKey();
-  const chatEl = g('chat-' + cardIdx); if (!chatEl) return;
+  const chatEl = g('chat-' + cardIdx);
+  if (!chatEl) return;
+
   if (!chatHistory[cardIdx]) chatHistory[cardIdx] = [];
   chatHistory[cardIdx].push({ role: 'user', content: question });
+
   chatEl.innerHTML += `<div class="msg msg-u">${escH(question)}</div>`;
   const tid = 'tk-' + Date.now();
   chatEl.innerHTML += `<div class="msg msg-a thinking" id="${tid}">Analisando...</div>`;
@@ -837,7 +1004,10 @@ async function askAI(question, cardIdx) {
 
   if (!key) {
     const el = document.getElementById(tid);
-    if (el) { el.textContent = '⚠ Configure a API Key no cabeçalho. Chave gratuita em openrouter.ai/keys'; el.classList.remove('thinking'); }
+    if (el) {
+      el.textContent = '⚠ Configure a API Key no cabeçalho. Chave gratuita em openrouter.ai/keys';
+      el.classList.remove('thinking');
+    }
     return;
   }
 
@@ -874,15 +1044,24 @@ async function askAI(question, cardIdx) {
       const e = await res.json().catch(() => ({}));
       throw new Error(e?.error?.message || ('Erro ' + res.status));
     }
+
     const data = await res.json();
     const reply = data?.choices?.[0]?.message?.content || 'Sem resposta.';
     chatHistory[cardIdx].push({ role: 'assistant', content: reply });
+
     const el = document.getElementById(tid);
-    if (el) { el.textContent = reply; el.classList.remove('thinking'); }
+    if (el) {
+      el.textContent = reply;
+      el.classList.remove('thinking');
+    }
+
     chatEl.scrollTop = chatEl.scrollHeight;
   } catch (e) {
     const el = document.getElementById(tid);
-    if (el) { el.textContent = '⚠ ' + e.message; el.classList.remove('thinking'); }
+    if (el) {
+      el.textContent = '⚠ ' + e.message;
+      el.classList.remove('thinking');
+    }
   }
 }
 
@@ -892,7 +1071,7 @@ const isMob = () => window.innerWidth <= 700;
 function mobTab(tab) {
   if (!isMob()) return;
 
-  ['prod', 'calc', 'res', 'imp'].forEach(t => g('tab-' + t)?.classList.toggle('on', t === tab));
+  ['prod','calc','res','imp'].forEach(t => g('tab-' + t)?.classList.toggle('on', t === tab));
 
   g('lp')?.classList.remove('mob-active');
   g('rp')?.classList.remove('mob-active');
@@ -915,8 +1094,14 @@ function mobTab(tab) {
     g('rp')?.classList.add('mob-active');
     showView('view-calc');
     safeText('hdr-title', 'Resultado');
-    if (lastResults) { safeShow('emp-calc', 'none'); safeShow('res-cards', 'block'); }
-    else safeShow('emp-calc', 'flex');
+
+    if (lastResults) {
+      safeShow('emp-calc', 'none');
+      safeShow('res-cards', 'block');
+    } else {
+      safeShow('emp-calc', 'flex');
+    }
+
     safeShow('tab-res-badge', 'none');
 
   } else if (tab === 'imp') {
@@ -926,13 +1111,14 @@ function mobTab(tab) {
     impGoStep(1);
   }
 }
+
 function initMob() {
   if (!isMob()) return;
   safeShow('key-status-wrap', 'none');
   mobTab('prod');
 }
 
-// Intercept run() para redirecionar resultado no mobile
+// intercepta run() no mobile
 const _runOrig = run;
 window.run = function () {
   _runOrig();
@@ -954,100 +1140,26 @@ window.addEventListener('resize', () => {
   }
 });
 
-/* ===== SEED DE PRODUTOS (carrega se localStorage vazio) ===== */
+/* ===== SEED DESATIVADO ===== */
 function seedIfEmpty() {
+  if (!ENABLE_SEED) return;
   if (ferts.length > 0) return;
-
-  const mkP = (name, sup, del, price, fr = 0) => {
-    const n = parseNPK(name);
-    return {
-      id: uid(), active: true, status: (n && Object.keys(n).length > 0) ? 'ok' : 'review',
-      name, supplier: sup, delivery: del, priceTon: price, freightTon: fr, minLoadTon: 0,
-      nutrients: n || {}, micros: {},
-      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
-    };
-  };
-
-  // Seus seeds originais (mantidos)
-  const CIBRA = [
-    ['CIBRAMIX I 00-14-18 MG', 3612.18], ['CIBRAMIX 00-20-00', 3503.34], ['CIBRAMIX I 00-20-20 MG', 4359.66],
-    ['CIBRAMIX 00-22-00', 3734.63], ['CIBRAMIX I 00-25-00 MG', 4081.56], ['CIBRAMIX I 00-25-23 MG', 5136.93],
-    ['CIBRAMIX I 00-30-10', 5074.74], ['CIBRAMIX 00-30-15 MG', 5285.62], ['CIBRAMIX 00-32-00 MG', 4884.27],
-    ['CIBRAMIX 00-44-00 MG', 6278.80], ['CIBRAMIX I 02-17-24 MG', 4244.85], ['CIBRAMIX 02-18-18 MG', 4142.78],
-    ['CIBRAMIX I 02-20-20 MG', 4414.89], ['CIBRAMIX 02-24-12 MG', 4347.34], ['CIBRAMIX 02-25-00 MG', 3993.13],
-    ['CIBRAMIX 02-25-25 MG', 5197.19], ['CIBRAMIX 02-26-00 MG', 4340.06], ['CIBRAMIX I 03-26-00 MG I', 4523.73],
-    ['CIBRAMIX 03-28-06 MG', 5462.46], ['CIBRAMIX 03-32-08 MG', 5455.69], ['CIBRAMIX 03-44-00 MG', 6353.63],
-    ['CIBRAMIX I 04-14-08 MG', 5848.92], ['CIBRAMIX 04-30-10 MG', 4523.73], ['CIBRAMIX I 04-30-10 MG', 4789.00],
-    ['CIBRAMIX I 05-25-25 MG', 5203.99], ['CIBRAMIX 05-35-00 MG', 5380.86], ['CIBRAMIX I 06-30-06 MG', 5387.66],
-    ['CIBRAMIX I 06-37-00 MG', 5816.22], ['CIBRAMIX I 07-34-09 MG', 5755.00], ['CIBRAMIX I 07-40-00 MG', 6027.10],
-    ['CIBRAMIX I 08-28-08 MG', 6442.06], ['CIBRAMIX I 09-46-00 MG', 6782.19], ['CIBRAMIX I 10-15-15 MG', 4183.60],
-    ['CIBRAMIX 10-20-10 MG', 4510.12], ['CIBRAMIX I 10-20-10 MG', 5557.75], ['CIBRAMIX I 10-50-00 MG', 7840.01],
-    ['KCL 60 GR', 3584.97], ['MAP 11-52/44 GR', 7333.61], ['SAM 20,5/23 GR', 2578.19],
-    ['SSP 19/16 + 16CA + 11S/SO4 GR', 2953.88], ['SSP 19/16 + 16CA + 10S/SO4 r', 3238.04],
-    ['SSP 20/16 GR', 3387.70], ['TSP 46/36 GR', 6319.62], ['UREIA 46 GR', 3460.41],
-    ['10-30-10 MG', 5401.27], ['10-49-00 + 0,75% ZN MG', 7183.55], ['10-50-00 MG', 7115.92],
-    ['10-15-15 MG', 4176.88], ['13-10-10 MG', 3503.34], ['00-00-54 +1B MG', 3795.85],
-    ['00-00-57 +0,5B MG', 3687.01], ['00-14-18 MG', 3496.56], ['00-17-24 MG', 4027.14],
-    ['00-18-18 MG', 3891.09], ['00-20-20 MG', 3894.30], ['00-20-25 MG', 4408.09],
-    ['00-20-30 MG', 4618.97], ['00-22-00 MG', 3591.77], ['00-25-00 MG', 3931.90],
-    ['00-25-25 MG', 5176.78], ['00-30-10 MG', 4925.08], ['00-30-15 MG', 5129.16],
-    ['00-30-20 MG', 5374.06], ['00-32-00 MG', 4727.83], ['00-33-00 MG', 4843.45],
-    ['00-36-00 MG', 5190.38], ['00-24-12 MG', 3435.31], ['00-24-16 MG', 4129.18],
-    ['02-20-20 MG', 4265.23], ['02-24-12 MG', 4380.88], ['02-25-00 MG', 3993.13],
-    ['02-25-23 MG', 5081.56], ['02-30-10 MG', 4986.31], ['03-28-00 MG', 4367.27],
-    ['03-30-15 MG', 5224.40], ['03-32-08 MG', 5163.17], ['04-14-08 MG', 3904.07],
-    ['04-20-30 MG', 4374.07], ['04-26-10 MG', 4659.78], ['04-30-10 MG', 5047.53],
-    ['04-35-10 MG', 6108.74], ['04-40-08 MG', 6108.74], ['04-50-20 MG', 4823.04],
-    ['05-25-15 MG', 4761.82], ['05-25-25 MG', 5176.78], ['05-25-30 MG', 5394.46],
-    ['05-35-00 MG', 5244.81], ['06-28-20 + 1%Zn MG', 5350.92], ['06-30-06 MG', 4999.91],
-    ['06-30-10 +0,5B+0,75Zn MG', 5544.12], ['06-30-10 MG', 5496.50], ['07-34-09 MG', 5605.34],
-    ['07-40-00 MG', 5870.65], ['08-20-00 MG', 3183.63], ['08-20-20 MG', 4625.77],
-    ['08-28-16 MG', 5299.23], ['08-28-16 + 1% ZN MG', 5330.52],
-    ['08-40-07 +0,5B+0,75ZN MG', 6605.31], ['08-40-08 MG', 6292.41], ['09-46-00 MG', 6612.13],
-    ['10-15-15 MG', 3326.47], ['10-20-10 MG', 4367.27], ['13-11-21 MG', 4149.59],
-    ['15-00-15 MG', 2829.88], ['15-00-30 MG', 3707.45], ['15-15-15 MG', 4510.12],
-    ['16-16-16 MG', 4836.65], ['18-18-18 MG', 5482.90], ['20-00-10 MG', 3095.18],
-    ['20-00-20 MG', 3793.86], ['20-05-20 MG', 4408.09], ['20-10-00 MG', 4292.44],
-    ['20-10-20 MG', 4789.00], ['26-00-26 MG', 4993.11], ['27-00-24 MG', 5034.33],
-    ['30-00-20 MG', 5244.81], ['33-00-00 MG', 3456.41], ['36-00-12 MG', 5337.32],
-    ['NITROCAP 18-10-05 0,5B 0,75Zn GR', 4421.69], ['NITROCAP 20-00-20 MG', 3965.92],
-    ['NITROCAP 20-00-30 MG', 4618.91], ['NITROCAP 20-10-10 MG', 4466.32],
-    ['NITROCAP 21-00-21 MG', 4163.19], ['NITROCAP 25-00-25 MG', 4993.11],
-    ['NITROCAP 27-00-24 MG', 4993.11], ['NITROCAP 30-00-20 MG', 5411.41],
-    ['NITROCAP 30-10-10 MG', 3904.66], ['NITROCAP 33-00-00 MG', 3469.31],
-    ['NITROCAP 36-00-12 MG', 5741.40], ['NITROCAP 45-00-00 I', 6021.55], ['NITROCAP 46 GR', 4299.11],
-  ].map(([n, p]) => mkP(n, 'Cibra', 'Julho', p, 0));
-
-  const TIMAC = [
-    ['K-UP 500 B1', 6349.54], ['SULFAMMO MeTA 17 B1', 6824.05], ['SULFAMMO MeTA 214 K B1', 6099.17],
-    ['SULFAMMO MeTA 29 B1', 7527.95], ['SULFAMMO ULTRA B1', 7257.92], ['SULFAMMO MeTA S B1', 6618.25],
-    ['TOP-PHOS 280 HP B1', 6416.39], ['TOP-PHOS 319 MASTER B1', 6184.37], ['TOP-PHOS 328 MASTER B1', 7200.25],
-    ['TOP-PHOS 88 MASTER B1', 7510.91], ['TOP-PHOS 842 MASTER B1', 8909.54],
-    ['NP PLUS 640 MASTER B1', 8857.11], ['INPZZA 470 MASTER B1', 7185.83], ['INPZZA 540 MASTER B1', 8440.27],
-  ].map(([n, p]) => mkP(n, 'TIMAC', 'Julho', p, 0));
-
-  const MOTTA = [
-    mkP('KCL 60% GR', 'Motta Fertilizantes', 'Mai-Jul', 3767.27, 0),
-    mkP('SSP 19%', 'Motta Fertilizantes', 'Mai-Jul', 3392.66, 0),
-    mkP('TSP 46%', 'Motta Fertilizantes', 'Mai-Jul', 6113.86, 0),
-    mkP('KCL 60% GR', 'Motta Fertilizantes', 'Mai-Jul', 3590.57, 0),
-    mkP('SSP 19%', 'Motta Fertilizantes', 'Mai-Jul', 3208.90, 0),
-    mkP('TSP 46%', 'Motta Fertilizantes', 'Mai-Jul', 5930.10, 0),
-  ];
-
-  ferts = [...CIBRA, ...TIMAC, ...MOTTA];
-  saveFerts();
-  toast('✓ ' + ferts.length + ' produtos carregados (Cibra, TIMAC, Motta)', 'ok');
 }
 
 /* ===== INIT ===== */
 document.addEventListener('input', e => {
-  if (e.target?.type === 'number' && e.target.value.length > 7) e.target.value = e.target.value.slice(0, 7);
+  if (e.target?.type === 'number' && e.target.value.length > 7) {
+    e.target.value = e.target.value.slice(0, 7);
+  }
 });
+
 updateKeyStatus();
-seedIfEmpty();
+purgeDemoProducts(); // remove demos antigos
+seedIfEmpty();       // não faz nada
 renderFerts();
 initMob();
 
 // PWA
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch(() => { });
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(() => {});
+}
