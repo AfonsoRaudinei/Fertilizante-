@@ -1,5 +1,8 @@
 /* ===========================
    FertiCalc — app.js (corrigido)
+   - sem seed/demo
+   - import robusto
+   - trava K2O na base via campo fkbase
    =========================== */
 
 /* ===== GLOBAL STATE ===== */
@@ -9,11 +12,11 @@ let lastResults = null, lastTgts = null, chatHistory = {};
 let parsedImport = [];
 
 /* ===== CONFIG ===== */
-const ENABLE_SEED = false;          // não carregar demos
-const REQUIRE_REAL_PRODUCTS = true; // solver só usa produto real
-const MIN_COVERAGE = 0.985;         // 98,5% da meta mínima
-const ABS_TOL_KGHA = 0.5;           // tolerância absoluta
-const MAX_K_COMB = 6;               // trava de performance
+const ENABLE_SEED = false;
+const REQUIRE_REAL_PRODUCTS = true;
+const MIN_COVERAGE = 0.985;   // 98,5% da meta
+const ABS_TOL_KGHA = 0.5;
+const MAX_K_COMB = 6;
 
 /* ===== UTILS ===== */
 const g = (x) => document.getElementById(x);
@@ -64,20 +67,15 @@ function navTo(sec) {
     document.querySelectorAll('.si')[0]?.classList.add('on');
     showView('view-calc');
     safeText('hdr-title', 'Fertilizantes');
-    safeShow('hdr-tag', 'none');
     safeShow('hdr-right', 'flex');
-
   } else if (sec === 'import') {
     document.querySelectorAll('.si')[1]?.classList.add('on');
     showView('view-import');
     safeText('hdr-title', 'Importar Lista');
-    safeShow('hdr-tag', 'none');
     safeShow('hdr-right', 'none');
     impGoStep(1);
-
   } else if (sec === 'ia-cfg') {
     toggleCfg();
-
   } else {
     toast('Em desenvolvimento');
   }
@@ -370,7 +368,7 @@ function parseNPK(name) {
     return n;
   }
 
-  // SAM
+  // SAM 20,5/23
   const sam = name.match(/SAM\s*([\d.,]+)\s*[/,]\s*([\d.,]+)/i);
   if (sam) {
     n.N = parseFloat(String(sam[1]).replace(',', '.'));
@@ -378,7 +376,7 @@ function parseNPK(name) {
     return n;
   }
 
-  // Fórmula NPK padrão
+  // Fórmula NPK padrão: 00-14-18 / 04-50-20 etc.
   const npk = name.match(/(\d{1,2})\s*[-–]\s*(\d{1,2})\s*[-–]\s*(\d{1,2})/);
   if (npk) {
     n.N = parseInt(npk[1], 10);
@@ -394,7 +392,7 @@ function parseLine(line, defF, defE, defFr) {
   line = String(line || '').trim();
   if (!line) return null;
 
-  // CORREÇÃO: não dividir por vírgula
+  // NÃO quebrar por vírgula
   const ps = line.split(/[|;\t]/).map(s => s.trim()).filter(Boolean);
 
   let sup = '', name = '', del = '', price = 0, fr = defFr;
@@ -570,7 +568,6 @@ function novaImport() {
 function isLegacySeedProduct(f) {
   if (!f || typeof f !== 'object') return false;
 
-  // seed antigo do seu código original costumava ter createdAt/updatedAt + micros
   const legacyMarkers =
     !!f.createdAt &&
     !!f.updatedAt &&
@@ -584,15 +581,29 @@ function isLegacySeedProduct(f) {
 
 function purgeDemoProducts() {
   const before = ferts.length;
-
   ferts = ferts.filter(f =>
     !(f.isSeed === true || f.source === 'seed' || isLegacySeedProduct(f))
   );
-
   if (ferts.length !== before) {
     saveFerts();
     toast('Produtos demo antigos removidos', 'ok');
   }
+}
+
+/* ===== REGRAS PARA K2O MÁX. NA BASE ===== */
+function isBaseFertilizer(prod) {
+  return (prod?.nutrients?.P2O5 || 0) > 0;
+}
+
+function maxDoseByBaseK(prod, tgts) {
+  const maxKBase = tgts.KBaseMax || 0;
+  if (maxKBase <= 0) return Infinity;
+
+  const k = prod?.nutrients?.K2O || 0;
+  if (k <= 0) return Infinity;
+
+  // dose máxima em kg/ha para não ultrapassar o K2O permitido na base
+  return (maxKBase * 100) / k;
 }
 
 /* ===== SOLVER ===== */
@@ -615,7 +626,6 @@ function combs(arr, k) {
   return r;
 }
 
-/* escolhe a melhor dose por produto testando candidatos */
 function chooseDoseForProduct(p, active, rem, tgts) {
   const candidates = [];
 
@@ -629,10 +639,19 @@ function chooseDoseForProduct(p, active, rem, tgts) {
 
   if (!candidates.length) return 0;
 
-  let bestDose = 0, bestScore = Infinity;
+  let bestDose = 0;
+  let bestScore = Infinity;
 
-  for (const dose of candidates) {
-    let short = 0, excess = 0;
+  const isBase = isBaseFertilizer(p);
+  const maxDoseBase = isBase ? maxDoseByBaseK(p, tgts) : Infinity;
+
+  for (let dose of candidates) {
+    if (isBase && dose > maxDoseBase) {
+      dose = maxDoseBase;
+    }
+
+    let short = 0;
+    let excess = 0;
 
     for (const n of active) {
       const meta = tgts[n] || 0;
@@ -646,8 +665,9 @@ function chooseDoseForProduct(p, active, rem, tgts) {
       excess += over / meta;
     }
 
-    // falta pesa MUITO mais que excesso
+    // falta pesa muito mais que excesso
     const score = (short * short * 120) + (excess * excess * 12);
+
     if (score < bestScore) {
       bestScore = score;
       bestDose = dose;
@@ -709,6 +729,22 @@ function calcCombo(prods, tgts, area) {
     finDel[n] = doses.reduce((s, d) => s + (d.del[n] || 0), 0);
   });
 
+  // valida K2O máximo vindo da base
+  const maxKBase = tgts.KBaseMax || 0;
+  if (maxKBase > 0) {
+    let baseKDelivered = 0;
+
+    doses.forEach(d => {
+      if (isBaseFertilizer(d.prod)) {
+        baseKDelivered += d.del.K2O || 0;
+      }
+    });
+
+    if (baseKDelivered > maxKBase + ABS_TOL_KGHA) {
+      return null;
+    }
+  }
+
   let short = 0, excess = 0, errAbs = 0;
   active.forEach(n => {
     const meta = tgts[n] || 0;
@@ -747,16 +783,12 @@ function scoreC(c, cr) {
   switch (cr) {
     case 'cost':
       return c.tCH * 0.75 + c.short * wShort + c.excess * (wExcess * 0.7) + c.doses.length * wProd;
-
     case 'freight':
       return c.tFH * 0.75 + c.short * wShort + c.excess * (wExcess * 0.7) + c.tCH * 0.10 + c.doses.length * wProd;
-
     case 'error':
       return c.short * wShort + c.excess * wExcess + c.tCH * 0.10 + c.doses.length * wProd;
-
     case 'ton':
       return c.tT * 0.60 + c.short * wShort + c.excess * (wExcess * 0.5) + c.tCH * 0.05;
-
     default: // balanced
       return c.short * wShort + c.excess * wExcess + c.doses.length * wProd + c.tCH * wCost + c.tFH * wFreight;
   }
@@ -787,10 +819,11 @@ function run() {
     N: parseFloat(g('fn')?.value) || 0,
     P2O5: parseFloat(g('fp')?.value) || 0,
     K2O: parseFloat(g('fk')?.value) || 0,
-    S: parseFloat(g('fs')?.value) || 0
+    S: parseFloat(g('fs')?.value) || 0,
+    KBaseMax: parseFloat(g('fkbase')?.value) || 0
   };
 
-  if (!Object.values(tgts).some(v => v > 0)) {
+  if (!Object.values({ N: tgts.N, P2O5: tgts.P2O5, K2O: tgts.K2O, S: tgts.S }).some(v => v > 0)) {
     toast('Defina ao menos uma meta', 'er');
     return;
   }
@@ -937,6 +970,11 @@ function buildCard(r, i, tgts, cr) {
       <div style="margin-top:10px;font-size:.65em;color:var(--txm)">
         <b>Indicadores:</b> Falta(rel): ${nd(r.short * 100, 1)}% · Excesso(rel): ${nd(r.excess * 100, 1)}%
       </div>
+
+      ${tgts.KBaseMax > 0 ? `
+      <div style="margin-top:6px;font-size:.65em;color:var(--txm)">
+        <b>K₂O máx. na base:</b> ${nd(tgts.KBaseMax, 1)} kg/ha
+      </div>` : ''}
     </div>
     ${iaHTML}
   </div>`;
@@ -950,7 +988,7 @@ function buildCtx() {
 
   const lines = [
     `Cultura: ${cult} | Área: ${area} ha | Critério: ${CRL[currentCrit]}`,
-    `Metas (kg/ha): N=${lastTgts.N || 0} P₂O₅=${lastTgts.P2O5 || 0} K₂O=${lastTgts.K2O || 0} S=${lastTgts.S || 0}`,
+    `Metas (kg/ha): N=${lastTgts.N || 0} P₂O₅=${lastTgts.P2O5 || 0} K₂O=${lastTgts.K2O || 0} S=${lastTgts.S || 0} K₂O máx. base=${lastTgts.KBaseMax || 0}`,
     ''
   ];
 
@@ -1155,7 +1193,7 @@ document.addEventListener('input', e => {
 
 updateKeyStatus();
 purgeDemoProducts(); // remove demos antigos
-seedIfEmpty();       // não faz nada
+seedIfEmpty();       // desativado
 renderFerts();
 initMob();
 
