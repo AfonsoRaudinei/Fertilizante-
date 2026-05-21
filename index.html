@@ -72,7 +72,7 @@
 <!-- MAIN -->
 <div id="body">
 
-  <!-- ESQUERDO: Lista 240px fixo -->
+  <!-- ESQUERDO: Lista -->
   <section id="lp">
     <div class="ph">
       <span class="pt">Cadastrados</span>
@@ -89,7 +89,7 @@
       <div class="filters">
         <div class="ftitle">Parâmetros do cálculo</div>
 
-        <div class="g2" style="margin-bottom:8px">
+        <div class="g2" style="margin-bottom:6px">
           <div class="fi">
             <span class="sl">Cultura</span>
             <select class="sel" id="fc">
@@ -103,46 +103,46 @@
           </div>
         </div>
 
-        <span class="sl" style="margin-bottom:5px">Metas nutricionais (kg/ha)</span>
-        <div class="g4" style="margin-bottom:8px">
+        <span class="sl" style="margin-bottom:4px">Metas nutricionais (kg/ha)</span>
+        <div class="g4" style="margin-bottom:6px">
           <div class="fi"><span class="sl">N</span><input type="number" class="inp" id="fn" value="0" max="9999999"></div>
           <div class="fi"><span class="sl">P₂O₅</span><input type="number" class="inp" id="fp" value="90" max="9999999"></div>
           <div class="fi"><span class="sl">K₂O</span><input type="number" class="inp" id="fk" value="120" max="9999999"></div>
           <div class="fi"><span class="sl">S</span><input type="number" class="inp" id="fs" value="0" max="9999999"></div>
         </div>
 
-        <!-- NOVO CAMPO -->
-        <div class="g2" style="margin-bottom:8px">
+        <div class="g2" style="margin-bottom:6px">
           <div class="fi">
             <span class="sl">K₂O máx. na base (kg/ha)</span>
             <input type="number" class="inp" id="fkbase" value="0" max="9999999" placeholder="0 = sem trava">
           </div>
           <div class="fi" style="display:flex;align-items:flex-end">
-            <div style="font-size:.7em;color:var(--txm);line-height:1.5;padding-bottom:4px">
+            <div style="font-size:.68em;color:var(--txm);line-height:1.4;padding-bottom:4px">
               0 = sem trava. Ex.: se meta de K₂O = 120 e K₂O máx. na base = 30,<br>
               a fórmula base só pode entregar até 30 kg/ha de K₂O.
             </div>
           </div>
         </div>
 
+        <!-- DROPDOWNS (substituem os botões segmentados) -->
         <div class="g2" style="margin-bottom:8px">
           <div class="fi">
             <span class="sl">Máx. produtos</span>
-            <div class="seg">
-              <button class="sgb on" data-m="1" onclick="sMax(1)">1</button>
-              <button class="sgb" data-m="2" onclick="sMax(2)">2</button>
-              <button class="sgb" data-m="3" onclick="sMax(3)">3</button>
-              <button class="sgb" data-m="4" onclick="sMax(4)">4</button>
-              <button class="sgb" data-m="5" onclick="sMax(5)">5</button>
-            </div>
+            <select class="sel" id="mxp" onchange="sMax(+this.value)">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
           </div>
           <div class="fi">
             <span class="sl">Mostrar top</span>
-            <div class="seg">
-              <button class="sgb on" data-n="1" onclick="sShow(1)">1</button>
-              <button class="sgb" data-n="2" onclick="sShow(2)">2</button>
-              <button class="sgb" data-n="3" onclick="sShow(3)">3</button>
-            </div>
+            <select class="sel" id="shn" onchange="sShow(+this.value)">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
           </div>
         </div>
 
