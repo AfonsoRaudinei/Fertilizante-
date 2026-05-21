@@ -11,44 +11,21 @@
 </head>
 <body>
 
-<!-- SIDEBAR OVERLAY -->
-<div id="sovly" onclick="closeSB()"></div>
-<aside id="sbar">
-  <div class="sb-hd">
-    <div class="sb-logo">🌱</div>
-    <div><div class="sb-brand">FertiCalc</div><div class="sb-sub">SoloForte · v1.0</div></div>
-    <button class="sb-x" onclick="closeSB()">✕</button>
-  </div>
-  <nav class="sb-nav">
-    <div class="sb-sec">Principal</div>
-    <div class="si on" onclick="navTo('calc')"><div class="si-ico">🧪</div>Fertilizantes</div>
-    <div class="si" onclick="navTo('import')"><div class="si-ico">📥</div>Importar lista</div>
-    <div class="sb-sec">Configurações</div>
-    <div class="si" onclick="navTo('dev')"><div class="si-ico">🏭</div>Fabricantes / Frete</div>
-    <div class="si" onclick="navTo('dev')"><div class="si-ico">🌿</div>Culturas</div>
-    <div class="si" onclick="navTo('dev')"><div class="si-ico">⚙️</div>Configurações</div>
-    <div class="sb-sec">Inteligência</div>
-    <div class="si" onclick="navTo('ia-cfg')"><div class="si-ico">🤖</div>IA Contextual<span class="sb-badge">Beta</span></div>
-  </nav>
-  <div class="sb-foot">SoloForte · Offline · PWA</div>
-</aside>
-
 <!-- HEADER -->
 <header id="hdr">
-  <button class="hm" onclick="openSB()">
-    <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
-      <rect width="17" height="1.5" rx=".75" fill="currentColor"/>
-      <rect y="4.75" width="13" height="1.5" rx=".75" fill="currentColor"/>
-      <rect y="9.5" width="17" height="1.5" rx=".75" fill="currentColor"/>
-    </svg>
-  </button>
-  <span class="ht" id="hdr-title">Fertilizantes</span>
-  <div class="hr" id="hdr-right">
-    <div style="display:flex;align-items:center;gap:4px" id="key-status-wrap">
-      <div class="key-dot missing" id="key-dot"></div>
-      <span style="font-size:.7em;color:var(--txm)" id="key-label">Sem chave</span>
+  <div class="brand">
+    <div class="brand-logo">🌱</div>
+    <div class="brand-txt">
+      <div class="brand-name">FertiCalc</div>
+      <div class="brand-sub">SoloForte</div>
     </div>
-    <button class="btn-xs" onclick="toggleCfg()">⚙ API Key</button>
+  </div>
+
+  <span class="ht" id="hdr-title">Fertilizantes</span>
+
+  <div class="hr" id="hdr-right">
+    <button class="btn-xs" onclick="navTo('import')">📥 Importar</button>
+    <button class="btn-xs" onclick="navTo('calc')">🧪 Calculadora</button>
     <button class="btn-add" onclick="openAddProduct()">
       <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
         <path d="M5.5 1v9M1 5.5h9" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
@@ -57,17 +34,6 @@
     </button>
   </div>
 </header>
-
-<!-- API KEY CONFIG -->
-<div id="cfg-panel">
-  <div style="font-size:.64em;font-weight:600;color:var(--txm);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">OpenRouter API Key</div>
-  <div style="display:flex;gap:6px;align-items:center">
-    <input type="password" class="inp" id="api-key-input" placeholder="sk-or-v1-..." style="flex:1;font-size:.78em">
-    <button class="btn-xs save-btn" onclick="saveKey()">Salvar</button>
-    <button class="btn-xs danger-btn" onclick="clearKey()">Limpar</button>
-  </div>
-  <div style="font-size:.64em;color:var(--txm);margin-top:5px">Salva localmente · Nunca exposta no console · Modelo: deepseek/deepseek-chat:free</div>
-</div>
 
 <!-- MAIN -->
 <div id="body">
@@ -124,7 +90,7 @@
           </div>
         </div>
 
-        <!-- DROPDOWNS (substituem os botões segmentados) -->
+        <!-- Dropdowns -->
         <div class="g2" style="margin-bottom:8px">
           <div class="fi">
             <span class="sl">Máx. produtos</span>
