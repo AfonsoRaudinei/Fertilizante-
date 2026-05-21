@@ -1,20 +1,17 @@
 /* ===========================
-   FertiCalc — app.js (corrigido)
-   - sem seed/demo
-   - import robusto
-   - trava K2O na base via campo fkbase
+   FertiCalc — app.js
+   (sem sidebar, sem IA)
    =========================== */
 
 /* ===== GLOBAL STATE ===== */
 let ferts = JSON.parse(localStorage.getItem('fc_ferts') || '[]');
-let editId = null, nuts = {}, mxP = 1, shN = 1, currentCrit = 'balanced';
-let lastResults = null, lastTgts = null, chatHistory = {};
+let editId = null, nuts = {}, mxP = 2, shN = 1, currentCrit = 'balanced';
+let lastResults = null, lastTgts = null;
 let parsedImport = [];
 
 /* ===== CONFIG ===== */
-const ENABLE_SEED = false;
 const REQUIRE_REAL_PRODUCTS = true;
-const MIN_COVERAGE = 0.985;   // 98,5% da meta
+const MIN_COVERAGE = 0.985;
 const ABS_TOL_KGHA = 0.5;
 const MAX_K_COMB = 6;
 
@@ -25,7 +22,6 @@ const safeText = (id, txt) => { const el = g(id); if (el) el.textContent = txt; 
 const brl = (n) => 'R$ ' + Number(n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const nd = (n, d = 2) => parseFloat((Number(n || 0)).toFixed(d));
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-const escH = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const fmtN = (n) => {
   if (!n) return '—';
   return ['N', 'P2O5', 'K2O', 'S']
@@ -44,79 +40,21 @@ function toast(msg, tp = '') {
   setTimeout(() => t.remove(), 2600);
 }
 
-function saveFerts() {
-  localStorage.setItem('fc_ferts', JSON.stringify(ferts));
-}
+function saveFerts() { localStorage.setItem('fc_ferts', JSON.stringify(ferts)); }
 
-/* ===== SIDEBAR ===== */
-function openSB() {
-  const sb = g('sbar'), ov = g('sovly');
-  if (sb) sb.classList.add('open');
-  if (ov) { ov.classList.add('on'); ov.style.display = 'block'; }
-}
-function closeSB() {
-  const sb = g('sbar'), ov = g('sovly');
-  if (sb) sb.classList.remove('open');
-  if (ov) { ov.classList.remove('on'); ov.style.display = 'none'; }
-}
+/* ===== NAVIGATION ===== */
 function navTo(sec) {
-  closeSB();
-  document.querySelectorAll('.si').forEach(s => s.classList.remove('on'));
-
   if (sec === 'calc') {
-    document.querySelectorAll('.si')[0]?.classList.add('on');
     showView('view-calc');
     safeText('hdr-title', 'Fertilizantes');
-    safeShow('hdr-right', 'flex');
   } else if (sec === 'import') {
-    document.querySelectorAll('.si')[1]?.classList.add('on');
     showView('view-import');
     safeText('hdr-title', 'Importar Lista');
-    safeShow('hdr-right', 'none');
     impGoStep(1);
-  } else if (sec === 'ia-cfg') {
-    toggleCfg();
-  } else {
-    toast('Em desenvolvimento');
   }
 }
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
-}
-
-/* ===== API KEY ===== */
-function getKey() { return localStorage.getItem('fc_ai_key') || ''; }
-
-function saveKey() {
-  const k = (g('api-key-input')?.value || '').trim();
-  if (!k) { toast('Cole a chave primeiro', 'er'); return; }
-  if (!k.startsWith('sk-')) { toast('Chave inválida (deve começar com sk-)', 'er'); return; }
-  localStorage.setItem('fc_ai_key', k);
-  if (g('api-key-input')) g('api-key-input').value = '';
-  updateKeyStatus();
-  toast('Chave salva', 'ok');
-  safeShow('cfg-panel', 'none');
-}
-
-function clearKey() {
-  localStorage.removeItem('fc_ai_key');
-  if (g('api-key-input')) g('api-key-input').value = '';
-  updateKeyStatus();
-  toast('Chave removida');
-}
-
-function updateKeyStatus() {
-  const has = !!getKey();
-  const dot = g('key-dot'), lbl = g('key-label');
-  if (dot) dot.className = 'key-dot ' + (has ? 'active' : 'missing');
-  if (lbl) lbl.textContent = has ? 'IA conectada' : 'Sem chave';
-}
-
-function toggleCfg() {
-  const p = g('cfg-panel');
-  if (!p) return;
-  p.style.display = p.style.display === 'block' ? 'none' : 'block';
-  if (p.style.display === 'block') g('api-key-input')?.focus();
 }
 
 /* ===== FERTILIZER LIST ===== */
@@ -204,7 +142,6 @@ function dupProd(id) {
   const c = JSON.parse(JSON.stringify(o));
   c.id = uid();
   c.name += ' (cópia)';
-  c.isSeed = false;
   c.source = 'manual';
   ferts.push(c);
   saveFerts();
@@ -283,7 +220,6 @@ function saveProd() {
     id: editId || uid(),
     active: true,
     status: Object.keys(nuts).length > 0 ? 'ok' : 'review',
-    isSeed: false,
     source: 'manual',
     name,
     supplier: (g('p-forn')?.value || '').trim(),
@@ -314,7 +250,6 @@ function parseBRL(s) {
   if (!s) return 0;
   s = String(s).trim().replace(/R\$\s*/i, '').replace(/\s/g, '');
   if (s === '-' || !s) return 0;
-
   if (s.includes(',') && s.includes('.')) {
     s = s.lastIndexOf(',') > s.lastIndexOf('.')
       ? s.replace(/\./g, '').replace(',', '.')
@@ -322,7 +257,6 @@ function parseBRL(s) {
   } else if (s.includes(',')) {
     s = s.replace(',', '.');
   }
-
   return parseFloat(s) || 0;
 }
 
@@ -330,7 +264,6 @@ function parseNPK(name) {
   name = String(name || '').trim();
   const n = {};
 
-  // KCL / KCl / Cloreto de Potássio
   if (/(^|\b)(KCL|KCl)\b|\bcloreto\b.*\bpot(á|a)ssio\b/i.test(name)) {
     const m =
       name.match(/(KCL|KCl)\s*(\d{1,2}(?:[.,]\d+)?)\s*%?/i) ||
@@ -339,14 +272,9 @@ function parseNPK(name) {
     return n;
   }
 
-  // Ureia
   const ur = name.match(/UREIA\s*(\d{1,2}(?:[.,]\d+)?)\s*%?/i);
-  if (ur) {
-    n.N = parseFloat(String(ur[1]).replace(',', '.'));
-    return n;
-  }
+  if (ur) { n.N = parseFloat(String(ur[1]).replace(',', '.')); return n; }
 
-  // MAP
   const map = name.match(/MAP\s*(\d{1,2}(?:[.,]\d+)?)\s*[-–]\s*(\d{1,2}(?:[.,]\d+)?)/i);
   if (map) {
     n.N = parseFloat(String(map[1]).replace(',', '.'));
@@ -354,21 +282,12 @@ function parseNPK(name) {
     return n;
   }
 
-  // TSP
   const tsp = name.match(/TSP\s*(\d{1,2}(?:[.,]\d+)?)/i);
-  if (tsp) {
-    n.P2O5 = parseFloat(String(tsp[1]).replace(',', '.'));
-    return n;
-  }
+  if (tsp) { n.P2O5 = parseFloat(String(tsp[1]).replace(',', '.')); return n; }
 
-  // SSP
   const ssp = name.match(/SSP\s*(\d{1,2}(?:[.,]\d+)?)/i);
-  if (ssp) {
-    n.P2O5 = parseFloat(String(ssp[1]).replace(',', '.'));
-    return n;
-  }
+  if (ssp) { n.P2O5 = parseFloat(String(ssp[1]).replace(',', '.')); return n; }
 
-  // SAM 20,5/23
   const sam = name.match(/SAM\s*([\d.,]+)\s*[/,]\s*([\d.,]+)/i);
   if (sam) {
     n.N = parseFloat(String(sam[1]).replace(',', '.'));
@@ -376,7 +295,6 @@ function parseNPK(name) {
     return n;
   }
 
-  // Fórmula NPK padrão: 00-14-18 / 04-50-20 etc.
   const npk = name.match(/(\d{1,2})\s*[-–]\s*(\d{1,2})\s*[-–]\s*(\d{1,2})/);
   if (npk) {
     n.N = parseInt(npk[1], 10);
@@ -384,44 +302,28 @@ function parseNPK(name) {
     n.K2O = parseInt(npk[3], 10);
     return n;
   }
-
   return null;
 }
 
 function parseLine(line, defF, defE, defFr) {
   line = String(line || '').trim();
   if (!line) return null;
-
-  // NÃO quebrar por vírgula
   const ps = line.split(/[|;\t]/).map(s => s.trim()).filter(Boolean);
-
   let sup = '', name = '', del = '', price = 0, fr = defFr;
 
   if (ps.length >= 5) {
-    sup = ps[0] || defF;
-    name = ps[1];
-    del = ps[2] || defE;
+    sup = ps[0] || defF; name = ps[1]; del = ps[2] || defE;
     const p3 = parseBRL(ps[3]), p4 = parseBRL(ps[4]);
     price = p3 > 0 ? p3 : p4;
   } else if (ps.length === 4) {
-    sup = ps[0] || defF;
-    name = ps[1];
-    del = ps[2] || defE;
+    sup = ps[0] || defF; name = ps[1]; del = ps[2] || defE;
     price = parseBRL(ps[3]);
   } else if (ps.length === 3) {
-    name = ps[0];
-    del = ps[1] || defE;
-    price = parseBRL(ps[2]);
-    sup = defF;
+    name = ps[0]; del = ps[1] || defE; price = parseBRL(ps[2]); sup = defF;
   } else if (ps.length === 2) {
-    name = ps[0];
-    price = parseBRL(ps[1]);
-    sup = defF;
-    del = defE;
+    name = ps[0]; price = parseBRL(ps[1]); sup = defF; del = defE;
   } else {
-    name = ps[0];
-    sup = defF;
-    del = defE;
+    name = ps[0]; sup = defF; del = defE;
   }
 
   if (!name) return null;
@@ -431,7 +333,6 @@ function parseLine(line, defF, defE, defFr) {
     id: uid(),
     active: true,
     status: parsed && Object.keys(parsed).length > 0 ? 'ok' : 'review',
-    isSeed: false,
     source: 'import',
     name: name.trim(),
     supplier: (sup || '').trim(),
@@ -528,14 +429,12 @@ function importar() {
     );
 
     if (di >= 0) {
-      if (dupAct === 'ignore') {
-        skipped++;
-      } else if (dupAct === 'update') {
+      if (dupAct === 'ignore') skipped++;
+      else if (dupAct === 'update') {
         ferts[di].priceTon = p.priceTon;
         ferts[di].freightTon = p.freightTon;
         ferts[di].nutrients = p.nutrients;
         ferts[di].status = p.status;
-        ferts[di].isSeed = false;
         ferts[di].source = 'import';
         updated++;
       } else {
@@ -564,45 +463,13 @@ function novaImport() {
   impGoStep(1);
 }
 
-/* ===== LIMPEZA DE PRODUTOS DEMO ANTIGOS ===== */
-function isLegacySeedProduct(f) {
-  if (!f || typeof f !== 'object') return false;
-
-  const legacyMarkers =
-    !!f.createdAt &&
-    !!f.updatedAt &&
-    typeof f.micros === 'object';
-
-  const supplierMatches =
-    ['cibra', 'timac', 'motta fertilizantes'].includes((f.supplier || '').toLowerCase());
-
-  return legacyMarkers && supplierMatches;
-}
-
-function purgeDemoProducts() {
-  const before = ferts.length;
-  ferts = ferts.filter(f =>
-    !(f.isSeed === true || f.source === 'seed' || isLegacySeedProduct(f))
-  );
-  if (ferts.length !== before) {
-    saveFerts();
-    toast('Produtos demo antigos removidos', 'ok');
-  }
-}
-
-/* ===== REGRAS PARA K2O MÁX. NA BASE ===== */
-function isBaseFertilizer(prod) {
-  return (prod?.nutrients?.P2O5 || 0) > 0;
-}
-
+/* ===== K2O MÁX. NA BASE ===== */
+function isBaseFertilizer(prod) { return (prod?.nutrients?.P2O5 || 0) > 0; }
 function maxDoseByBaseK(prod, tgts) {
   const maxKBase = tgts.KBaseMax || 0;
   if (maxKBase <= 0) return Infinity;
-
   const k = prod?.nutrients?.K2O || 0;
   if (k <= 0) return Infinity;
-
-  // dose máxima em kg/ha para não ultrapassar o K2O permitido na base
   return (maxKBase * 100) / k;
 }
 
@@ -612,8 +479,7 @@ function getValid() {
     f.active &&
     f.status === 'ok' &&
     (f.priceTon || 0) > 0 &&
-    Object.values(f.nutrients || {}).some(v => v > 0) &&
-    (!REQUIRE_REAL_PRODUCTS || (!f.isSeed && f.source !== 'seed'))
+    Object.values(f.nutrients || {}).some(v => v > 0)
   );
 }
 
@@ -628,52 +494,32 @@ function combs(arr, k) {
 
 function chooseDoseForProduct(p, active, rem, tgts) {
   const candidates = [];
-
   for (const n of active) {
     const t = p.nutrients[n] || 0;
     const r = rem[n] || 0;
-    if (t > 0 && r > 0.01) {
-      candidates.push(100 * r / t);
-    }
+    if (t > 0 && r > 0.01) candidates.push(100 * r / t);
   }
-
   if (!candidates.length) return 0;
 
-  let bestDose = 0;
-  let bestScore = Infinity;
-
+  let bestDose = 0, bestScore = Infinity;
   const isBase = isBaseFertilizer(p);
   const maxDoseBase = isBase ? maxDoseByBaseK(p, tgts) : Infinity;
 
   for (let dose of candidates) {
-    if (isBase && dose > maxDoseBase) {
-      dose = maxDoseBase;
-    }
-
-    let short = 0;
-    let excess = 0;
-
+    if (isBase && dose > maxDoseBase) dose = maxDoseBase;
+    let short = 0, excess = 0;
     for (const n of active) {
       const meta = tgts[n] || 0;
       if (meta <= 0) continue;
-
       const del = (dose * (p.nutrients[n] || 0)) / 100;
       const newRem = Math.max(0, (rem[n] || 0) - del);
       const over = Math.max(0, del - (rem[n] || 0));
-
       short += newRem / meta;
       excess += over / meta;
     }
-
-    // falta pesa muito mais que excesso
     const score = (short * short * 120) + (excess * excess * 12);
-
-    if (score < bestScore) {
-      bestScore = score;
-      bestDose = dose;
-    }
+    if (score < bestScore) { bestScore = score; bestDose = dose; }
   }
-
   return bestDose;
 }
 
@@ -690,25 +536,19 @@ function calcCombo(prods, tgts, area) {
 
   const rem = {};
   active.forEach(n => rem[n] = tgts[n]);
-
   const doses = [];
 
   for (const p of sorted) {
     const dose = chooseDoseForProduct(p, active, rem, tgts);
     if (dose < 0.001) continue;
-
     const del = {};
     active.forEach(n => {
       del[n] = (dose * (p.nutrients[n] || 0)) / 100;
       rem[n] = Math.max(0, (rem[n] || 0) - del[n]);
     });
-
     const tonHa = dose / 1000;
-
     doses.push({
-      prod: p,
-      dose,
-      tonHa,
+      prod: p, dose, tonHa,
       costHa: tonHa * (p.priceTon || 0),
       frHa: tonHa * (p.freightTon || 0),
       del,
@@ -725,24 +565,13 @@ function calcCombo(prods, tgts, area) {
   const tC = doses.reduce((s, d) => s + d.costTotal, 0);
 
   const finDel = {};
-  active.forEach(n => {
-    finDel[n] = doses.reduce((s, d) => s + (d.del[n] || 0), 0);
-  });
+  active.forEach(n => { finDel[n] = doses.reduce((s, d) => s + (d.del[n] || 0), 0); });
 
-  // valida K2O máximo vindo da base
   const maxKBase = tgts.KBaseMax || 0;
   if (maxKBase > 0) {
     let baseKDelivered = 0;
-
-    doses.forEach(d => {
-      if (isBaseFertilizer(d.prod)) {
-        baseKDelivered += d.del.K2O || 0;
-      }
-    });
-
-    if (baseKDelivered > maxKBase + ABS_TOL_KGHA) {
-      return null;
-    }
+    doses.forEach(d => { if (isBaseFertilizer(d.prod)) baseKDelivered += d.del.K2O || 0; });
+    if (baseKDelivered > maxKBase + ABS_TOL_KGHA) return null;
   }
 
   let short = 0, excess = 0, errAbs = 0;
@@ -755,14 +584,10 @@ function calcCombo(prods, tgts, area) {
     else excess += diff / meta;
     errAbs += Math.abs(diff) / meta;
   });
-
   short /= active.length;
   excess /= active.length;
   const err = errAbs / active.length;
 
-  const sob = active.reduce((s, n) => s + Math.max(0, (finDel[n] || 0) - (tgts[n] || 0)), 0);
-
-  // exige cobertura mínima
   for (const n of active) {
     const meta = tgts[n] || 0;
     const del = finDel[n] || 0;
@@ -770,38 +595,32 @@ function calcCombo(prods, tgts, area) {
     if (del < (meta * MIN_COVERAGE - ABS_TOL_KGHA)) return null;
   }
 
-  return { doses, tCH, tFH, tT, tC, err, short, excess, sob, finDel, active, area };
+  return { doses, tCH, tFH, tT, tC, err, short, excess, finDel, active, area };
 }
 
 function scoreC(c, cr) {
-  const wShort = 12000;
-  const wExcess = 3000;
-  const wProd = 20;
-  const wCost = 0.08;
-  const wFreight = 0.04;
-
+  const wShort = 12000, wExcess = 3000, wProd = 20, wCost = 0.08, wFreight = 0.04;
   switch (cr) {
-    case 'cost':
-      return c.tCH * 0.75 + c.short * wShort + c.excess * (wExcess * 0.7) + c.doses.length * wProd;
-    case 'freight':
-      return c.tFH * 0.75 + c.short * wShort + c.excess * (wExcess * 0.7) + c.tCH * 0.10 + c.doses.length * wProd;
-    case 'error':
-      return c.short * wShort + c.excess * wExcess + c.tCH * 0.10 + c.doses.length * wProd;
-    case 'ton':
-      return c.tT * 0.60 + c.short * wShort + c.excess * (wExcess * 0.5) + c.tCH * 0.05;
-    default: // balanced
-      return c.short * wShort + c.excess * wExcess + c.doses.length * wProd + c.tCH * wCost + c.tFH * wFreight;
+    case 'cost':    return c.tCH * 0.75 + c.short * wShort + c.excess * (wExcess * 0.7) + c.doses.length * wProd;
+    case 'freight': return c.tFH * 0.75 + c.short * wShort + c.excess * (wExcess * 0.7) + c.tCH * 0.10 + c.doses.length * wProd;
+    case 'error':   return c.short * wShort + c.excess * wExcess + c.tCH * 0.10 + c.doses.length * wProd;
+    case 'ton':     return c.tT * 0.60 + c.short * wShort + c.excess * (wExcess * 0.5) + c.tCH * 0.05;
+    default:        return c.short * wShort + c.excess * wExcess + c.doses.length * wProd + c.tCH * wCost + c.tFH * wFreight;
   }
 }
 
+/* ===== SELETORES MÁX / MOSTRAR (dropdown) ===== */
 function sMax(n) {
   mxP = n;
-  document.querySelectorAll('[data-m]').forEach(b => b.classList.toggle('on', +b.dataset.m === n));
+  const sel = g('mxp');
+  if (sel) sel.value = String(n);
 }
 function sShow(n) {
   shN = n;
-  document.querySelectorAll('[data-n]').forEach(b => b.classList.toggle('on', +b.dataset.n === n));
+  const sel = g('shn');
+  if (sel) sel.value = String(n);
 }
+
 function setCrit(cr) {
   currentCrit = cr;
   document.querySelectorAll('.ctab').forEach(b => b.classList.toggle('on', b.dataset.c === cr));
@@ -824,15 +643,11 @@ function run() {
   };
 
   if (!Object.values({ N: tgts.N, P2O5: tgts.P2O5, K2O: tgts.K2O, S: tgts.S }).some(v => v > 0)) {
-    toast('Defina ao menos uma meta', 'er');
-    return;
+    toast('Defina ao menos uma meta', 'er'); return;
   }
 
   const v = getValid();
-  if (!v.length) {
-    toast('Nenhum produto válido', 'er');
-    return;
-  }
+  if (!v.length) { toast('Nenhum produto válido', 'er'); return; }
 
   const all = [];
   for (let k = 1; k <= Math.min(mxP, v.length, MAX_K_COMB); k++) {
@@ -842,31 +657,25 @@ function run() {
     });
   }
 
-  if (!all.length) {
-    toast('Não foi possível calcular com os produtos disponíveis', 'er');
-    return;
-  }
+  if (!all.length) { toast('Não foi possível calcular com os produtos disponíveis', 'er'); return; }
 
   all.sort((a, b) => scoreC(a, currentCrit) - scoreC(b, currentCrit));
-
   lastResults = all;
   lastTgts = tgts;
-  chatHistory = {};
 
   safeShow('emp-calc', 'none');
   safeShow('res-cards', 'block');
   renderCards(all.slice(0, shN), tgts, currentCrit);
   toast('Cálculo concluído!', 'ok');
+
+  if (isMob() && lastResults) {
+    safeShow('tab-res-badge', 'flex');
+    setTimeout(() => mobTab('res'), 300);
+  }
 }
 
 /* ===== UI RESULTADOS ===== */
-const CRL = {
-  balanced: 'Balanceado',
-  cost: 'Menor custo',
-  freight: 'Menor frete',
-  error: 'Menor erro',
-  ton: 'Menor tonelada'
-};
+const CRL = { balanced: 'Balanceado', cost: 'Menor custo', freight: 'Menor frete', error: 'Menor erro', ton: 'Menor tonelada' };
 const RKL = ['1ª','2ª','3ª'];
 
 function renderCards(rs, tgts, cr) {
@@ -909,43 +718,11 @@ function buildCard(r, i, tgts, cr) {
       <div class="rr"><span class="rl">Custo total</span><span class="rv">${brl(d.costTotal)}</span></div>
       ${d.frHa > 0 ? `<div class="rr"><span class="rl">Frete/ha</span><span class="rv">${brl(d.frHa)}</span></div>` : ''}
       <div class="nut-pills">
-        ${r.active
-          .filter(n => (d.del[n] || 0) > 0.01)
-          .map(n => `<span class="np">${fmtNK(n)} ${nd(d.del[n] || 0, 1)} kg/ha</span>`)
-          .join('')}
+        ${r.active.filter(n => (d.del[n] || 0) > 0.01)
+          .map(n => `<span class="np">${fmtNK(n)} ${nd(d.del[n] || 0, 1)} kg/ha</span>`).join('')}
       </div>
     </div>
   `).join('');
-
-  const qPrompts = [
-    'Por que esta combinação foi escolhida?',
-    'Qual a vantagem do custo?',
-    'Há risco de excesso nutricional?',
-    'Como interpretar a sobra/falta?',
-    'Vale trocar por outro produto?'
-  ];
-
-  const iaHTML = `<div class="ia-panel">
-    <div class="ia-hdr" onclick="toggleIA(${i})">
-      <div class="ia-ico">🤖</div>
-      <div class="ia-title">Explicar com IA</div>
-      <div class="ia-st" id="ia-st-${i}">${getKey() ? 'Pronta' : 'Sem chave'}</div>
-      <div class="ia-arr" id="ia-arr-${i}">▼</div>
-    </div>
-    <div class="ia-body" id="ia-body-${i}">
-      <div class="quick-prompts">
-        ${qPrompts.map(q => `<button class="qp" onclick="askAI('${q.replace(/'/g, "\\'")}',${i})">${q}</button>`).join('')}
-      </div>
-      <div class="ia-chat" id="chat-${i}">
-        <div class="msg msg-a">Analisarei a combinação ${i + 1}. Escolha uma pergunta ou escreva.</div>
-      </div>
-      <div style="padding:7px 11px;border-top:1px solid var(--bd);display:flex;gap:5px">
-        <input class="inp" id="ia-inp-${i}" placeholder="Sua pergunta..." style="flex:1;font-size:.79em" onkeydown="if(event.key==='Enter')sendMsg(${i})">
-        <button class="btn-xs save-btn" onclick="sendMsg(${i})">Enviar</button>
-      </div>
-      <div class="ia-disc">IA explica — não calcula. Baseada apenas nos dados acima.</div>
-    </div>
-  </div>`;
 
   return `<div class="${win ? 'rc-win' : 'rc'}" style="margin-bottom:12px">
     ${win ? '<div class="ribbon">Melhor opção</div>' : ''}
@@ -976,141 +753,15 @@ function buildCard(r, i, tgts, cr) {
         <b>K₂O máx. na base:</b> ${nd(tgts.KBaseMax, 1)} kg/ha
       </div>` : ''}
     </div>
-    ${iaHTML}
   </div>`;
 }
 
-/* ===== IA ===== */
-function buildCtx() {
-  if (!lastResults || !lastTgts) return '';
-  const cult = g('fc')?.value;
-  const area = g('fa')?.value;
-
-  const lines = [
-    `Cultura: ${cult} | Área: ${area} ha | Critério: ${CRL[currentCrit]}`,
-    `Metas (kg/ha): N=${lastTgts.N || 0} P₂O₅=${lastTgts.P2O5 || 0} K₂O=${lastTgts.K2O || 0} S=${lastTgts.S || 0} K₂O máx. base=${lastTgts.KBaseMax || 0}`,
-    ''
-  ];
-
-  lastResults.slice(0, shN).forEach((r, i) => {
-    lines.push(`--- Combinação ${i + 1} ${i === 0 ? '(MELHOR)' : ''} ---`);
-    r.doses.forEach(d => {
-      lines.push(`${d.prod.name} | ${fmtN(d.prod.nutrients)} | R$ ${d.prod.priceTon}/t`);
-      lines.push(`  Dose: ${nd(d.dose, 1)} kg/ha | Total: ${nd(d.tonTotal, 2)} t | Custo/ha: ${brl(d.costHa)}`);
-    });
-    lines.push(`Custo/ha: ${brl(r.tCH)} | Total: ${nd(r.tT, 2)} t | Total R$: ${brl(r.tC)}`);
-    r.active.forEach(n => {
-      const m = lastTgts[n];
-      const d = r.finDel[n] || 0;
-      const diff = d - m;
-      lines.push(`${fmtNK(n)}: meta ${m} → entregue ${nd(d, 1)} [${Math.abs(diff) < 0.5 ? 'OK' : diff > 0 ? 'SOBRA ' + nd(diff, 1) : 'FALTA ' + nd(Math.abs(diff), 1)} kg/ha]`);
-    });
-    lines.push('');
-  });
-
-  return lines.join('\n');
-}
-
-function toggleIA(i) {
-  const b = g('ia-body-' + i);
-  const a = g('ia-arr-' + i);
-  if (!b) return;
-  const o = b.classList.toggle('open');
-  if (a) a.classList.toggle('open', o);
-}
-
-function sendMsg(i) {
-  const inp = g('ia-inp-' + i);
-  const q = (inp?.value || '').trim();
-  if (!q) return;
-  if (inp) inp.value = '';
-  askAI(q, i);
-}
-
-async function askAI(question, cardIdx) {
-  const key = getKey();
-  const chatEl = g('chat-' + cardIdx);
-  if (!chatEl) return;
-
-  if (!chatHistory[cardIdx]) chatHistory[cardIdx] = [];
-  chatHistory[cardIdx].push({ role: 'user', content: question });
-
-  chatEl.innerHTML += `<div class="msg msg-u">${escH(question)}</div>`;
-  const tid = 'tk-' + Date.now();
-  chatEl.innerHTML += `<div class="msg msg-a thinking" id="${tid}">Analisando...</div>`;
-  chatEl.scrollTop = chatEl.scrollHeight;
-
-  if (!key) {
-    const el = document.getElementById(tid);
-    if (el) {
-      el.textContent = '⚠ Configure a API Key no cabeçalho. Chave gratuita em openrouter.ai/keys';
-      el.classList.remove('thinking');
-    }
-    return;
-  }
-
-  const sys =
-    `Você é um agrônomo especialista em fertilização do Cerrado brasileiro.\n\n` +
-    `Dados do resultado:\n${buildCtx()}\n\n` +
-    `REGRAS ABSOLUTAS:\n` +
-    `1. NUNCA recalcule valores — os números acima são a fonte da verdade\n` +
-    `2. NUNCA invente produtos, nutrientes ou dados externos\n` +
-    `3. SÓ explique, justifique e analise com base nos dados fornecidos\n` +
-    `4. Resposta em português, objetiva, máximo 180 palavras\n` +
-    `5. Recuse gentilmente perguntas fora do escopo agronômico`;
-
-  const msgs = [{ role: 'system', content: sys }, ...(chatHistory[cardIdx] || []).slice(-6)];
-
-  try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + key,
-        'HTTP-Referer': 'https://soloforte.app',
-        'X-Title': 'FertiCalc SoloForte'
-      },
-      body: JSON.stringify({
-        model: 'deepseek/deepseek-chat:free',
-        temperature: 0.2,
-        max_tokens: 300,
-        messages: msgs
-      })
-    });
-
-    if (!res.ok) {
-      const e = await res.json().catch(() => ({}));
-      throw new Error(e?.error?.message || ('Erro ' + res.status));
-    }
-
-    const data = await res.json();
-    const reply = data?.choices?.[0]?.message?.content || 'Sem resposta.';
-    chatHistory[cardIdx].push({ role: 'assistant', content: reply });
-
-    const el = document.getElementById(tid);
-    if (el) {
-      el.textContent = reply;
-      el.classList.remove('thinking');
-    }
-
-    chatEl.scrollTop = chatEl.scrollHeight;
-  } catch (e) {
-    const el = document.getElementById(tid);
-    if (el) {
-      el.textContent = '⚠ ' + e.message;
-      el.classList.remove('thinking');
-    }
-  }
-}
-
 /* ===== MOBILE TAB NAVIGATION ===== */
-const isMob = () => window.innerWidth <= 700;
+const isMob = () => window.innerWidth <= 768;
 
 function mobTab(tab) {
   if (!isMob()) return;
-
   ['prod','calc','res','imp'].forEach(t => g('tab-' + t)?.classList.toggle('on', t === tab));
-
   g('lp')?.classList.remove('mob-active');
   g('rp')?.classList.remove('mob-active');
 
@@ -1120,28 +771,23 @@ function mobTab(tab) {
   if (tab === 'prod') {
     g('lp')?.classList.add('mob-active');
     safeText('hdr-title', 'Fertilizantes');
-
   } else if (tab === 'calc') {
     g('rp')?.classList.add('mob-active');
     showView('view-calc');
     safeText('hdr-title', 'Calcular');
     safeShow('emp-calc', 'flex');
     safeShow('res-cards', 'none');
-
   } else if (tab === 'res') {
     g('rp')?.classList.add('mob-active');
     showView('view-calc');
     safeText('hdr-title', 'Resultado');
-
     if (lastResults) {
       safeShow('emp-calc', 'none');
       safeShow('res-cards', 'block');
     } else {
       safeShow('emp-calc', 'flex');
     }
-
     safeShow('tab-res-badge', 'none');
-
   } else if (tab === 'imp') {
     g('rp')?.classList.add('mob-active');
     showView('view-import');
@@ -1152,19 +798,8 @@ function mobTab(tab) {
 
 function initMob() {
   if (!isMob()) return;
-  safeShow('key-status-wrap', 'none');
   mobTab('prod');
 }
-
-// intercepta run() no mobile
-const _runOrig = run;
-window.run = function () {
-  _runOrig();
-  if (isMob() && lastResults) {
-    safeShow('tab-res-badge', 'flex');
-    setTimeout(() => mobTab('res'), 300);
-  }
-};
 
 window.addEventListener('resize', () => {
   if (!isMob()) {
@@ -1178,12 +813,6 @@ window.addEventListener('resize', () => {
   }
 });
 
-/* ===== SEED DESATIVADO ===== */
-function seedIfEmpty() {
-  if (!ENABLE_SEED) return;
-  if (ferts.length > 0) return;
-}
-
 /* ===== INIT ===== */
 document.addEventListener('input', e => {
   if (e.target?.type === 'number' && e.target.value.length > 7) {
@@ -1191,10 +820,9 @@ document.addEventListener('input', e => {
   }
 });
 
-updateKeyStatus();
-purgeDemoProducts(); // remove demos antigos
-seedIfEmpty();       // desativado
 renderFerts();
+sMax(mxP);
+sShow(shN);
 initMob();
 
 // PWA
