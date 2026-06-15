@@ -1,0 +1,450 @@
+/* =========================== FertiCalc — app.css CORRIGIDO =========================== */
+
+/* ===== RESET ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== TOKENS ===== */
+:root {
+  --bl: #007AFF;
+  --bld: #0051D5;
+  --bll: #EAF2FF;
+  --bg: #FFFFFF;
+  --bgs: #F5F5F7;
+  --bd: #E5E7EB;
+  --bds: #D1D1D6;
+  --tx: #1D1D1F;
+  --txs: #6B7280;
+  --txm: #9CA3AF;
+  --ok: #34C759;
+  --er: #FF3B30;
+  --wn: #FF9500;
+  --ok-bg: #E8F5E9;
+  --er-bg: #FFEBEE;
+  --wn-bg: #FFF3E0;
+  --fn: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --r: 8px;
+  --rm: 12px;
+  --rl: 16px;
+}
+
+body {
+  font-family: var(--fn);
+  background: var(--bgs);
+  color: var(--tx);
+  font-size: 13px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+#hdr {
+  height: 56px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--bd);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 170px;
+}
+
+/* Correção da imagem quebrada: o logo agora é SVG inline e não depende de arquivo externo. */
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex: 0 0 38px;
+  display: grid;
+  place-items: center;
+  background: var(--bll);
+  box-shadow: inset 0 0 0 1px rgba(0, 122, 255, .14);
+}
+
+.brand-logo svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.brand-name {
+  font-weight: 800;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.brand-sub {
+  color: var(--txs);
+  font-size: .76rem;
+  margin-top: 3px;
+}
+
+.ht {
+  font-size: .78rem;
+  color: var(--txs);
+  padding: 5px 10px;
+  background: var(--bgs);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.hr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* ===== LAYOUT ===== */
+#body {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+#lp {
+  border-right: 1px solid var(--bd);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#rp {
+  background: var(--bgs);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.ph {
+  height: 43px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--bd);
+  flex-shrink: 0;
+}
+
+.pt {
+  font-weight: 800;
+}
+
+#fert-cnt {
+  color: var(--txs);
+  font-size: .78rem;
+}
+
+.pl {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+/* ===== FILTROS COMPACTOS ===== */
+.filters {
+  padding: 8px 10px;
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--bd);
+  flex-shrink: 0;
+}
+
+.ftitle {
+  font-size: .68rem;
+  margin-bottom: 6px;
+  font-weight: 800;
+  color: var(--txs);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+
+.fi {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sl {
+  font-size: .62rem;
+  margin-bottom: 1px;
+  color: var(--txs);
+  font-weight: 700;
+}
+
+.mt {
+  display: block;
+  margin-top: 7px;
+}
+
+/* ===== INPUTS ===== */
+input.inp, select.sel {
+  width: 100%;
+  border: 1px solid var(--bds);
+  border-radius: var(--r);
+  background: #FFFFFF;
+  font-size: .78rem;
+  padding: 5px 7px;
+  height: 30px;
+  outline: none;
+}
+
+input.inp:focus, select.sel:focus {
+  border-color: var(--bl);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, .12);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+/* ===== BOTÕES ===== */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: 0;
+}
+
+.btn-xs, .btn-add, .btn-c, .btn-outline {
+  border-radius: var(--r);
+  font-weight: 800;
+  transition: transform .12s ease, filter .12s ease, background .12s ease;
+}
+
+.btn-xs {
+  height: 30px;
+  padding: 0 10px;
+  background: var(--bgs);
+  color: var(--tx);
+  border: 1px solid var(--bd);
+  font-size: .74rem;
+}
+
+.btn-add, .btn-c {
+  background: var(--bl);
+  color: #FFFFFF;
+}
+
+.btn-add {
+  height: 32px;
+  padding: 0 12px;
+  font-size: .76rem;
+}
+
+.btn-c {
+  height: 32px;
+  font-size: .82rem;
+  padding: 0 14px;
+}
+
+.btn-outline {
+  height: 32px;
+  font-size: .78rem;
+  padding: 0 12px;
+  background: #FFFFFF;
+  color: var(--bl);
+  border: 1px solid rgba(0, 122, 255, .35);
+}
+
+button:hover { filter: brightness(.98); }
+button:active { transform: translateY(1px); }
+
+/* ===== RESULTADO ===== */
+#res-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+#res-scroll::-webkit-scrollbar { width: 3px; }
+#res-scroll::-webkit-scrollbar-thumb { background: var(--bds); }
+
+.empty-r {
+  height: auto;
+  min-height: 116px;
+  padding: 18px 12px;
+  gap: 6px;
+  text-align: center;
+  color: var(--txs);
+  background: #FFFFFF;
+  border: 1px dashed var(--bds);
+  border-radius: var(--rm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon { font-size: 22px; }
+
+.rc, .rc-win {
+  background: #FFFFFF;
+  border: 1px solid var(--bd);
+  border-radius: var(--rm);
+  overflow: hidden;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+}
+
+.rc-win {
+  border-color: rgba(52, 199, 89, .38);
+  box-shadow: 0 8px 24px rgba(52, 199, 89, .10);
+}
+
+.rh {
+  padding: 8px 10px;
+  background: linear-gradient(135deg, rgba(52,199,89,.12), rgba(0,122,255,.08));
+  border-bottom: 1px solid var(--bd);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rht {
+  font-size: .8rem;
+  font-weight: 900;
+}
+
+.badge {
+  font-size: .62rem;
+  color: #147A33;
+  background: var(--ok-bg);
+  border: 1px solid rgba(52, 199, 89, .28);
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.rp-item {
+  padding: 8px 10px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid var(--bd);
+}
+
+.rp-item:last-child { border-bottom: 0; }
+
+.rpn {
+  font-size: .76rem;
+  color: var(--txs);
+  font-weight: 700;
+}
+
+.rpv {
+  font-size: .82rem;
+  font-weight: 900;
+  text-align: right;
+}
+
+.rs {
+  padding: 8px 10px;
+  font-size: .72rem;
+  color: var(--txs);
+  background: #FAFAFA;
+}
+
+/* ===== MODO COMPACTO APÓS CÁLCULO ===== */
+.compact .filters {
+  padding: 5px 8px;
+}
+
+.compact .g2,
+.compact .g3,
+.compact .g4 {
+  gap: 4px;
+}
+
+.results-only .filters {
+  display: none;
+}
+
+.compact #res-scroll {
+  padding: 8px 10px;
+}
+
+/* ===== TOAST ===== */
+#tw {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.t {
+  background: #FFFFFF;
+  color: var(--tx);
+  border: 1px solid var(--bd);
+  border-left: 4px solid var(--bl);
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+  font-weight: 800;
+  max-width: 280px;
+}
+
+.t.ok { border-left-color: var(--ok); }
+.t.er { border-left-color: var(--er); }
+.t.wn { border-left-color: var(--wn); }
+
+/* ===== SCROLL BARS ===== */
+::-webkit-scrollbar {
+  height: 3px;
+  width: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bds);
+  border-radius: 2px;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 860px) {
+  body { overflow: auto; height: auto; min-height: 100vh; }
+  #body { grid-template-columns: 1fr; overflow: visible; }
+  #lp, #rp { min-height: 280px; overflow: visible; }
+  #hdr { height: auto; align-items: flex-start; flex-wrap: wrap; }
+  .ht { order: 3; }
+  .hr { width: 100%; justify-content: flex-start; }
+  .g4 { grid-template-columns: 1fr 1fr; }
+}
