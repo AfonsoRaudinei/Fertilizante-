@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FertiCalc — Calculadora NPK</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue:       #007AFF;
+    --blue-dark:  #0051D5;
+    --green:      #34C759;
+    --green-dark: #1E8C3A;
+    --red:        #FF3B30;
+    --bg:         #F5F5F7;
+    --bg2:        #ECECEC;
+    --white:      #FFFFFF;
+    --text1:      #1D1D1F;
+    --text2:      #6E6E73;
+    --text3:      #C7C7CC;
+    --border:     #D1D1D6;
+    --border2:    #E5E5E7;
+    --radius-lg:  16px;
+    --radius-md:  12px;
+    --radius-sm:  8px;
+    --shadow-card: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-btn:  0 4px 12px rgba(0,122,255,0.28);
+    --shadow-green:0 4px 12px rgba(52,199,89,0.28);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(180deg, #F2F2F7 0%, #E5E5EA 100%);
+    min-height: 100vh;
+    color: var(--text1);
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border2);
+    position: sticky; top: 0; z-index: 100;
+    padding: 0 20px;
+  }
+  .header-inner {
+    max-width: 960px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 52px;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, #34C759 0%, #1E8C3A 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(52,199,89,0.3);
+    flex-shrink: 0;
+  }
+  .logo-icon svg { width: 18px; height: 18px; }
+  .logo-text { font-size: 17px; font-weight: 600; color: var(--text1); letter-spacing: -0.3px; }
+  .logo-badge { font-size: 11px; color: var(--green); font-weight: 500; }
+  .header-calc-btn {
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+    color: #fff; border: none; border-radius: 20px;
+    padding: 7px 16px; font-size: 13px; font-weight: 600;
+    cursor: pointer; box-shadow: var(--shadow-green);
+    transition: all 0.2s;
+  }
+  .header-calc-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(52,199,89,0.4); }
+  .header-calc-btn:active { transform: translateY(0); }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 960px; margin: 0 auto; padding: 20px 16px 100px; }
+
+  /* ── SECTION CARD ── */
+  .card {
+    background: rgba(255,255,255,0.96);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .card-header {
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid var(--border2);
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; user-select: none;
+  }
+  .card-header-left { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .section-icon {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .section-icon.green { background: rgba(52,199,89,0.12); }
+  .section-icon.blue  { background: rgba(0,122,255,0.10); }
+  .section-icon.orange{ background: rgba(255,149,0,0.12); }
+  .section-icon svg { width: 16px; height: 16px; }
+  .section-title { font-size: 14px; font-weight: 600; color: var(--text1); letter-spacing: 0.1px; }
+  .section-subtitle { font-size: 12px; color: var(--text2); margin-top: 1px; }
+  .collapse-btn {
+    width: 24px; height: 24px; border-radius: 12px;
+    background: var(--bg2); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2); font-size: 12px; transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .collapse-btn:hover { background: var(--border); }
+  .collapse-btn.open svg { transform: rotate(180deg); }
+  .card-body { padding: 16px 18px; }
+  .card-body.collapsed { display: none; }
+
+  /* ── CENÁRIO ── */
+  .scenario-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  }
+  @media (max-width: 600px) { .scenario-grid { grid-template-columns: 1fr; } }
+
+  .field-group { display: flex; flex-direction: column; gap: 5px; }
+  .field-label {
+    font-size: 11px; font-weight: 500; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .field-input {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-size: 15px; font-weight: 500; color: var(--text1);
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    width: 100%;
+    max-width: 7ch; /* 7 dígitos */
+    min-width: 80px;
+  }
+  .field-input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(0,122,255,0.10);
+  }
+  .field-input.wide { max-width: 100%; min-width: 0; }
+  .field-unit { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+  /* number inputs — remove arrows */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+
+  /* ── PRODUCTS TABLE ── */
+  .products-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+  }
+  .products-count { font-size: 12px; color: var(--text2); }
+
+  .btn { border: none; cursor: pointer; border-radius: var(--radius-sm); font-weight: 500; transition: all 0.2s; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+    color: #fff; padding: 8px 14px; font-size: 13px;
+    box-shadow: var(--shadow-btn);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,122,255,0.38); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-secondary {
+    background: var(--bg2); color: var(--text2);
+    padding: 8px 14px; font-size: 13px;
+  }
+  .btn-secondary:hover { background: var(--border); color: var(--text1); }
+  .btn-danger {
+    background: rgba(255,59,48,0.1); color: var(--red);
+    padding: 8px 14px; font-size: 13px; border: 1px solid rgba(255,59,48,0.2);
+  }
+  .btn-danger:hover { background: rgba(255,59,48,0.18); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-icon {
+    width: 28px; height: 28px; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 6px; border: none; cursor: pointer;
+    background: transparent; color: var(--text2); transition: all 0.15s;
+    font-size: 14px;
+  }
+  .btn-icon:hover { background: var(--bg2); }
+  .btn-icon.del:hover { background: rgba(255,59,48,0.1); color: var(--red); }
+  .btn-icon.edit:hover { background: rgba(0,122,255,0.1); color: var(--blue); }
+
+  .products-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    min-width: 880px;
+  }
+  thead th {
+    font-size: 10px; font-weight: 600; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.4px;
+    padding: 7px 8px; text-align: left;
+    border-bottom: 1px solid var(--border2);
+    white-space: nowrap; background: #FAFAFC;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border2);
+    transition: background 0.12s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #F9F9FB; }
+  tbody tr.editing { background: rgba(0,122,255,0.03); }
+  tbody td { padding: 7px 8px; vertical-align: middle; color: var(--text1); }
+  tbody td.muted { color: var(--text2); }
+
+  /* inline edit inputs in table */
+  .td-input {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-size: 12px; color: var(--text1);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .td-input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,122,255,0.10); }
+  .td-input.num { width: 52px; text-align: right; max-width: 7ch; }
+  .td-input.name { width: 130px; }
+  .td-input.supplier { width: 110px; }
+  .td-input.delivery { width: 80px; }
+  .td-input.price { width: 72px; text-align: right; max-width: 7ch; }
+
+  .td-select {
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 6px;
+    font-size: 12px; color: var(--text1); background: #fff;
+    outline: none; cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2386868B'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    padding-right: 20px;
+    min-width: 100px;
+  }
+  .td-select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,122,255,0.10); }
+
+  /* nutrient badges in view mode */
+  .npk-row { display: flex; gap: 4px; flex-wrap: wrap; }
+  .npk-badge {
+    font-size: 10px; font-weight: 600; border-radius: 4px;
+    padding: 1px 5px; white-space: nowrap;
+  }
+  .npk-n { background: rgba(0,122,255,0.1); color: #0051D5; }
+  .npk-p { background: rgba(52,199,89,0.12); color: #1E8C3A; }
+  .npk-k { background: rgba(255,149,0,0.12); color: #B86800; }
+  .npk-ca { background: rgba(90,200,250,0.15); color: #007AAA; }
+  .npk-s { background: rgba(255,204,0,0.15); color: #997000; }
+
+  /* ── TOP 3 RESULTS ── */
+  .results-empty {
+    text-align: center; padding: 40px 20px;
+    color: var(--text2); font-size: 14px;
+  }
+  .results-empty .results-icon { font-size: 32px; margin-bottom: 8px; }
+
+  .result-cards { display: flex; flex-direction: column; gap: 14px; }
+
+  .result-card {
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--border2);
+    overflow: hidden;
+    background: #fff;
+  }
+  .result-card.rank1 {
+    border-color: rgba(52,199,89,0.4);
+    background: linear-gradient(180deg, #fff 0%, rgba(52,199,89,0.03) 100%);
+    box-shadow: 0 2px 12px rgba(52,199,89,0.12);
+  }
+
+  .result-header {
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border2);
+    background: rgba(249,249,251,0.6);
+  }
+  .rank-badge {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; flex-shrink: 0;
+  }
+  .rank1 .rank-badge { background: linear-gradient(135deg,#34C759,#1E8C3A); color:#fff; box-shadow:0 2px 8px rgba(52,199,89,0.4); }
+  .rank2 .rank-badge { background: #E5E5EA; color: var(--text2); }
+  .rank3 .rank-badge { background: #E5E5EA; color: var(--text3); }
+
+  .result-mix-name { font-size: 16px; font-weight: 700; color: var(--text1); letter-spacing: -0.2px; }
+  .result-supplier  { font-size: 12px; color: var(--text2); margin-top: 1px; }
+  .result-ha-cost {
+    margin-left: auto; text-align: right;
+  }
+  .ha-cost-value { font-size: 18px; font-weight: 700; color: var(--green-dark); }
+  .ha-cost-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.4px; }
+  .rank1 .ha-cost-value { color: var(--green); }
+
+  .result-body { padding: 14px 16px; }
+  .result-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px; margin-bottom: 12px;
+  }
+  @media (max-width: 580px) { .result-grid { grid-template-columns: 1fr 1fr; } }
+
+  .result-stat { }
+  .result-stat-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+  .result-stat-value { font-size: 14px; font-weight: 600; color: var(--text1); }
+  .result-stat-value.green { color: var(--green-dark); }
+  .result-stat-value.blue  { color: var(--blue); }
+
+  .result-divider { height: 1px; background: var(--border2); margin: 10px 0; }
+
+  .result-nutrients { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nutri-chip {
+    display: flex; flex-direction: column; align-items: center;
+    background: var(--bg); border-radius: 8px;
+    padding: 6px 10px; min-width: 52px;
+  }
+  .nutri-chip-label { font-size: 10px; color: var(--text2); font-weight: 500; }
+  .nutri-chip-value { font-size: 13px; font-weight: 700; color: var(--text1); }
+
+  .k-excess-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(52,199,89,0.10); border: 1px solid rgba(52,199,89,0.25);
+    border-radius: 8px; padding: 5px 10px;
+    font-size: 12px; color: var(--green-dark); font-weight: 500;
+    margin-top: 8px;
+  }
+
+  .result-products-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-top: 10px;
+  }
+  @media (max-width: 480px) { .result-products-row { grid-template-columns: 1fr; } }
+
+  .result-product-box {
+    background: var(--bg); border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .rpb-role { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2); margin-bottom: 4px; }
+  .rpb-name { font-size: 13px; font-weight: 600; color: var(--text1); margin-bottom: 2px; }
+  .rpb-supplier { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+  .rpb-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); padding: 1px 0; }
+  .rpb-row strong { color: var(--text1); font-weight: 600; }
+
+  /* ── FAB ── */
+  .fab {
+    position: fixed; bottom: 28px; right: 22px;
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+    color: #fff; border: none; border-radius: 28px;
+    padding: 0 20px; height: 52px;
+    font-size: 15px; font-weight: 700;
+    box-shadow: 0 6px 20px rgba(52,199,89,0.42);
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+    transition: all 0.2s; z-index: 200;
+    letter-spacing: -0.2px;
+  }
+  .fab:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(52,199,89,0.52); }
+  .fab:active { transform: translateY(0); }
+  .fab svg { width: 18px; height: 18px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: rgba(28,28,30,0.92); color: #fff; border-radius: 12px;
+    padding: 10px 18px; font-size: 13px; font-weight: 500;
+    opacity: 0; transition: all 0.28s; z-index: 300; pointer-events: none;
+    backdrop-filter: blur(10px);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+    z-index: 500; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 20px;
+    width: calc(100% - 32px); max-width: 480px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+    padding: 24px;
+  }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 18px; color: var(--text1); }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-grid.triple { grid-template-columns: 1fr 1fr 1fr; }
+  .modal-label { font-size: 11px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px; }
+  .modal-input {
+    width: 100%; border: 1px solid var(--border);
+    border-radius: 9px; padding: 10px 12px;
+    font-size: 14px; color: var(--text1); background: #fff; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .modal-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.10); }
+  .modal-input.num { max-width: 7ch; text-align: right; }
+  .modal-select {
+    width: 100%; border: 1px solid var(--border);
+    border-radius: 9px; padding: 10px 12px;
+    font-size: 14px; color: var(--text1); background: #fff; outline: none;
+    appearance: none; -webkit-appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2386868B'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .modal-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.10); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+  .modal-col { display: flex; flex-direction: column; }
+
+  /* ── ALERT ── */
+  .alert-box {
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 13px; font-weight: 500; margin-bottom: 12px;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .alert-box.warn { background: rgba(255,204,0,0.12); color: #7D6000; border: 1px solid rgba(255,204,0,0.3); }
+  .alert-box.err  { background: rgba(255,59,48,0.08); color: #C02020; border: 1px solid rgba(255,59,48,0.2); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 480px) {
+    .header-logo .logo-badge { display: none; }
+    .logo-text { font-size: 15px; }
+    .card-body { padding: 14px 12px; }
+    table { font-size: 12px; }
+    .fab { padding: 0 16px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/>
+          <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+          <line x1="9" y1="9" x2="9.01" y2="9"/>
+          <line x1="15" y1="9" x2="15.01" y2="9"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">FertiCalc</div>
+        <div class="logo-badge">NPK Mix Optimizer</div>
+      </div>
+    </div>
+    <button class="header-calc-btn" onclick="calcular()">▶ Calcular</button>
+  </div>
+</header>
+
+<!-- PAGE -->
+<main class="page">
+
+  <!-- ══ CENÁRIO ══ -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('cenario')">
+      <div class="card-header-left">
+        <div class="section-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="18" rx="3"/>
+            <path d="M8 12h8M8 16h5"/>
+            <path d="M8 8h8"/>
+          </svg>
+        </div>
+        <div>
+          <div class="section-title">Cenário de Cálculo</div>
+          <div class="section-subtitle">Área e doses desejadas de P e K</div>
+        </div>
+      </div>
+      <button class="collapse-btn open" id="btn-cenario">
+        <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="card-body" id="body-cenario">
+      <div class="scenario-grid">
+        <div class="field-group">
+          <div class="field-label">Área</div>
+          <input class="field-input wide" type="number" id="area" placeholder="0" min="0" step="0.1" max="9999999" oninput="limitDigits(this,7)">
+          <div class="field-unit">hectares (ha)</div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">P desejado</div>
+          <input class="field-input wide" type="number" id="pDesejado" placeholder="0" min="0" step="0.1" max="9999999" oninput="limitDigits(this,7)">
+          <div class="field-unit">kg/ha de P₂O₅</div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">K desejado</div>
+          <input class="field-input wide" type="number" id="kDesejado" placeholder="0" min="0" step="0.1" max="9999999" oninput="limitDigits(this,7)">
+          <div class="field-unit">kg/ha de K₂O</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PRODUTOS / ADUBOS ══ -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('produtos')">
+      <div class="card-header-left">
+        <div class="section-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="section-title">Produtos / Adubos</div>
+          <div class="section-subtitle" id="products-subtitle">Carregando...</div>
+        </div>
+      </div>
+      <button class="collapse-btn open" id="btn-produtos">
+        <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="card-body" id="body-produtos">
+      <div class="products-toolbar">
+        <span class="products-count" id="prod-count">— produtos cadastrados</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="resetProducts()">↩ Restaurar padrão</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Adicionar adubo</button>
+        </div>
+      </div>
+      <div id="alert-area"></div>
+      <div class="products-scroll">
+        <table id="products-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Fornecedor</th>
+              <th>Nome do Adubo</th>
+              <th>Entrega</th>
+              <th style="text-align:right">N%</th>
+              <th style="text-align:right">P%</th>
+              <th style="text-align:right">K%</th>
+              <th style="text-align:right">Ca%</th>
+              <th style="text-align:right">S%</th>
+              <th style="text-align:right">Frete R$/t</th>
+              <th style="text-align:right">Preço R$/t</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="products-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RESULTADOS ══ -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('resultados')">
+      <div class="card-header-left">
+        <div class="section-icon orange">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div>
+          <div class="section-title">Resultados — Top 3 Mixes</div>
+          <div class="section-subtitle">Combinações mais baratas por hectare</div>
+        </div>
+      </div>
+      <button class="collapse-btn open" id="btn-resultados">
+        <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="card-body" id="body-resultados">
+      <div id="results-area">
+        <div class="results-empty">
+          <div class="results-icon">🌱</div>
+          <div>Preencha o cenário e clique em <strong>Calcular</strong> para ver os mixes mais baratos.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FAB -->
+<button class="fab" onclick="calcular()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+  </svg>
+  Calcular Top 3
+</button>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL ADICIONAR/EDITAR -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Adicionar Adubo</div>
+    <div class="modal-grid">
+      <div class="modal-col">
+        <div class="modal-label">Fornecedor</div>
+        <select class="modal-select" id="m-fornecedor">
+          <option value="">Selecionar...</option>
+          <option>BR Fértil</option>
+          <option>Cibra</option>
+          <option>Mosaic</option>
+          <option>Motta Fertilizantes</option>
+          <option>GEN</option>
+          <option>Fertipar</option>
+          <option>Yara</option>
+          <option>Outra</option>
+        </select>
+      </div>
+      <div class="modal-col">
+        <div class="modal-label">Nome do Adubo</div>
+        <input class="modal-input" id="m-produto" type="text" placeholder="Ex: MAP 11-52">
+      </div>
+      <div class="modal-col">
+        <div class="modal-label">Entrega</div>
+        <input class="modal-input" id="m-entrega" type="text" placeholder="Ex: Jun-Ago">
+      </div>
+      <div class="modal-col" style="grid-column: span 1;">
+        <div class="modal-label">Preço Venda (R$/t)</div>
+        <input class="modal-input" id="m-preco" type="number" placeholder="0,00" min="0" step="0.01" oninput="limitDigits(this,7)">
+      </div>
+      <div class="modal-col" style="grid-column: span 1;">
+        <div class="modal-label">Frete (R$/t)</div>
+        <input class="modal-input" id="m-frete" type="number" placeholder="0,00" min="0" step="0.01" oninput="limitDigits(this,7)">
+      </div>
+    </div>
+    <div style="margin-top:14px;margin-bottom:6px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;">Composição Nutricional (%)</div>
+    <div class="modal-grid triple">
+      <div class="modal-col">
+        <div class="modal-label">N %</div>
+        <input class="modal-input num" id="m-n" type="number" placeholder="0" min="0" max="100" step="0.1" oninput="limitDigits(this,3)">
+      </div>
+      <div class="modal-col">
+        <div class="modal-label">P %</div>
+        <input class="modal-input num" id="m-p" type="number" placeholder="0" min="0" max="100" step="0.1" oninput="limitDigits(this,3)">
+      </div>
+      <div class="modal-col">
+        <div class="modal-label">K %</div>
+        <input class="modal-input num" id="m-k" type="number" placeholder="0" min="0" max="100" step="0.1" oninput="limitDigits(this,3)">
+      </div>
+      <div class="modal-col">
+        <div class="modal-label">Ca %</div>
+        <input class="modal-input num" id="m-ca" type="number" placeholder="0" min="0" max="100" step="0.1" oninput="limitDigits(this,3)">
+      </div>
+      <div class="modal-col">
+        <div class="modal-label">S %</div>
+        <input class="modal-input num" id="m-s" type="number" placeholder="0" min="0" max="100" step="0.1" oninput="limitDigits(this,3)">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveModal()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   INITIAL PRODUCTS DATA
+═══════════════════════════════════════ */
+const INITIAL_PRODUCTS = [
+  // ─── BR Fértil ───
+  {fornecedor:"BR Fértil",produto:"TSP 45%",entrega:"",n:0,p:45,k:0,ca:14,s:1,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"SSP 20%",entrega:"",n:0,p:20,k:0,ca:20,s:11,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"Complexo 20%",entrega:"",n:0,p:20,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"MAP 11.52",entrega:"",n:11,p:52,k:0,ca:0,s:2,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"KCL",entrega:"",n:0,p:0,k:60,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"09.46.00",entrega:"",n:9,p:46,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"08.20.20",entrega:"",n:8,p:20,k:20,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"07.40.00 2%S",entrega:"",n:7,p:40,k:0,ca:0,s:2,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"06.40.10",entrega:"",n:6,p:40,k:10,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"06.36.06",entrega:"",n:6,p:36,k:6,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"06.30.10",entrega:"",n:6,p:30,k:10,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"06.30.06",entrega:"",n:6,p:30,k:6,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"05.37.00 +2%S",entrega:"",n:5,p:37,k:0,ca:0,s:2,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"02.30.10",entrega:"",n:2,p:30,k:10,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"00.33.00",entrega:"",n:0,p:33,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"BR Fértil",produto:"00.28.00 8%Ca 4%S",entrega:"",n:0,p:28,k:0,ca:8,s:4,freteTonelada:0,precoVenda:0},
+
+  // ─── Cibra ───
+  {fornecedor:"Cibra",produto:"00-32-00 MG",entrega:"",n:0,p:32,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"00-33-00 MG",entrega:"",n:0,p:33,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"00-36-00 MG",entrega:"",n:0,p:36,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"02-25-00 MG",entrega:"",n:2,p:25,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"03-28-00 MG",entrega:"",n:3,p:28,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"03-30-15 MG",entrega:"",n:3,p:30,k:15,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"03-32-08 MG",entrega:"",n:3,p:32,k:8,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"04-35-10 MG",entrega:"",n:4,p:35,k:10,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"04-40-08 MG",entrega:"",n:4,p:40,k:8,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"BASEFORT DUO 03-28-06+6S",entrega:"",n:3,p:28,k:6,ca:0,s:6,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"BASEFORT DUO 03-31-00+8S",entrega:"",n:3,p:31,k:0,ca:0,s:8,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"BASEFORT DUO 05-36-00+5S",entrega:"",n:5,p:36,k:0,ca:0,s:5,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"BASEFORT S 03-28-06 6S",entrega:"",n:3,p:28,k:6,ca:0,s:6,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"BASEFORT S 03-30-00 9S GR",entrega:"",n:3,p:30,k:0,ca:0,s:9,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"BASEFORT S 05-36-00+6S",entrega:"",n:5,p:36,k:0,ca:0,s:6,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"KCL 60 GR",entrega:"",n:0,p:0,k:60,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"MAP 11-52/44 GR",entrega:"",n:11,p:52,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"SSP 19/16+16Ca+11S GR",entrega:"",n:0,p:19,k:0,ca:16,s:11,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"SSP 20/16 GR",entrega:"",n:0,p:20,k:0,ca:16,s:10,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"TSP 46/36 GR",entrega:"",n:0,p:46,k:0,ca:14,s:1,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"CIBRAMIX 09-46-00 MG",entrega:"",n:9,p:46,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"CIBRAMIX 07-40-00 MG",entrega:"",n:7,p:40,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"CIBRAMIX 08-40-08 MG",entrega:"",n:8,p:40,k:8,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"CIBRAMIX 06-30-06 MG",entrega:"",n:6,p:30,k:6,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"CIBRAMIX 06-37-00 MG",entrega:"",n:6,p:37,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"CIBRAMIX 05-35-00 MG",entrega:"",n:5,p:35,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"CIBRAMIX 10-50-00 MG",entrega:"",n:10,p:50,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"CIBRAMIX 00-00-54+1B MG",entrega:"",n:0,p:0,k:54,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"CIBRAMIX 00-00-57+0.5B MG",entreja:"",n:0,p:0,k:57,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Cibra",produto:"Rhizosorb 08-39/30 GR",entrega:"",n:8,p:39,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+
+  // ─── Mosaic ───
+  {fornecedor:"Mosaic",produto:"MS09E 08-45-00 S9",entrega:"",n:8,p:45,k:0,ca:0,s:9,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Mosaic",produto:"FFALM 09-50-00",entrega:"",n:9,p:50,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Mosaic",produto:"FFALM 00-45-00",entrega:"",n:0,p:45,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Mosaic",produto:"KCl 60 Granulado",entrega:"",n:0,p:0,k:60,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Mosaic",produto:"MS09E 05-26-25 S9",entrega:"",n:5,p:26,k:25,ca:0,s:9,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Mosaic",produto:"MS09E 08-37-11 S9",entrega:"",n:8,p:37,k:11,ca:0,s:9,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Mosaic",produto:"MicroEssentials S9 10-46-00",entrega:"",n:10,p:46,k:0,ca:0,s:9,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Mosaic",produto:"Aspire",entrega:"",n:0,p:0,k:60,ca:0,s:0,freteTonelada:0,precoVenda:0},
+
+  // ─── Motta Fertilizantes ───
+  {fornecedor:"Motta Fertilizantes",produto:"KCL 60% GR",entrega:"",n:0,p:0,k:60,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Motta Fertilizantes",produto:"TSP 46",entrega:"",n:0,p:46,k:0,ca:14,s:1,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Motta Fertilizantes",produto:"SSP 19",entrega:"",n:0,p:19,k:0,ca:20,s:11,freteTonelada:0,precoVenda:0},
+  {fornecedor:"Motta Fertilizantes",produto:"NPS 08-40 +5%S",entrega:"",n:8,p:40,k:0,ca:0,s:5,freteTonelada:0,precoVenda:0},
+
+  // ─── GEN ───
+  {fornecedor:"GEN",produto:"MAP",entrega:"",n:11,p:52,k:0,ca:0,s:0,freteTonelada:0,precoVenda:0},
+  {fornecedor:"GEN",produto:"TSP 46%",entrega:"",n:0,p:46,k:0,ca:14,s:1,freteTonelada:0,precoVenda:0},
+  {fornecedor:"GEN",produto:"SSP 19",entrega:"",n:0,p:19,k:0,ca:20,s:11,freteTonelada:0,precoVenda:0},
+  {fornecedor:"GEN",produto:"KCL",entrega:"",n:0,p:0,k:60,ca:0,s:0,freteTonelada:0,precoVenda:0},
+];
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let products = [];
+let modalEditIndex = -1; // -1 = novo
+
+/* ═══════════════════════════════════════
+   LOCALSTORAGE
+═══════════════════════════════════════ */
+const LS_KEY = 'ferticale_products_v2';
+const LS_SCENARIO = 'ferticale_scenario_v2';
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) { products = JSON.parse(raw); } else { products = INITIAL_PRODUCTS.map(p=>({...p})); }
+  } catch(e) { products = INITIAL_PRODUCTS.map(p=>({...p})); }
+  loadScenario();
+}
+
+function saveData() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(products)); } catch(e) {}
+}
+
+function saveScenario() {
+  try {
+    localStorage.setItem(LS_SCENARIO, JSON.stringify({
+      area: document.getElementById('area').value,
+      p: document.getElementById('pDesejado').value,
+      k: document.getElementById('kDesejado').value
+    }));
+  } catch(e) {}
+}
+
+function loadScenario() {
+  try {
+    const raw = localStorage.getItem(LS_SCENARIO);
+    if (raw) {
+      const d = JSON.parse(raw);
+      document.getElementById('area').value = d.area || '';
+      document.getElementById('pDesejado').value = d.p || '';
+      document.getElementById('kDesejado').value = d.k || '';
+    }
+  } catch(e) {}
+}
+
+function resetProducts() {
+  if (!confirm('Restaurar lista padrão? Os dados atuais serão perdidos.')) return;
+  products = INITIAL_PRODUCTS.map(p=>({...p}));
+  saveData();
+  renderProducts();
+  toast('Lista restaurada para o padrão.');
+}
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+function n(v,dec=2) {
+  const x = parseFloat(v);
+  if (isNaN(x)) return '—';
+  return x.toLocaleString('pt-BR', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+}
+function currency(v) {
+  const x = parseFloat(v);
+  if (isNaN(x)) return '—';
+  return 'R$ ' + x.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function limitDigits(el, maxInt) {
+  const val = el.value.replace('-','');
+  const parts = val.split('.');
+  if (parts[0] && parts[0].length > maxInt) {
+    el.value = parts[0].slice(0, maxInt) + (parts[1] !== undefined ? '.' + parts[1] : '');
+  }
+  saveScenario();
+}
+
+function toast(msg, dur=2400) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), dur);
+}
+
+function toggleCard(name) {
+  const body = document.getElementById('body-' + name);
+  const btn  = document.getElementById('btn-' + name);
+  const hidden = body.classList.toggle('collapsed');
+  btn.classList.toggle('open', !hidden);
+}
+
+/* ═══════════════════════════════════════
+   RENDER PRODUCTS TABLE
+═══════════════════════════════════════ */
+function renderProducts() {
+  const tbody = document.getElementById('products-tbody');
+  const count = products.length;
+  document.getElementById('prod-count').textContent = `${count} produto${count!==1?'s':''} cadastrado${count!==1?'s':''}`;
+  document.getElementById('products-subtitle').textContent = `${count} adubo${count!==1?'s':''} — clique para expandir`;
+
+  tbody.innerHTML = '';
+  products.forEach((p, i) => {
+    const tr = document.createElement('tr');
+    tr.dataset.index = i;
+
+    const hasPrice = p.precoVenda > 0;
+    const priceClass = hasPrice ? '' : 'muted';
+
+    tr.innerHTML = `
+      <td class="muted" style="font-size:11px;">${i+1}</td>
+      <td>${p.fornecedor || '—'}</td>
+      <td style="font-weight:500;">${p.produto || '—'}</td>
+      <td class="muted">${p.entrega || '—'}</td>
+      <td style="text-align:right;">${p.n>0?p.n:'—'}</td>
+      <td style="text-align:right;color:${p.p>0?'#1E8C3A':'#C7C7CC'};font-weight:${p.p>0?600:400};">${p.p>0?p.p:'—'}</td>
+      <td style="text-align:right;color:${p.k>0?'#B86800':'#C7C7CC'};font-weight:${p.k>0?600:400};">${p.k>0?p.k:'—'}</td>
+      <td style="text-align:right;">${p.ca>0?p.ca:'—'}</td>
+      <td style="text-align:right;">${p.s>0?p.s:'—'}</td>
+      <td style="text-align:right;" class="${p.freteTonelada>0?'':'muted'}">${p.freteTonelada>0?n(p.freteTonelada):'—'}</td>
+      <td style="text-align:right;font-weight:600;" class="${priceClass}">${hasPrice?n(p.precoVenda):'—'}</td>
+      <td>
+        <div style="display:flex;gap:4px;justify-content:flex-end;">
+          <button class="btn-icon edit" title="Editar" onclick="openEditModal(${i})">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-icon del" title="Excluir" onclick="deleteProduct(${i})">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          </button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ═══════════════════════════════════════
+   MODAL
+═══════════════════════════════════════ */
+function openAddModal() {
+  modalEditIndex = -1;
+  document.getElementById('modal-title').textContent = 'Adicionar Adubo';
+  clearModal();
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function openEditModal(i) {
+  modalEditIndex = i;
+  const p = products[i];
+  document.getElementById('modal-title').textContent = 'Editar Adubo';
+  document.getElementById('m-fornecedor').value = p.fornecedor || '';
+  document.getElementById('m-produto').value = p.produto || '';
+  document.getElementById('m-entrega').value = p.entrega || '';
+  document.getElementById('m-preco').value = p.precoVenda || '';
+  document.getElementById('m-frete').value = p.freteTonelada || '';
+  document.getElementById('m-n').value = p.n || '';
+  document.getElementById('m-p').value = p.p || '';
+  document.getElementById('m-k').value = p.k || '';
+  document.getElementById('m-ca').value = p.ca || '';
+  document.getElementById('m-s').value = p.s || '';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function clearModal() {
+  ['m-fornecedor','m-produto','m-entrega','m-preco','m-frete','m-n','m-p','m-k','m-ca','m-s']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el.tagName==='SELECT') el.selectedIndex=0; else el.value='';
+    });
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+function saveModal() {
+  const produto = document.getElementById('m-produto').value.trim();
+  if (!produto) { alert('Informe o nome do adubo.'); return; }
+  const entry = {
+    fornecedor: document.getElementById('m-fornecedor').value,
+    produto,
+    entrega:      document.getElementById('m-entrega').value.trim(),
+    precoVenda:   parseFloat(document.getElementById('m-preco').value) || 0,
+    freteTonelada:parseFloat(document.getElementById('m-frete').value) || 0,
+    n:  parseFloat(document.getElementById('m-n').value) || 0,
+    p:  parseFloat(document.getElementById('m-p').value) || 0,
+    k:  parseFloat(document.getElementById('m-k').value) || 0,
+    ca: parseFloat(document.getElementById('m-ca').value) || 0,
+    s:  parseFloat(document.getElementById('m-s').value) || 0,
+  };
+  if (modalEditIndex === -1) { products.push(entry); toast('Adubo adicionado!'); }
+  else { products[modalEditIndex] = entry; toast('Adubo atualizado!'); }
+  saveData();
+  renderProducts();
+  closeModal();
+}
+
+function deleteProduct(i) {
+  const p = products[i];
+  if (!confirm(`Excluir "${p.produto}" (${p.fornecedor})?`)) return;
+  products.splice(i, 1);
+  saveData();
+  renderProducts();
+  toast('Produto removido.');
+}
+
+// Close modal on overlay click
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* ═══════════════════════════════════════
+   CALCULATION ENGINE
+═══════════════════════════════════════ */
+function calcular() {
+  saveScenario();
+  const alertArea = document.getElementById('alert-area');
+  alertArea.innerHTML = '';
+
+  const area = parseFloat(document.getElementById('area').value);
+  const pDes = parseFloat(document.getElementById('pDesejado').value);
+  const kDes = parseFloat(document.getElementById('kDesejado').value) || 0;
+
+  // Validações cenário
+  if (!area || area <= 0) { showAlert('Informe uma área válida (maior que zero).','err'); scrollResults(); return; }
+  if (!pDes || pDes <= 0) { showAlert('Informe o P desejado (maior que zero).','err'); scrollResults(); return; }
+
+  // Filtrar produtos válidos (com preço > 0)
+  const valid = products.filter(p => p.precoVenda > 0);
+  if (valid.length < 2) {
+    showAlert('Cadastre pelo menos 2 produtos com preço de venda para calcular o mix.','warn');
+    renderResults([]); return;
+  }
+
+  // Fontes
+  const fontesP = valid.filter(p => p.p > 0);
+  const fontesK = valid.filter(p => p.k > 0);
+
+  if (fontesP.length === 0) { showAlert('Nenhum produto com P > 0 encontrado. Cadastre ou adicione preços.','warn'); renderResults([]); return; }
+  if (fontesK.length === 0) { showAlert('Nenhum produto com K > 0 encontrado. Cadastre ou adicione preços.','warn'); renderResults([]); return; }
+
+  const combos = [];
+
+  // Chave de identidade: nome + fornecedor (evita duplicados do array)
+  const prodKey = p => `${p.fornecedor}||${p.produto}`;
+
+  for (const prodA of fontesP) {
+    for (const prodB of fontesK) {
+      // Bloquear mesmo produto (por referência ou por nome+fornecedor)
+      if (prodA === prodB) continue;
+      if (prodKey(prodA) === prodKey(prodB)) continue;
+
+      try {
+        // 1. Dose do Produto A (fonte P)
+        const kgHaA = (100 * pDes) / prodA.p;
+
+        // 2. K que vem junto com A
+        const kEntregueA = kgHaA * prodA.k / 100;
+
+        // 3. K restante
+        const kRestante = Math.max(0, kDes - kEntregueA);
+
+        // 4. Dose do Produto B (fonte K)
+        const kgHaB = kRestante > 0 ? (100 * kRestante) / prodB.k : 0;
+
+        // 5. Toneladas
+        const tA = (kgHaA / 1000) * area;
+        const tB = (kgHaB / 1000) * area;
+        const tTotal = tA + tB;
+
+        // 6. Custo
+        const precoFinalA = prodA.precoVenda + (prodA.freteTonelada || 0);
+        const precoFinalB = prodB.precoVenda + (prodB.freteTonelada || 0);
+        const custoA = tA * precoFinalA;
+        const custoB = tB * precoFinalB;
+        const custoTotal = custoA + custoB;
+        const custoHa = custoTotal / area;
+
+        // 7. Nutrientes totais
+        const nTotal  = kgHaA * prodA.n/100 + kgHaB * prodB.n/100;
+        const caTotal = kgHaA * prodA.ca/100 + kgHaB * prodB.ca/100;
+        const sTotal  = kgHaA * prodA.s/100 + kgHaB * prodB.s/100;
+
+        // 8. K final
+        const kFinal = kEntregueA + kgHaB * prodB.k / 100;
+
+        // 9. Excesso K
+        const kExcedente = Math.max(0, kFinal - kDes);
+
+        combos.push({
+          prodA, prodB, kgHaA, kgHaB, kEntregueA, kRestante, kFinal, kExcedente,
+          tA, tB, tTotal, custoA, custoB, custoTotal, custoHa,
+          nTotal, caTotal, sTotal,
+          precoFinalA, precoFinalB,
+          area, pDes, kDes
+        });
+      } catch(e) { /* skip invalid */ }
+    }
+  }
+
+  if (combos.length === 0) {
+    showAlert('Não foi possível calcular nenhum mix válido. Verifique os dados.','err');
+    renderResults([]); return;
+  }
+
+  // Sort by cost/ha, then pick top 3 garantindo Produto A único
+  combos.sort((a,b) => a.custoHa - b.custoHa);
+  const top3 = [];
+  const usedA = new Set();
+  for (const c of combos) {
+    if (top3.length >= 3) break;
+    const keyA = prodKey(c.prodA);
+    if (usedA.has(keyA)) continue;
+    usedA.add(keyA);
+    top3.push(c);
+  }
+  renderResults(top3);
+
+  // Scroll to results
+  document.getElementById('body-resultados').classList.remove('collapsed');
+  document.getElementById('btn-resultados').classList.add('open');
+  setTimeout(() => document.getElementById('body-resultados').scrollIntoView({behavior:'smooth',block:'start'}), 100);
+}
+
+function showAlert(msg, type='warn') {
+  const alertArea = document.getElementById('alert-area');
+  alertArea.innerHTML = `<div class="alert-box ${type}"><span>${type==='err'?'⚠️':'ℹ️'}</span><span>${msg}</span></div>`;
+}
+
+function scrollResults() {
+  document.getElementById('body-resultados').classList.remove('collapsed');
+  setTimeout(() => document.getElementById('results-area').scrollIntoView({behavior:'smooth',block:'start'}), 100);
+}
+
+/* ═══════════════════════════════════════
+   RENDER RESULTS
+═══════════════════════════════════════ */
+function renderResults(top3) {
+  const area = document.getElementById('results-area');
+  if (!top3 || top3.length === 0) {
+    area.innerHTML = `<div class="results-empty"><div class="results-icon">🌿</div><div>Nenhum resultado disponível. Verifique o cenário e os preços dos produtos.</div></div>`;
+    return;
+  }
+
+  const ranks = ['1º','2º','3º'];
+  const rankClass = ['rank1','rank2','rank3'];
+
+  const cards = top3.map((c, idx) => {
+    const kExStr = c.kExcedente > 0.01
+      ? `<div class="k-excess-badge">✅ K excedente: +${n(c.kExcedente,2)} kg/ha — bônus para a cultura</div>` : '';
+
+    const delivA = c.prodA.entrega ? `Entrega: ${c.prodA.entrega}` : '';
+    const delivB = c.prodB.entrega ? `Entrega: ${c.prodB.entrega}` : '';
+
+    return `
+<div class="result-card ${rankClass[idx]}">
+  <div class="result-header">
+    <div class="rank-badge">${ranks[idx]}</div>
+    <div style="flex:1;min-width:0;">
+      <div class="result-mix-name">${c.prodA.produto} + ${c.prodB.produto}</div>
+      <div class="result-supplier">${c.prodA.fornecedor} · ${c.prodB.fornecedor}</div>
+    </div>
+    <div class="result-ha-cost">
+      <div class="ha-cost-value">${currency(c.custoHa)}</div>
+      <div class="ha-cost-label">por hectare</div>
+    </div>
+  </div>
+  <div class="result-body">
+    <div class="result-grid">
+      <div class="result-stat">
+        <div class="result-stat-label">Custo Total</div>
+        <div class="result-stat-value">${currency(c.custoTotal)}</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-label">Total Toneladas</div>
+        <div class="result-stat-value">${n(c.tTotal,3)} t</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-label">Área</div>
+        <div class="result-stat-value">${n(c.area,1)} ha</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-label">Dose Prod. A (P)</div>
+        <div class="result-stat-value green">${n(c.kgHaA,2)} kg/ha</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-label">Dose Prod. B (K)</div>
+        <div class="result-stat-value">${n(c.kgHaB,2)} kg/ha</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-label">K aplicado total</div>
+        <div class="result-stat-value">${n(c.kFinal,2)} kg/ha</div>
+      </div>
+    </div>
+    <div class="result-divider"></div>
+    <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;">Nutrientes Aplicados</div>
+    <div class="result-nutrients">
+      <div class="nutri-chip"><div class="nutri-chip-label">N</div><div class="nutri-chip-value">${n(c.nTotal,1)}</div></div>
+      <div class="nutri-chip"><div class="nutri-chip-label">P (alvo)</div><div class="nutri-chip-value">${n(c.pDes,1)}</div></div>
+      <div class="nutri-chip"><div class="nutri-chip-label">K final</div><div class="nutri-chip-value">${n(c.kFinal,1)}</div></div>
+      <div class="nutri-chip"><div class="nutri-chip-label">K via A</div><div class="nutri-chip-value">${n(c.kEntregueA,1)}</div></div>
+      <div class="nutri-chip"><div class="nutri-chip-label">Ca</div><div class="nutri-chip-value">${n(c.caTotal,1)}</div></div>
+      <div class="nutri-chip"><div class="nutri-chip-label">S</div><div class="nutri-chip-value">${n(c.sTotal,1)}</div></div>
+    </div>
+    ${kExStr}
+    <div class="result-divider"></div>
+    <div class="result-products-row">
+      <div class="result-product-box">
+        <div class="rpb-role">🟢 Produto A — Fonte de P</div>
+        <div class="rpb-name">${c.prodA.produto}</div>
+        <div class="rpb-supplier">${c.prodA.fornecedor}${delivA ? ' · ' + delivA : ''}</div>
+        <div class="rpb-row"><span>Preço venda</span><strong>${currency(c.prodA.precoVenda)}/t</strong></div>
+        <div class="rpb-row"><span>Frete</span><strong>${c.prodA.freteTonelada>0?currency(c.prodA.freteTonelada)+'/t':'—'}</strong></div>
+        <div class="rpb-row"><span>Preço final</span><strong>${currency(c.precoFinalA)}/t</strong></div>
+        <div class="rpb-row"><span>Dose</span><strong>${n(c.kgHaA,2)} kg/ha</strong></div>
+        <div class="rpb-row"><span>Volume</span><strong>${n(c.tA,3)} t</strong></div>
+        <div class="rpb-row"><span>Custo parcial</span><strong>${currency(c.custoA)}</strong></div>
+      </div>
+      <div class="result-product-box">
+        <div class="rpb-role">🟡 Produto B — Fonte de K</div>
+        <div class="rpb-name">${c.prodB.produto}</div>
+        <div class="rpb-supplier">${c.prodB.fornecedor}${delivB ? ' · ' + delivB : ''}</div>
+        <div class="rpb-row"><span>Preço venda</span><strong>${currency(c.prodB.precoVenda)}/t</strong></div>
+        <div class="rpb-row"><span>Frete</span><strong>${c.prodB.freteTonelada>0?currency(c.prodB.freteTonelada)+'/t':'—'}</strong></div>
+        <div class="rpb-row"><span>Preço final</span><strong>${currency(c.precoFinalB)}/t</strong></div>
+        <div class="rpb-row"><span>Dose</span><strong>${n(c.kgHaB,2)} kg/ha</strong></div>
+        <div class="rpb-row"><span>Volume</span><strong>${n(c.tB,3)} t</strong></div>
+        <div class="rpb-row"><span>Custo parcial</span><strong>${currency(c.custoB)}</strong></div>
+      </div>
+    </div>
+  </div>
+</div>`;
+  }).join('');
+
+  area.innerHTML = `<div class="result-cards">${cards}</div>`;
+}
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadData();
+  renderProducts();
+
+  // Auto-save scenario on input
+  ['area','pDesejado','kDesejado'].forEach(id => {
+    document.getElementById(id).addEventListener('input', saveScenario);
+  });
+});
+</script>
+</body>
+</html>
